@@ -78,6 +78,17 @@ def create_app(config_class=Config):
     def hello():
         return "Hello, HR App with DB setup!"
 
+    @app.route('/health')
+    def health_check():
+        """Health check endpoint for deployment monitoring."""
+        try:
+            # Test database connection
+            db.session.execute('SELECT 1')
+            return {"status": "healthy", "database": "connected"}, 200
+        except Exception as e:
+            app.logger.error(f"Health check failed: {e}")
+            return {"status": "unhealthy", "error": str(e)}, 500
+
     # Register error handlers
     @app.errorhandler(404)
     def not_found_error(error):
@@ -99,8 +110,14 @@ def create_app(config_class=Config):
     
     # Create database tables
     with app.app_context():
-        db.create_all()
-        from .models.users import insert_initial_roles
-        insert_initial_roles()
+        try:
+            db.create_all()
+            from .models.users import insert_initial_roles
+            insert_initial_roles()
+            app.logger.info("Database tables created successfully")
+        except Exception as e:
+            app.logger.error(f"Error creating database tables: {e}")
+            # Don't fail the app startup for database issues in production
+            pass
     
     return app
