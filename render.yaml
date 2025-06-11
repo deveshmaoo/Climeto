@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: hrms-app
+    env: python
+    buildCommand: "pip install -r requirements-minimal.txt"
+    startCommand: "gunicorn run:app"
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: hrms-db
+          property: connectionString
+  
+  - type: pserv
+    name: hrms-db
+    env: postgresql
+    plan: free
+    databaseName: hrms
+    databaseUser: hrms_user 
