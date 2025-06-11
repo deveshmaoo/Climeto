@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+
+{% block title %}Employee Profile - HRMS{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Employee Profile</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <button type="button" class="btn btn-outline-secondary">
+            <i class="fas fa-edit"></i> Edit Profile
+        </button>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body text-center">
+                <div class="mb-3">
+                    <i class="fas fa-user-circle text-muted" style="font-size: 5rem;"></i>
+                </div>
+                {% if employee %}
+                <h5 class="card-title">{{ employee.full_name }}</h5>
+                <p class="text-muted">{{ employee.designation }}</p>
+                <p class="text-muted">{{ employee.department }}</p>
+                <p class="text-muted">Employee ID: {{ employee.employee_id }}</p>
+                {% else %}
+                <h5 class="card-title">{{ current_user.email }}</h5>
+                <p class="text-muted">Profile not completed</p>
+                <div class="alert alert-warning">
+                    <small>Please complete your employee profile</small>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        {% if employee %}
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0">Personal Information</h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <strong>First Name:</strong>
+                        <p>{{ employee.first_name }}</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <strong>Last Name:</strong>
+                        <p>{{ employee.last_name }}</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <strong>Date of Birth:</strong>
+                        <p>{{ employee.date_of_birth.strftime('%B %d, %Y') if employee.date_of_birth else 'Not provided' }}</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <strong>Gender:</strong>
+                        <p>{{ employee.gender or 'Not provided' }}</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <strong>Personal Email:</strong>
+                        <p>{{ employee.personal_email or 'Not provided' }}</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <strong>Phone:</strong>
+                        <p>{{ employee.phone or 'Not provided' }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header">
+                <h6 class="mb-0">Work Information</h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <strong>Department:</strong>
+                        <p>{{ employee.department }}</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <strong>Designation:</strong>
+                        <p>{{ employee.designation }}</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <strong>Joining Date:</strong>
+                        <p>{{ employee.joining_date.strftime('%B %d, %Y') if employee.joining_date else 'Not provided' }}</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <strong>Employment Status:</strong>
+                        <span class="badge bg-success">{{ employee.employment_status }}</span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <strong>Work Email:</strong>
+                        <p>{{ employee.work_email or 'Not provided' }}</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <strong>Work Phone:</strong>
+                        <p>{{ employee.work_phone or 'Not provided' }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        {% if employee.address %}
+        <div class="card mt-3">
+            <div class="card-header">
+                <h6 class="mb-0">Address</h6>
+            </div>
+            <div class="card-body">
+                <p>{{ employee.address }}</p>
+            </div>
+        </div>
+        {% endif %}
+        
+        {% else %}
+        <div class="card">
+            <div class="card-body text-center">
+                <i class="fas fa-user-plus text-muted mb-3" style="font-size: 3rem;"></i>
+                <h5>Complete Your Profile</h5>
+                <p class="text-muted">Your employee profile is not set up yet. Please contact HR to complete your profile setup.</p>
+                <button class="btn btn-primary">
+                    <i class="fas fa-envelope"></i> Contact HR
+                </button>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %} 

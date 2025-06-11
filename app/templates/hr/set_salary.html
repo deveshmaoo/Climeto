@@ -1,0 +1,237 @@
+{% extends "base.html" %}
+
+{% block title %}Set Salary - {{ employee.full_name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-dollar-sign text-primary"></i> 
+                    {% if current_salary %}Update{% else %}Set{% endif %} Salary - {{ employee.full_name }}
+                </h2>
+                <a href="{{ url_for('hr.salary_management') }}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Salary Management
+                </a>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Salary Details</h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="POST">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="basic_salary" class="form-label">Basic Salary (Annual) <span class="text-danger">*</span></label>
+                                            <div class="input-group">
+                                                <span class="input-group-text">$</span>
+                                                <input type="number" class="form-control" id="basic_salary" name="basic_salary" 
+                                                       required step="1000" min="0"
+                                                       value="{{ current_salary.basic_salary if current_salary else '' }}"
+                                                       placeholder="50000">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="effective_from" class="form-label">Effective From <span class="text-danger">*</span></label>
+                                            <input type="date" class="form-control" id="effective_from" name="effective_from" 
+                                                   required value="{{ current_salary.effective_from if current_salary else '' }}">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <h6 class="border-bottom pb-2 mb-3">Allowances</h6>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="hra" class="form-label">House Rent Allowance (HRA)</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text">$</span>
+                                                <input type="number" class="form-control" id="hra" name="hra" 
+                                                       step="100" min="0"
+                                                       value="{{ current_salary.hra if current_salary else '0' }}"
+                                                       placeholder="0">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="transport_allowance" class="form-label">Transport Allowance</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text">$</span>
+                                                <input type="number" class="form-control" id="transport_allowance" name="transport_allowance" 
+                                                       step="100" min="0"
+                                                       value="{{ current_salary.transport_allowance if current_salary else '0' }}"
+                                                       placeholder="0">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="medical_allowance" class="form-label">Medical Allowance</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text">$</span>
+                                                <input type="number" class="form-control" id="medical_allowance" name="medical_allowance" 
+                                                       step="100" min="0"
+                                                       value="{{ current_salary.medical_allowance if current_salary else '0' }}"
+                                                       placeholder="0">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="special_allowance" class="form-label">Special Allowance</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text">$</span>
+                                                <input type="number" class="form-control" id="special_allowance" name="special_allowance" 
+                                                       step="100" min="0"
+                                                       value="{{ current_salary.special_allowance if current_salary else '0' }}"
+                                                       placeholder="0">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="bonus" class="form-label">Annual Bonus</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text">$</span>
+                                                <input type="number" class="form-control" id="bonus" name="bonus" 
+                                                       step="100" min="0"
+                                                       value="{{ current_salary.bonus if current_salary else '0' }}"
+                                                       placeholder="0">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="overtime_rate" class="form-label">Overtime Rate (per hour)</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text">$</span>
+                                                <input type="number" class="form-control" id="overtime_rate" name="overtime_rate" 
+                                                       step="1" min="0"
+                                                       value="{{ current_salary.overtime_rate if current_salary else '0' }}"
+                                                       placeholder="0">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="d-flex justify-content-between">
+                                    <a href="{{ url_for('hr.salary_management') }}" class="btn btn-outline-secondary">
+                                        <i class="fas fa-times"></i> Cancel
+                                    </a>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save"></i> {% if current_salary %}Update Salary{% else %}Set Salary{% endif %}
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <!-- Employee Info -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">Employee Information</h5>
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Name:</strong> {{ employee.full_name }}</p>
+                            <p><strong>Employee ID:</strong> {{ employee.employee_id }}</p>
+                            <p><strong>Department:</strong> {{ employee.department }}</p>
+                            <p><strong>Designation:</strong> {{ employee.designation }}</p>
+                            <p><strong>Joining Date:</strong> {{ employee.joining_date.strftime('%Y-%m-%d') }}</p>
+                        </div>
+                    </div>
+
+                    <!-- Salary Calculator -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Salary Calculator</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-2">
+                                <strong>Gross Annual Salary:</strong>
+                                <div class="h5 text-success" id="gross-salary">$0</div>
+                            </div>
+                            <hr>
+                            <div class="small">
+                                <div class="d-flex justify-content-between">
+                                    <span>Basic:</span>
+                                    <span id="basic-display">$0</span>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <span>HRA:</span>
+                                    <span id="hra-display">$0</span>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <span>Transport:</span>
+                                    <span id="transport-display">$0</span>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <span>Medical:</span>
+                                    <span id="medical-display">$0</span>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <span>Special:</span>
+                                    <span id="special-display">$0</span>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <span>Bonus:</span>
+                                    <span id="bonus-display">$0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function updateSalaryCalculator() {
+    const basic = parseFloat(document.getElementById('basic_salary').value) || 0;
+    const hra = parseFloat(document.getElementById('hra').value) || 0;
+    const transport = parseFloat(document.getElementById('transport_allowance').value) || 0;
+    const medical = parseFloat(document.getElementById('medical_allowance').value) || 0;
+    const special = parseFloat(document.getElementById('special_allowance').value) || 0;
+    const bonus = parseFloat(document.getElementById('bonus').value) || 0;
+    
+    const gross = basic + hra + transport + medical + special + bonus;
+    
+    document.getElementById('gross-salary').textContent = '$' + gross.toLocaleString();
+    document.getElementById('basic-display').textContent = '$' + basic.toLocaleString();
+    document.getElementById('hra-display').textContent = '$' + hra.toLocaleString();
+    document.getElementById('transport-display').textContent = '$' + transport.toLocaleString();
+    document.getElementById('medical-display').textContent = '$' + medical.toLocaleString();
+    document.getElementById('special-display').textContent = '$' + special.toLocaleString();
+    document.getElementById('bonus-display').textContent = '$' + bonus.toLocaleString();
+}
+
+// Add event listeners to all salary inputs
+['basic_salary', 'hra', 'transport_allowance', 'medical_allowance', 'special_allowance', 'bonus'].forEach(id => {
+    document.getElementById(id).addEventListener('input', updateSalaryCalculator);
+});
+
+// Initial calculation
+updateSalaryCalculator();
+
+// Set minimum date to today
+document.getElementById('effective_from').min = new Date().toISOString().split('T')[0];
+</script>
+{% endblock %} 

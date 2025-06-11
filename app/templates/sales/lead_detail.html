@@ -1,0 +1,321 @@
+{% extends "base.html" %}
+
+{% block title %}{{ lead.company_name }} - Lead Details{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">
+        <i class="fas fa-building"></i> {{ lead.company_name }}
+        <span class="badge 
+            {% if lead.status == 'New' %}bg-secondary
+            {% elif lead.status == 'Qualified' %}bg-info
+            {% elif lead.status == 'Proposal' %}bg-warning
+            {% elif lead.status == 'Negotiation' %}bg-primary
+            {% elif lead.status == 'Closed Won' %}bg-success
+            {% else %}bg-danger{% endif %} ms-2">
+            {{ lead.status }}
+        </span>
+    </h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group me-2">
+            <a href="{{ url_for('sales.list_leads') }}" class="btn btn-sm btn-outline-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Leads
+            </a>
+            {% if current_user.can_view_all_activities() or lead.assigned_to_id == current_user.employee.id %}
+            <a href="{{ url_for('sales.edit_lead', id=lead.id) }}" class="btn btn-sm btn-outline-primary">
+                <i class="fas fa-edit"></i> Edit Lead
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Lead Information -->
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-info-circle"></i> Lead Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <table class="table table-borderless">
+                            <tr>
+                                <td><strong>Company:</strong></td>
+                                <td>{{ lead.company_name }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Contact Person:</strong></td>
+                                <td>{{ lead.contact_person }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Email:</strong></td>
+                                <td><a href="mailto:{{ lead.email }}">{{ lead.email }}</a></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Phone:</strong></td>
+                                <td>
+                                    {% if lead.phone %}
+                                        <a href="tel:{{ lead.phone }}">{{ lead.phone }}</a>
+                                    {% else %}
+                                        <span class="text-muted">Not provided</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Industry:</strong></td>
+                                <td>{{ lead.industry or 'Not specified' }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <table class="table table-borderless">
+                            <tr>
+                                <td><strong>Status:</strong></td>
+                                <td>
+                                    <span class="badge 
+                                        {% if lead.status == 'New' %}bg-secondary
+                                        {% elif lead.status == 'Qualified' %}bg-info
+                                        {% elif lead.status == 'Proposal' %}bg-warning
+                                        {% elif lead.status == 'Negotiation' %}bg-primary
+                                        {% elif lead.status == 'Closed Won' %}bg-success
+                                        {% else %}bg-danger{% endif %}">
+                                        {{ lead.status }}
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Priority:</strong></td>
+                                <td>
+                                    <span class="badge 
+                                        {% if lead.priority == 'High' %}bg-danger
+                                        {% elif lead.priority == 'Medium' %}bg-warning
+                                        {% else %}bg-success{% endif %}">
+                                        {{ lead.priority }}
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Source:</strong></td>
+                                <td>{{ lead.source or 'Not specified' }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Estimated Value:</strong></td>
+                                <td>
+                                    {% if lead.estimated_value %}
+                                        ${{ "{:,.0f}".format(lead.estimated_value) }}
+                                    {% else %}
+                                        <span class="text-muted">Not specified</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Expected Close:</strong></td>
+                                <td>
+                                    {% if lead.expected_close_date %}
+                                        {{ lead.expected_close_date.strftime('%B %d, %Y') }}
+                                    {% else %}
+                                        <span class="text-muted">Not set</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Assigned To:</strong></td>
+                                <td>
+                                    {% if lead.assigned_to %}
+                                        {{ lead.assigned_to.first_name }} {{ lead.assigned_to.last_name }}
+                                    {% else %}
+                                        <span class="text-muted">Unassigned</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                
+                {% if lead.notes %}
+                <div class="mt-3">
+                    <h6><strong>Notes:</strong></h6>
+                    <p class="text-muted">{{ lead.notes }}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Lead Interactions -->
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-comments"></i> Interactions</h5>
+                <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addInteractionModal">
+                    <i class="fas fa-plus"></i> Add Interaction
+                </button>
+            </div>
+            <div class="card-body">
+                {% if interactions %}
+                    <div class="timeline">
+                        {% for interaction in interactions %}
+                        <div class="timeline-item mb-3">
+                            <div class="timeline-marker bg-primary"></div>
+                            <div class="timeline-content">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h6 class="mb-1">
+                                            <span class="badge bg-info">{{ interaction.interaction_type }}</span>
+                                            {{ interaction.interaction_date.strftime('%B %d, %Y at %I:%M %p') }}
+                                        </h6>
+                                        <p class="mb-2">{{ interaction.description }}</p>
+                                        {% if interaction.next_follow_up %}
+                                        <small class="text-muted">
+                                            <i class="fas fa-calendar"></i> Next follow-up: {{ interaction.next_follow_up.strftime('%B %d, %Y') }}
+                                        </small>
+                                        {% endif %}
+                                    </div>
+                                    <small class="text-muted">
+                                        by {{ interaction.performed_by.first_name }} {{ interaction.performed_by.last_name }}
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-comments fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">No interactions recorded yet.</p>
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addInteractionModal">
+                            <i class="fas fa-plus"></i> Add First Interaction
+                        </button>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="col-md-4">
+        <!-- Quick Actions -->
+        <div class="card mb-3">
+            <div class="card-header">
+                <h6 class="mb-0">Quick Actions</h6>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    {% if lead.status == 'Closed Won' %}
+                    <a href="{{ url_for('sales.convert_lead', id=lead.id) }}" class="btn btn-success">
+                        <i class="fas fa-exchange-alt"></i> Convert to Client
+                    </a>
+                    {% endif %}
+                    <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addInteractionModal">
+                        <i class="fas fa-phone"></i> Log Interaction
+                    </button>
+                    <a href="mailto:{{ lead.email }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-envelope"></i> Send Email
+                    </a>
+                    {% if lead.phone %}
+                    <a href="tel:{{ lead.phone }}" class="btn btn-outline-info">
+                        <i class="fas fa-phone"></i> Call
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Lead Progress -->
+        <div class="card mb-3">
+            <div class="card-header">
+                <h6 class="mb-0">Lead Progress</h6>
+            </div>
+            <div class="card-body">
+                <div class="mb-2">
+                    <small class="text-muted">Created: {{ lead.created_at.strftime('%B %d, %Y') }}</small>
+                </div>
+                <div class="mb-2">
+                    <small class="text-muted">Last Updated: {{ lead.updated_at.strftime('%B %d, %Y') }}</small>
+                </div>
+                <div class="progress mt-3" style="height: 20px;">
+                    {% set progress = 20 if lead.status == 'New' else (40 if lead.status == 'Qualified' else (60 if lead.status == 'Proposal' else (80 if lead.status == 'Negotiation' else 100))) %}
+                    <div class="progress-bar 
+                        {% if lead.status == 'Closed Won' %}bg-success
+                        {% elif lead.status == 'Closed Lost' %}bg-danger
+                        {% else %}bg-primary{% endif %}" 
+                        style="width: {{ progress }}%">
+                        {{ progress }}%
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Interaction Modal -->
+<div class="modal fade" id="addInteractionModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Interaction</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ url_for('sales.add_interaction', id=lead.id) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="interaction_type" class="form-label">Interaction Type</label>
+                        <select name="interaction_type" id="interaction_type" class="form-select" required>
+                            <option value="Call">Phone Call</option>
+                            <option value="Email">Email</option>
+                            <option value="Meeting">Meeting</option>
+                            <option value="Demo">Demo</option>
+                            <option value="Proposal">Proposal</option>
+                            <option value="Follow-up">Follow-up</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea name="description" id="description" class="form-control" rows="3" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="next_follow_up" class="form-label">Next Follow-up Date</label>
+                        <input type="date" name="next_follow_up" id="next_follow_up" class="form-control">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Interaction</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+.timeline {
+    position: relative;
+    padding-left: 30px;
+}
+
+.timeline-item {
+    position: relative;
+}
+
+.timeline-marker {
+    position: absolute;
+    left: -35px;
+    top: 0;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.timeline-content {
+    border-left: 2px solid #dee2e6;
+    padding-left: 20px;
+    padding-bottom: 20px;
+}
+
+.timeline-item:last-child .timeline-content {
+    border-left: none;
+}
+</style>
+{% endblock %} 

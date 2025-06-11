@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+
+{% block title %}Create Job Posting - HR{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-plus text-primary"></i> Create Job Posting</h2>
+                <a href="{{ url_for('hr.job_postings') }}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Job Postings
+                </a>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Job Details</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="mb-3">
+                                    <label for="title" class="form-label">Job Title <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="title" name="title" required
+                                           placeholder="e.g., Senior Software Engineer">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="department" class="form-label">Department <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="department" name="department" required>
+                                        <option value="">Select Department</option>
+                                        <option value="Management">Management</option>
+                                        <option value="HR">HR</option>
+                                        <option value="EPR Compliance">EPR Compliance</option>
+                                        <option value="Project Development">Project Development</option>
+                                        <option value="Digital Marketing">Digital Marketing</option>
+                                        <option value="Business Development">Business Development</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="employment_type" class="form-label">Employment Type</label>
+                                    <select class="form-select" id="employment_type" name="employment_type">
+                                        <option value="Full-time">Full-time</option>
+                                        <option value="Part-time">Part-time</option>
+                                        <option value="Contract">Contract</option>
+                                        <option value="Intern">Intern</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="location" class="form-label">Location</label>
+                                    <input type="text" class="form-control" id="location" name="location"
+                                           placeholder="e.g., New York, NY / Remote">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="openings" class="form-label">Number of Openings</label>
+                                    <input type="number" class="form-control" id="openings" name="openings" 
+                                           value="1" min="1" max="100">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="salary_range_min" class="form-label">Min Salary (Annual)</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        <input type="number" class="form-control" id="salary_range_min" name="salary_range_min"
+                                               placeholder="50000" step="1000">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="salary_range_max" class="form-label">Max Salary (Annual)</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        <input type="number" class="form-control" id="salary_range_max" name="salary_range_max"
+                                               placeholder="80000" step="1000">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="application_deadline" class="form-label">Application Deadline</label>
+                            <input type="date" class="form-control" id="application_deadline" name="application_deadline">
+                            <div class="form-text">Leave empty for no deadline</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Job Description <span class="text-danger">*</span></label>
+                            <textarea class="form-control" id="description" name="description" rows="6" required
+                                      placeholder="Detailed job description, responsibilities, and what the role entails..."></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="requirements" class="form-label">Requirements & Qualifications <span class="text-danger">*</span></label>
+                            <textarea class="form-control" id="requirements" name="requirements" rows="6" required
+                                      placeholder="Required skills, experience, education, and qualifications..."></textarea>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('hr.job_postings') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Create Job Posting
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Auto-set minimum date to today
+document.getElementById('application_deadline').min = new Date().toISOString().split('T')[0];
+
+// Salary validation
+document.getElementById('salary_range_max').addEventListener('blur', function() {
+    const minSalary = parseFloat(document.getElementById('salary_range_min').value);
+    const maxSalary = parseFloat(this.value);
+    
+    if (minSalary && maxSalary && maxSalary < minSalary) {
+        alert('Maximum salary should be greater than minimum salary');
+        this.focus();
+    }
+});
+</script>
+{% endblock %} 

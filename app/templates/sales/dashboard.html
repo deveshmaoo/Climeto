@@ -1,0 +1,250 @@
+{% extends "base.html" %}
+
+{% block title %}Sales Dashboard - HRMS{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2"><i class="fas fa-chart-line"></i> Sales Dashboard</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group me-2">
+            <a href="{{ url_for('sales.create_lead') }}" class="btn btn-sm btn-outline-secondary">
+                <i class="fas fa-plus"></i> New Lead
+            </a>
+            <a href="{{ url_for('sales.sales_funnel') }}" class="btn btn-sm btn-outline-secondary">
+                <i class="fas fa-funnel-dollar"></i> Funnel View
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Sales Metrics -->
+<div class="row mb-4">
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Leads</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ leads|length }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-bullseye fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-success shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Won Deals</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ funnel_data['Closed Won'] }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-trophy fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-info shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Active Clients</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ clients|length }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-handshake fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-warning shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Pipeline Value</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                            ${{ "%.0f"|format(leads|sum(attribute='estimated_value') or 0) }}
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Sales Funnel Overview -->
+<div class="row mb-4">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Sales Funnel Overview</h6>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    {% for stage, count in funnel_data.items() %}
+                    <div class="col-md-2 mb-3">
+                        <div class="funnel-stage-mini border rounded p-2
+                            {% if stage == 'Closed Won' %}bg-success text-white
+                            {% elif stage == 'Closed Lost' %}bg-danger text-white
+                            {% else %}bg-light{% endif %}">
+                            <div class="h6 mb-1">{{ stage }}</div>
+                            <div class="h4 mb-0">{{ count }}</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="text-center mt-3">
+                    <a href="{{ url_for('sales.sales_funnel') }}" class="btn btn-primary">
+                        <i class="fas fa-funnel-dollar"></i> View Interactive Funnel
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card shadow">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Quick Actions</h6>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('sales.create_lead') }}" class="btn btn-outline-primary">
+                        <i class="fas fa-plus"></i> Add New Lead
+                    </a>
+                    <a href="{{ url_for('sales.list_leads') }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-list"></i> View All Leads
+                    </a>
+                    <a href="{{ url_for('sales.list_clients') }}" class="btn btn-outline-info">
+                        <i class="fas fa-users"></i> Manage Clients
+                    </a>
+                    <a href="{{ url_for('sales.analytics') }}" class="btn btn-outline-success">
+                        <i class="fas fa-chart-bar"></i> View Analytics
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Leads and Activities -->
+<div class="row">
+    <div class="col-lg-6">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Recent Leads</h6>
+            </div>
+            <div class="card-body">
+                {% if leads %}
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Company</th>
+                                <th>Contact</th>
+                                <th>Status</th>
+                                <th>Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for lead in leads %}
+                            <tr>
+                                <td>
+                                    <a href="{{ url_for('sales.lead_detail', id=lead.id) }}">
+                                        {{ lead.company_name }}
+                                    </a>
+                                </td>
+                                <td>{{ lead.contact_person }}</td>
+                                <td>
+                                    <span class="badge 
+                                        {% if lead.status == 'Closed Won' %}bg-success
+                                        {% elif lead.status == 'Closed Lost' %}bg-danger
+                                        {% elif lead.status == 'Negotiation' %}bg-warning
+                                        {% else %}bg-primary{% endif %}">
+                                        {{ lead.status }}
+                                    </span>
+                                </td>
+                                <td>${{ "%.0f"|format(lead.estimated_value or 0) }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center text-muted py-4">
+                    <i class="fas fa-inbox fa-3x mb-3"></i>
+                    <p>No leads found. <a href="{{ url_for('sales.create_lead') }}">Create your first lead</a></p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Recent Activities</h6>
+            </div>
+            <div class="card-body">
+                {% if recent_activities %}
+                <div class="timeline">
+                    {% for activity in recent_activities %}
+                    <div class="timeline-item mb-3">
+                        <div class="d-flex">
+                            <div class="timeline-marker bg-primary rounded-circle me-3" style="width: 12px; height: 12px; margin-top: 6px;"></div>
+                            <div class="flex-grow-1">
+                                <h6 class="mb-1">{{ activity.activity_type }}</h6>
+                                <p class="mb-1 text-muted">{{ activity.description }}</p>
+                                <small class="text-muted">{{ activity.created_at.strftime('%b %d, %Y at %I:%M %p') }}</small>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center text-muted py-4">
+                    <i class="fas fa-clock fa-3x mb-3"></i>
+                    <p>No recent activities</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.border-left-primary {
+    border-left: 0.25rem solid #4e73df !important;
+}
+.border-left-success {
+    border-left: 0.25rem solid #1cc88a !important;
+}
+.border-left-info {
+    border-left: 0.25rem solid #36b9cc !important;
+}
+.border-left-warning {
+    border-left: 0.25rem solid #f6c23e !important;
+}
+.funnel-stage-mini {
+    transition: all 0.3s ease;
+}
+.funnel-stage-mini:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+</style>
+{% endblock %} 

@@ -1,0 +1,301 @@
+{% extends "base.html" %}
+
+{% block title %}Sales Analytics - HRMS{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2"><i class="fas fa-chart-bar"></i> Sales Analytics</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group me-2">
+            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="exportAnalytics()">
+                <i class="fas fa-download"></i> Export Report
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Key Metrics -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h2 class="text-primary">{{ leads|length }}</h2>
+                <p class="card-text">Total Leads</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h2 class="text-success">{{ clients|length }}</h2>
+                <p class="card-text">Active Clients</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h2 class="text-info">{{ "%.1f"|format(conversion_rate) }}%</h2>
+                <p class="card-text">Conversion Rate</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h2 class="text-warning">
+                    ${{ "{:,.0f}".format(monthly_revenue.values()|sum) if monthly_revenue else 0 }}
+                </h2>
+                <p class="card-text">Total Revenue</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Row -->
+<div class="row">
+    <!-- Lead Generation Trends -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-chart-line"></i> Lead Generation Trends</h5>
+            </div>
+            <div class="card-body">
+                {% if monthly_leads %}
+                    <canvas id="leadTrendsChart" width="400" height="200"></canvas>
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-chart-line fa-3x text-muted"></i>
+                        <p class="text-muted mt-2">No lead data available</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Revenue by Month -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-dollar-sign"></i> Monthly Revenue</h5>
+            </div>
+            <div class="card-body">
+                {% if monthly_revenue %}
+                    <canvas id="revenueChart" width="400" height="200"></canvas>
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-dollar-sign fa-3x text-muted"></i>
+                        <p class="text-muted mt-2">No revenue data available</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Detailed Analytics -->
+<div class="row">
+    <!-- Lead Status Breakdown -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-pie-chart"></i> Lead Status Breakdown</h5>
+            </div>
+            <div class="card-body">
+                {% set status_counts = {} %}
+                {% for lead in leads %}
+                    {% if status_counts.update({lead.status: status_counts.get(lead.status, 0) + 1}) %}{% endif %}
+                {% endfor %}
+                
+                {% if status_counts %}
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            {% for status, count in status_counts.items() %}
+                            <tr>
+                                <td>
+                                    <span class="badge 
+                                        {% if status == 'New' %}bg-secondary
+                                        {% elif status == 'Qualified' %}bg-info
+                                        {% elif status == 'Proposal' %}bg-warning
+                                        {% elif status == 'Negotiation' %}bg-primary
+                                        {% elif status == 'Closed Won' %}bg-success
+                                        {% else %}bg-danger{% endif %}">
+                                        {{ status }}
+                                    </span>
+                                </td>
+                                <td>{{ count }}</td>
+                                <td>
+                                    <div class="progress" style="height: 10px;">
+                                        <div class="progress-bar" style="width: {{ (count / leads|length * 100)|round(1) }}%"></div>
+                                    </div>
+                                </td>
+                                <td class="text-end">{{ (count / leads|length * 100)|round(1) }}%</td>
+                            </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-muted text-center">No lead status data available</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Performing Sources -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-star"></i> Lead Sources</h5>
+            </div>
+            <div class="card-body">
+                {% set source_counts = {} %}
+                {% for lead in leads %}
+                    {% if lead.source %}
+                        {% if source_counts.update({lead.source: source_counts.get(lead.source, 0) + 1}) %}{% endif %}
+                    {% endif %}
+                {% endfor %}
+                
+                {% if source_counts %}
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            {% for source, count in source_counts.items()|sort(attribute=1, reverse=true) %}
+                            <tr>
+                                <td>{{ source }}</td>
+                                <td>{{ count }}</td>
+                                <td>
+                                    <div class="progress" style="height: 10px;">
+                                        <div class="progress-bar bg-info" style="width: {{ (count / leads|length * 100)|round(1) }}%"></div>
+                                    </div>
+                                </td>
+                                <td class="text-end">{{ (count / leads|length * 100)|round(1) }}%</td>
+                            </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-muted text-center">No lead source data available</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Activity -->
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-clock"></i> Recent Sales Activity</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Company</th>
+                                <th>Status</th>
+                                <th>Value</th>
+                                <th>Assigned To</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for lead in leads[:10] %}
+                            <tr>
+                                <td>{{ lead.created_at.strftime('%b %d, %Y') }}</td>
+                                <td>{{ lead.company_name }}</td>
+                                <td>
+                                    <span class="badge 
+                                        {% if lead.status == 'New' %}bg-secondary
+                                        {% elif lead.status == 'Qualified' %}bg-info
+                                        {% elif lead.status == 'Proposal' %}bg-warning
+                                        {% elif lead.status == 'Negotiation' %}bg-primary
+                                        {% elif lead.status == 'Closed Won' %}bg-success
+                                        {% else %}bg-danger{% endif %}">
+                                        {{ lead.status }}
+                                    </span>
+                                </td>
+                                <td>${{ "{:,.0f}".format(lead.estimated_value) if lead.estimated_value else 'N/A' }}</td>
+                                <td>
+                                    {% if lead.assigned_to %}
+                                        {{ lead.assigned_to.first_name }} {{ lead.assigned_to.last_name }}
+                                    {% else %}
+                                        <span class="text-muted">Unassigned</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chart.js Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Lead Trends Chart
+{% if monthly_leads %}
+const leadCtx = document.getElementById('leadTrendsChart').getContext('2d');
+new Chart(leadCtx, {
+    type: 'line',
+    data: {
+        labels: {{ monthly_leads.keys()|list|tojson }},
+        datasets: [{
+            label: 'Leads Generated',
+            data: {{ monthly_leads.values()|list|tojson }},
+            borderColor: 'rgb(75, 192, 192)',
+            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+            tension: 0.1
+        }]
+    },
+    options: {
+        responsive: true,
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+{% endif %}
+
+// Revenue Chart
+{% if monthly_revenue %}
+const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+new Chart(revenueCtx, {
+    type: 'bar',
+    data: {
+        labels: {{ monthly_revenue.keys()|list|tojson }},
+        datasets: [{
+            label: 'Revenue ($)',
+            data: {{ monthly_revenue.values()|list|tojson }},
+            backgroundColor: 'rgba(54, 162, 235, 0.5)',
+            borderColor: 'rgb(54, 162, 235)',
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true,
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    callback: function(value) {
+                        return '$' + value.toLocaleString();
+                    }
+                }
+            }
+        }
+    }
+});
+{% endif %}
+
+function exportAnalytics() {
+    // Simple export functionality
+    window.print();
+}
+</script>
+{% endblock %} 

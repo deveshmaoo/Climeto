@@ -1,0 +1,253 @@
+{% extends "base.html" %}
+
+{% block title %}Sales Funnel - HRMS{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2"><i class="fas fa-funnel-dollar"></i> Sales Funnel</h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <div class="btn-group me-2">
+                <a href="{{ url_for('sales.create_lead') }}" class="btn btn-sm btn-outline-secondary">
+                    <i class="fas fa-plus"></i> Add Lead
+                </a>
+                <a href="{{ url_for('sales.analytics') }}" class="btn btn-sm btn-outline-secondary">
+                    <i class="fas fa-chart-bar"></i> Analytics
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Funnel Overview -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Pipeline Overview</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        {% for stage, leads in funnel_stages.items() %}
+                        <div class="col-md-2">
+                            <div class="funnel-stage border rounded p-3 mb-2 
+                                {% if stage == 'Closed Won' %}bg-success text-white
+                                {% elif stage == 'Closed Lost' %}bg-danger text-white
+                                {% else %}bg-light{% endif %}">
+                                <h6>{{ stage }}</h6>
+                                <div class="h4 mb-1">{{ leads|length }}</div>
+                                <small class="text-muted">
+                                    ${{ "%.2f"|format(total_value_by_stage[stage]/1000) }}K
+                                </small>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Interactive Funnel Board -->
+    <div class="row">
+        {% for stage, leads in funnel_stages.items() %}
+        <div class="col-lg-2 col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-primary text-white">
+                    <h6 class="mb-0">
+                        {{ stage }}
+                        <span class="badge bg-light text-dark float-end">{{ leads|length }}</span>
+                    </h6>
+                </div>
+                <div class="card-body p-2 funnel-column" data-stage="{{ stage }}" style="min-height: 400px; max-height: 500px; overflow-y: auto;">
+                    {% for lead in leads %}
+                    <div class="lead-card card mb-2 draggable" data-lead-id="{{ lead.id }}" style="cursor: move;">
+                        <div class="card-body p-2">
+                            <h6 class="card-title mb-1" style="font-size: 0.9rem;">{{ lead.company_name }}</h6>
+                            <p class="card-text mb-1" style="font-size: 0.8rem;">
+                                <strong>{{ lead.contact_person }}</strong><br>
+                                <span class="text-muted">{{ lead.email }}</span>
+                            </p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">
+                                    ${{ "%.0f"|format(lead.estimated_value or 0) }}
+                                </small>
+                                <span class="badge 
+                                    {% if lead.priority == 'High' %}bg-danger
+                                    {% elif lead.priority == 'Medium' %}bg-warning
+                                    {% else %}bg-secondary{% endif %}">
+                                    {{ lead.priority }}
+                                </span>
+                            </div>
+                            <div class="mt-2">
+                                <a href="{{ url_for('sales.lead_detail', id=lead.id) }}" 
+                                   class="btn btn-sm btn-outline-primary">View</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    
+                    {% if leads|length == 0 %}
+                    <div class="text-center text-muted py-4">
+                        <i class="fas fa-inbox fa-2x mb-2"></i>
+                        <p>No leads in this stage</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Conversion Analytics -->
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Conversion Rates</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for conversion, rate in conversion_rates.items() %}
+                        <div class="col-md-3 mb-3">
+                            <div class="text-center">
+                                <div class="h4 text-primary">{{ "%.1f"|format(rate) }}%</div>
+                                <small class="text-muted">{{ conversion.replace('_to_', ' → ').replace('_', ' ') }}</small>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Update Lead Status Modal -->
+<div class="modal fade" id="updateStatusModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Update Lead Status</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to move <strong id="leadName"></strong> to <strong id="newStatus"></strong>?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="confirmUpdate">Update</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.funnel-stage {
+    transition: all 0.3s ease;
+}
+.funnel-stage:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+.funnel-column {
+    border: 2px dashed transparent;
+}
+.funnel-column.drag-over {
+    border-color: #007bff;
+    background-color: rgba(0,123,255,0.1);
+}
+.lead-card {
+    transition: all 0.3s ease;
+}
+.lead-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+.draggable {
+    cursor: move;
+}
+.dragging {
+    opacity: 0.5;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Make lead cards draggable
+    const leadCards = document.querySelectorAll('.lead-card');
+    const funnelColumns = document.querySelectorAll('.funnel-column');
+    
+    leadCards.forEach(card => {
+        card.addEventListener('dragstart', function(e) {
+            e.dataTransfer.setData('text/plain', this.dataset.leadId);
+            this.classList.add('dragging');
+        });
+        
+        card.addEventListener('dragend', function() {
+            this.classList.remove('dragging');
+        });
+        
+        card.setAttribute('draggable', true);
+    });
+    
+    funnelColumns.forEach(column => {
+        column.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            this.classList.add('drag-over');
+        });
+        
+        column.addEventListener('dragleave', function() {
+            this.classList.remove('drag-over');
+        });
+        
+        column.addEventListener('drop', function(e) {
+            e.preventDefault();
+            this.classList.remove('drag-over');
+            
+            const leadId = e.dataTransfer.getData('text/plain');
+            const newStatus = this.dataset.stage;
+            const leadCard = document.querySelector(`[data-lead-id="${leadId}"]`);
+            const leadName = leadCard.querySelector('.card-title').textContent;
+            
+            // Show confirmation modal
+            document.getElementById('leadName').textContent = leadName;
+            document.getElementById('newStatus').textContent = newStatus;
+            
+            const modal = new bootstrap.Modal(document.getElementById('updateStatusModal'));
+            modal.show();
+            
+            // Handle confirmation
+            document.getElementById('confirmUpdate').onclick = function() {
+                updateLeadStatus(leadId, newStatus);
+                modal.hide();
+            };
+        });
+    });
+});
+
+function updateLeadStatus(leadId, newStatus) {
+    fetch(`/sales/lead/${leadId}/update-status`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({
+            status: newStatus
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload(); // Refresh to show updated funnel
+        } else {
+            alert('Error updating lead status: ' + data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error updating lead status');
+    });
+}
+</script>
+{% endblock %} 

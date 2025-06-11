@@ -1,0 +1,199 @@
+{% extends "base.html" %}
+
+{% block title %}Create Lead - HRMS{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2"><i class="fas fa-user-plus"></i> Create New Lead</h1>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Lead Information</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    {{ form.hidden_tag() }}
+                    
+                    <!-- Company Information -->
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.company_name.label(class="form-label") }}
+                            {{ form.company_name(class="form-control") }}
+                            {% for error in form.company_name.errors %}
+                                <div class="text-danger small">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            {{ form.industry.label(class="form-label") }}
+                            {{ form.industry(class="form-control") }}
+                            {% for error in form.industry.errors %}
+                                <div class="text-danger small">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <!-- Contact Information -->
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.contact_person.label(class="form-label") }}
+                            {{ form.contact_person(class="form-control") }}
+                            {% for error in form.contact_person.errors %}
+                                <div class="text-danger small">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            {{ form.email.label(class="form-label") }}
+                            {{ form.email(class="form-control") }}
+                            {% for error in form.email.errors %}
+                                <div class="text-danger small">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.phone.label(class="form-label") }}
+                            {{ form.phone(class="form-control") }}
+                            {% for error in form.phone.errors %}
+                                <div class="text-danger small">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            {{ form.source.label(class="form-label") }}
+                            {{ form.source(class="form-select") }}
+                            {% for error in form.source.errors %}
+                                <div class="text-danger small">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <!-- Lead Details -->
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.priority.label(class="form-label") }}
+                            {{ form.priority(class="form-select") }}
+                            {% for error in form.priority.errors %}
+                                <div class="text-danger small">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            {{ form.assigned_to.label(class="form-label") }}
+                            {{ form.assigned_to(class="form-select") }}
+                            {% for error in form.assigned_to.errors %}
+                                <div class="text-danger small">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.estimated_value.label(class="form-label") }}
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                {{ form.estimated_value(class="form-control") }}
+                            </div>
+                            {% for error in form.estimated_value.errors %}
+                                <div class="text-danger small">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            {{ form.expected_close_date.label(class="form-label") }}
+                            {{ form.expected_close_date(class="form-control") }}
+                            {% for error in form.expected_close_date.errors %}
+                                <div class="text-danger small">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.notes.label(class="form-label") }}
+                        {{ form.notes(class="form-control", rows="3") }}
+                        {% for error in form.notes.errors %}
+                            <div class="text-danger small">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('sales.list_leads') }}" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Cancel
+                        </a>
+                        {{ form.submit(class="btn btn-primary") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0">Lead Guidelines</h6>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled">
+                    <li class="mb-2">
+                        <strong>Company Name:</strong><br>
+                        <small class="text-muted">Enter the full legal name of the company</small>
+                    </li>
+                    <li class="mb-2">
+                        <strong>Contact Person:</strong><br>
+                        <small class="text-muted">Primary decision maker or contact person</small>
+                    </li>
+                    <li class="mb-2">
+                        <strong>Lead Source:</strong><br>
+                        <small class="text-muted">How did this lead come to us?</small>
+                    </li>
+                    <li class="mb-2">
+                        <strong>Priority:</strong><br>
+                        <small class="text-muted">Set based on potential value and urgency</small>
+                    </li>
+                    <li class="mb-2">
+                        <strong>Estimated Value:</strong><br>
+                        <small class="text-muted">Potential project value in USD</small>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header">
+                <h6 class="mb-0">Lead Status Guide</h6>
+            </div>
+            <div class="card-body">
+                <div class="mb-2">
+                    <span class="badge bg-secondary me-2">New</span>
+                    <small>Just received, needs qualification</small>
+                </div>
+                <div class="mb-2">
+                    <span class="badge bg-info me-2">Qualified</span>
+                    <small>Verified as potential customer</small>
+                </div>
+                <div class="mb-2">
+                    <span class="badge bg-warning me-2">Proposal</span>
+                    <small>Proposal sent, awaiting response</small>
+                </div>
+                <div class="mb-2">
+                    <span class="badge bg-primary me-2">Negotiation</span>
+                    <small>In active negotiation</small>
+                </div>
+                <div class="mb-2">
+                    <span class="badge bg-success me-2">Closed Won</span>
+                    <small>Successfully converted to client</small>
+                </div>
+                <div class="mb-2">
+                    <span class="badge bg-danger me-2">Closed Lost</span>
+                    <small>Did not convert to client</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

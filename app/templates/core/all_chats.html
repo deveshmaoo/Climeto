@@ -1,0 +1,229 @@
+{% extends "base.html" %}
+
+{% block title %}All Chat Messages{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2"><i class="fas fa-comments"></i> All Chat Messages</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group me-2">
+            <a href="{{ url_for('core.dashboard') }}" class="btn btn-sm btn-outline-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title"><i class="fas fa-filter"></i> Filter Messages</h6>
+                <div class="row align-items-end">
+                    <div class="col-md-2">
+                        <label for="filterType" class="form-label">Message Type</label>
+                        <select class="form-select" id="filterType" onchange="applyFilters()">
+                            <option value="all" {% if filter_type == 'all' %}selected{% endif %}>All Messages</option>
+                            <option value="text" {% if filter_type == 'text' %}selected{% endif %}>Text Only</option>
+                            <option value="files" {% if filter_type == 'files' %}selected{% endif %}>Files & Images</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label for="filterTime" class="form-label">Time Period</label>
+                        <select class="form-select" id="filterTime" onchange="applyFilters()">
+                            <option value="all" {% if filter_type == 'all' %}selected{% endif %}>All Time</option>
+                            <option value="today" {% if filter_type == 'today' %}selected{% endif %}>Today</option>
+                            <option value="week" {% if filter_type == 'week' %}selected{% endif %}>This Week</option>
+                            <option value="month">This Month</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="searchQuery" class="form-label">Search Messages</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="searchQuery" placeholder="Search in messages...">
+                            <button class="btn btn-outline-secondary" type="button" onclick="searchMessages()">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <label for="filterProject" class="form-label">Project</label>
+                        <select class="form-select" id="filterProject" onchange="applyFilters()">
+                            <option value="all">All Projects</option>
+                            <!-- Projects would be populated by backend -->
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <button type="button" class="btn btn-secondary" onclick="clearFilters()">
+                            <i class="fas fa-times"></i> Clear Filters
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="refreshChats()">
+                            <i class="fas fa-sync"></i> Refresh
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chat Messages -->
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-comment-dots"></i> Messages</h5>
+                <span class="badge bg-secondary">{{ chats|length }} messages</span>
+            </div>
+            <div class="card-body p-0">
+                {% if chats %}
+                    <div class="chat-container" style="max-height: 600px; overflow-y: auto;">
+                        {% for chat in chats %}
+                        <div class="chat-message border-bottom p-3 {% if loop.index % 2 == 0 %}bg-light{% endif %}">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div class="flex-grow-1">
+                                    <!-- Message Header -->
+                                    <div class="d-flex align-items-center mb-2">
+                                        <div class="avatar-circle me-2">
+                                            {{ chat.sender.first_name[0] if chat.sender.first_name else 'U' }}
+                                        </div>
+                                        <div>
+                                            <strong>{{ chat.sender.first_name }} {{ chat.sender.last_name }}</strong>
+                                            <small class="text-muted ms-2">
+                                                in <a href="{{ url_for('project.view_project', id=chat.project.id) }}" class="text-decoration-none">
+                                                    {{ chat.project.name }}
+                                                </a>
+                                            </small>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Message Content -->
+                                    <div class="message-content">
+                                        {% if chat.message_type == 'image' %}
+                                            <div class="mb-2">
+                                                <img src="{{ url_for('static', filename='uploads/' + chat.file_path) }}" 
+                                                     alt="Shared image" class="img-thumbnail" style="max-width: 300px;">
+                                            </div>
+                                            {% if chat.message != 'Shared a file: ' + chat.file_name %}
+                                                <p class="mb-0">{{ chat.message }}</p>
+                                            {% endif %}
+                                        {% elif chat.message_type == 'file' %}
+                                            <div class="file-attachment">
+                                                <i class="fas fa-file me-2"></i>
+                                                <a href="{{ url_for('static', filename='uploads/' + chat.file_path) }}" 
+                                                   class="text-decoration-none" download>
+                                                    {{ chat.file_name }}
+                                                </a>
+                                                <small class="text-muted ms-2">
+                                                    ({{ (chat.file_size / 1024)|round(1) }} KB)
+                                                </small>
+                                            </div>
+                                            {% if chat.message != 'Shared a file: ' + chat.file_name %}
+                                                <p class="mb-0 mt-2">{{ chat.message }}</p>
+                                            {% endif %}
+                                        {% else %}
+                                            <p class="mb-0">{{ chat.message }}</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <!-- Timestamp -->
+                                <div class="text-end">
+                                    <small class="text-muted">
+                                        {{ chat.created_at.strftime('%b %d, %Y') }}<br>
+                                        {{ chat.created_at.strftime('%I:%M %p') }}
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-comments fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No Messages Found</h5>
+                        <p class="text-muted">
+                            {% if filter_type != 'all' %}
+                                No messages match the current filter criteria.
+                            {% else %}
+                                No chat messages available yet.
+                            {% endif %}
+                        </p>
+                        {% if filter_type != 'all' %}
+                            <button type="button" class="btn btn-primary" onclick="clearFilters()">
+                                <i class="fas fa-times"></i> Clear Filters
+                            </button>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.avatar-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #007bff;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.chat-message:hover {
+    background-color: #f8f9fa !important;
+}
+
+.file-attachment {
+    padding: 10px;
+    background-color: #f8f9fa;
+    border-radius: 5px;
+    border-left: 4px solid #007bff;
+}
+</style>
+
+<script>
+function applyFilters() {
+    const filterType = document.getElementById('filterType').value;
+    const filterTime = document.getElementById('filterTime').value;
+    const filterProject = document.getElementById('filterProject').value;
+    
+    const params = new URLSearchParams();
+    if (filterType !== 'all') params.set('filter', filterType);
+    if (filterTime !== 'all') params.set('time', filterTime);
+    if (filterProject !== 'all') params.set('project', filterProject);
+    
+    window.location.href = '{{ url_for("core.all_chats") }}?' + params.toString();
+}
+
+function clearFilters() {
+    window.location.href = '{{ url_for("core.all_chats") }}';
+}
+
+function refreshChats() {
+    window.location.reload();
+}
+
+function searchMessages() {
+    const query = document.getElementById('searchQuery').value;
+    if (query.trim()) {
+        const params = new URLSearchParams(window.location.search);
+        params.set('search', query);
+        window.location.href = '{{ url_for("core.all_chats") }}?' + params.toString();
+    }
+}
+
+// Auto-scroll to bottom for new messages
+document.addEventListener('DOMContentLoaded', function() {
+    const chatContainer = document.querySelector('.chat-container');
+    if (chatContainer) {
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+});
+</script>
+{% endblock %} 

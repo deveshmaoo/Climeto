@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}Project List - HRMS{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">All Projects</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <a href="{{ url_for('project.create_project') }}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> New Project
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Project Name</th>
+                        <th>Status</th>
+                        <th>Progress</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if projects %}
+                        {% for project in projects %}
+                        <tr>
+                            <td>
+                                <a href="{{ url_for('project.view_project', id=project.id) }}" class="text-decoration-none">
+                                    {{ project.name }}
+                                </a>
+                            </td>
+                            <td>
+                                <span class="badge bg-{{ 'success' if project.status == 'Active' else 'secondary' }}">
+                                    {{ project.status }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="progress" style="height: 20px;">
+                                    <div class="progress-bar" role="progressbar" style="width: {{ project.progress or 0 }}%">
+                                        {{ project.progress or 0 }}%
+                                    </div>
+                                </div>
+                            </td>
+                            <td>{{ project.start_date.strftime('%Y-%m-%d') if project.start_date else 'N/A' }}</td>
+                            <td>{{ project.end_date.strftime('%Y-%m-%d') if project.end_date else 'N/A' }}</td>
+                            <td>
+                                <a href="{{ url_for('project.view_project', id=project.id) }}" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-eye"></i> View
+                                </a>
+                                <a href="{{ url_for('project.project_tasks', id=project.id) }}" class="btn btn-sm btn-outline-secondary">
+                                    <i class="fas fa-tasks"></i> Tasks
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center text-muted">
+                                <i class="fas fa-project-diagram fa-2x mb-2"></i>
+                                <p>No projects found</p>
+                                <a href="{{ url_for('project.create_project') }}" class="btn btn-primary">Create First Project</a>
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %} 

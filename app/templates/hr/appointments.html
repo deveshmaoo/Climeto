@@ -1,0 +1,234 @@
+{% extends "base.html" %}
+
+{% block title %}Appointments - HR{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-calendar-check text-primary"></i> Appointment Management</h2>
+                <a href="{{ url_for('hr.create_appointment') }}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Schedule New Appointment
+                </a>
+            </div>
+
+            <!-- Status Filter -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Filter Appointments</h5>
+                </div>
+                <div class="card-body">
+                    <div class="btn-group" role="group">
+                        <a href="{{ url_for('hr.appointments') }}" class="btn btn-outline-primary {{ 'active' if not request.args.get('status') else '' }}">
+                            All Appointments
+                        </a>
+                        <a href="{{ url_for('hr.appointments', status='Pending') }}" class="btn btn-outline-warning {{ 'active' if request.args.get('status') == 'Pending' else '' }}">
+                            Pending
+                        </a>
+                        <a href="{{ url_for('hr.appointments', status='Confirmed') }}" class="btn btn-outline-success {{ 'active' if request.args.get('status') == 'Confirmed' else '' }}">
+                            Confirmed
+                        </a>
+                        <a href="{{ url_for('hr.appointments', status='Completed') }}" class="btn btn-outline-info {{ 'active' if request.args.get('status') == 'Completed' else '' }}">
+                            Completed
+                        </a>
+                        <a href="{{ url_for('hr.appointments', status='Cancelled') }}" class="btn btn-outline-danger {{ 'active' if request.args.get('status') == 'Cancelled' else '' }}">
+                            Cancelled
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Appointments List -->
+            {% if appointments %}
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-list"></i> Appointments
+                        <span class="badge bg-primary ms-2">{{ appointments|length }}</span>
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Date & Time</th>
+                                    <th>Title</th>
+                                    <th>Organizer</th>
+                                    <th>Participants</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for appointment in appointments %}
+                                <tr>
+                                    <td>
+                                        <div>
+                                            <strong>{{ appointment.appointment_date.strftime('%B %d, %Y') }}</strong>
+                                        </div>
+                                        <div class="text-muted small">
+                                            {{ appointment.start_time.strftime('%I:%M %p') }} - 
+                                            {{ appointment.end_time.strftime('%I:%M %p') if appointment.end_time else 'Open' }}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div>
+                                            <strong>{{ appointment.title }}</strong>
+                                        </div>
+                                        {% if appointment.description %}
+                                        <div class="text-muted small">{{ appointment.description[:100] }}{{ '...' if appointment.description|length > 100 else '' }}</div>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div>
+                                            {{ appointment.organizer.first_name }} {{ appointment.organizer.last_name }}
+                                        </div>
+                                        <div class="text-muted small">{{ appointment.organizer.department }}</div>
+                                    </td>
+                                    <td>
+                                        <div class="mb-2">
+                                            <span class="badge bg-info">{{ appointment.participants|length }} participant{{ 's' if appointment.participants|length != 1 else '' }}</span>
+                                        </div>
+                                        {% for participant in appointment.participants[:3] %}
+                                        <div class="small">
+                                            {{ participant.employee.first_name }} {{ participant.employee.last_name }}
+                                            <span class="badge badge-sm {{ 
+                                                'bg-success' if participant.response_status == 'Accepted' else
+                                                'bg-warning' if participant.response_status == 'Pending' else
+                                                'bg-danger' if participant.response_status == 'Declined' else 'bg-secondary'
+                                            }}">
+                                                {{ participant.response_status }}
+                                            </span>
+                                        </div>
+                                        {% endfor %}
+                                        {% if appointment.participants|length > 3 %}
+                                        <div class="small text-muted">+{{ appointment.participants|length - 3 }} more</div>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="badge {{ 
+                                            'bg-warning' if appointment.status == 'Pending' else
+                                            'bg-success' if appointment.status == 'Confirmed' else
+                                            'bg-info' if appointment.status == 'Completed' else
+                                            'bg-danger' if appointment.status == 'Cancelled' else 'bg-secondary'
+                                        }}">
+                                            {{ appointment.status }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <button type="button" class="btn btn-outline-primary" 
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#appointmentModal{{ appointment.id }}">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            {% if appointment.organizer_id == current_user.employee.id %}
+                                            <button type="button" class="btn btn-outline-secondary" 
+                                                    onclick="editAppointment({{ appointment.id }})">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Appointment Detail Modals -->
+            {% for appointment in appointments %}
+            <div class="modal fade" id="appointmentModal{{ appointment.id }}" tabindex="-1">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">{{ appointment.title }}</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6>Date & Time</h6>
+                                    <p>{{ appointment.appointment_date.strftime('%B %d, %Y') }}</p>
+                                    <p>{{ appointment.start_time.strftime('%I:%M %p') }} - 
+                                       {{ appointment.end_time.strftime('%I:%M %p') if appointment.end_time else 'Open' }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6>Organizer</h6>
+                                    <p>{{ appointment.organizer.first_name }} {{ appointment.organizer.last_name }}</p>
+                                    <p class="text-muted">{{ appointment.organizer.department }}</p>
+                                </div>
+                            </div>
+                            
+                            {% if appointment.location %}
+                            <div class="mb-3">
+                                <h6>Location</h6>
+                                <p>{{ appointment.location }}</p>
+                            </div>
+                            {% endif %}
+                            
+                            {% if appointment.description %}
+                            <div class="mb-3">
+                                <h6>Description</h6>
+                                <p>{{ appointment.description }}</p>
+                            </div>
+                            {% endif %}
+                            
+                            <div class="mb-3">
+                                <h6>Participants ({{ appointment.participants|length }})</h6>
+                                <div class="row">
+                                    {% for participant in appointment.participants %}
+                                    <div class="col-md-6 mb-2">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span>{{ participant.employee.first_name }} {{ participant.employee.last_name }}</span>
+                                            <span class="badge {{ 
+                                                'bg-success' if participant.response_status == 'Accepted' else
+                                                'bg-warning' if participant.response_status == 'Pending' else
+                                                'bg-danger' if participant.response_status == 'Declined' else 'bg-secondary'
+                                            }}">
+                                                {{ participant.response_status }}
+                                            </span>
+                                        </div>
+                                        {% if participant.response_note %}
+                                        <small class="text-muted">{{ participant.response_note }}</small>
+                                        {% endif %}
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+
+            {% else %}
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    <i class="fas fa-calendar-times fa-4x text-muted mb-4"></i>
+                    <h4 class="text-muted">No Appointments Found</h4>
+                    <p class="text-muted">No appointments match your current filter criteria.</p>
+                    <a href="{{ url_for('hr.create_appointment') }}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Schedule First Appointment
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+function editAppointment(id) {
+    // TODO: Implement edit functionality
+    alert('Edit functionality coming soon!');
+}
+</script>
+{% endblock %} 

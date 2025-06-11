@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block title %}Assign Training - HRMS{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2"><i class="fas fa-graduation-cap"></i> Assign Training</h1>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Create Training Assignment</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.employee_id.label(class="form-label") }}
+                            {{ form.employee_id(class="form-select") }}
+                            {% for error in form.employee_id.errors %}
+                                <div class="text-danger small">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            {{ form.training_type.label(class="form-label") }}
+                            {{ form.training_type(class="form-select") }}
+                            {% for error in form.training_type.errors %}
+                                <div class="text-danger small">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.training_title.label(class="form-label") }}
+                        {{ form.training_title(class="form-control") }}
+                        {% for error in form.training_title.errors %}
+                            <div class="text-danger small">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.description.label(class="form-label") }}
+                        {{ form.description(class="form-control", rows="3") }}
+                        {% for error in form.description.errors %}
+                            <div class="text-danger small">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.due_date.label(class="form-label") }}
+                            {{ form.due_date(class="form-control") }}
+                            {% for error in form.due_date.errors %}
+                                <div class="text-danger small">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.reason.label(class="form-label") }}
+                        {{ form.reason(class="form-control", rows="2") }}
+                        {% for error in form.reason.errors %}
+                            <div class="text-danger small">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('core.dashboard') }}" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Cancel
+                        </a>
+                        {{ form.submit(class="btn btn-primary") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0">Training Types</h6>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled">
+                    <li class="mb-2">
+                        <strong>Performance Improvement:</strong><br>
+                        <small class="text-muted">For employees with low performance ratings</small>
+                    </li>
+                    <li class="mb-2">
+                        <strong>Skill Development:</strong><br>
+                        <small class="text-muted">General skill enhancement programs</small>
+                    </li>
+                    <li class="mb-2">
+                        <strong>Compliance Training:</strong><br>
+                        <small class="text-muted">Mandatory compliance and policy training</small>
+                    </li>
+                    <li class="mb-2">
+                        <strong>Leadership Development:</strong><br>
+                        <small class="text-muted">Management and leadership skills</small>
+                    </li>
+                    <li class="mb-2">
+                        <strong>Technical Training:</strong><br>
+                        <small class="text-muted">Technology and tool-specific training</small>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

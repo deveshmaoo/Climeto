@@ -1,0 +1,267 @@
+{% extends "base.html" %}
+
+{% block title %}Leads - HRMS{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2"><i class="fas fa-users"></i> Leads</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group me-2">
+            <a href="{{ url_for('sales.create_lead') }}" class="btn btn-sm btn-primary">
+                <i class="fas fa-plus"></i> Create Lead
+            </a>
+            <a href="{{ url_for('sales.sales_funnel') }}" class="btn btn-sm btn-outline-secondary">
+                <i class="fas fa-funnel-dollar"></i> Funnel View
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="row mb-3">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="GET" class="row g-3">
+                    <div class="col-md-3">
+                        <label for="status" class="form-label">Status</label>
+                        <select name="status" id="status" class="form-select">
+                            <option value="all" {% if filters.status == 'all' %}selected{% endif %}>All Status</option>
+                            <option value="New" {% if filters.status == 'New' %}selected{% endif %}>New</option>
+                            <option value="Qualified" {% if filters.status == 'Qualified' %}selected{% endif %}>Qualified</option>
+                            <option value="Proposal" {% if filters.status == 'Proposal' %}selected{% endif %}>Proposal</option>
+                            <option value="Negotiation" {% if filters.status == 'Negotiation' %}selected{% endif %}>Negotiation</option>
+                            <option value="Closed Won" {% if filters.status == 'Closed Won' %}selected{% endif %}>Closed Won</option>
+                            <option value="Closed Lost" {% if filters.status == 'Closed Lost' %}selected{% endif %}>Closed Lost</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label for="priority" class="form-label">Priority</label>
+                        <select name="priority" id="priority" class="form-select">
+                            <option value="all" {% if filters.priority == 'all' %}selected{% endif %}>All Priority</option>
+                            <option value="High" {% if filters.priority == 'High' %}selected{% endif %}>High</option>
+                            <option value="Medium" {% if filters.priority == 'Medium' %}selected{% endif %}>Medium</option>
+                            <option value="Low" {% if filters.priority == 'Low' %}selected{% endif %}>Low</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="source" class="form-label">Source</label>
+                        <select name="source" id="source" class="form-select">
+                            <option value="all" {% if filters.source == 'all' %}selected{% endif %}>All Sources</option>
+                            {% for source in sources %}
+                                <option value="{{ source }}" {% if filters.source == source %}selected{% endif %}>{{ source }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label for="assigned" class="form-label">Assigned To</label>
+                        <select name="assigned" id="assigned" class="form-select">
+                            <option value="all" {% if filters.assigned == 'all' %}selected{% endif %}>All Assignees</option>
+                            {% for assignee in assignees %}
+                                <option value="{{ assignee.id }}" {% if filters.assigned == assignee.id|string %}selected{% endif %}>
+                                    {{ assignee.first_name }} {{ assignee.last_name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label for="submit" class="form-label">&nbsp;</label>
+                        <div>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-filter"></i> Filter
+                            </button>
+                            <a href="{{ url_for('sales.list_leads') }}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Clear
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Leads List -->
+<div class="row">
+    <div class="col-md-12">
+        {% if leads %}
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    Lead List 
+                    <span class="badge bg-primary ms-2">{{ leads|length }} leads</span>
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Company</th>
+                                <th>Contact</th>
+                                <th>Status</th>
+                                <th>Priority</th>
+                                <th>Source</th>
+                                <th>Value</th>
+                                <th>Assigned To</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for lead in leads %}
+                            <tr>
+                                <td>
+                                    <div>
+                                        <strong>{{ lead.company_name }}</strong>
+                                        {% if lead.industry %}
+                                            <br><small class="text-muted">{{ lead.industry }}</small>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        <strong>{{ lead.contact_person }}</strong><br>
+                                        <small class="text-muted">
+                                            <i class="fas fa-envelope"></i> {{ lead.email }}<br>
+                                            {% if lead.phone %}
+                                            <i class="fas fa-phone"></i> {{ lead.phone }}
+                                            {% endif %}
+                                        </small>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge 
+                                        {% if lead.status == 'New' %}bg-secondary
+                                        {% elif lead.status == 'Qualified' %}bg-info
+                                        {% elif lead.status == 'Proposal' %}bg-warning
+                                        {% elif lead.status == 'Negotiation' %}bg-primary
+                                        {% elif lead.status == 'Closed Won' %}bg-success
+                                        {% else %}bg-danger{% endif %}">
+                                        {{ lead.status }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge 
+                                        {% if lead.priority == 'High' %}bg-danger
+                                        {% elif lead.priority == 'Medium' %}bg-warning
+                                        {% else %}bg-success{% endif %}">
+                                        {{ lead.priority }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-info">{{ lead.source or 'Unknown' }}</span>
+                                </td>
+                                <td>
+                                    {% if lead.estimated_value %}
+                                        ${{ "{:,.0f}".format(lead.estimated_value) }}
+                                    {% else %}
+                                        <span class="text-muted">N/A</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if lead.assigned_to %}
+                                        {{ lead.assigned_to.first_name }} {{ lead.assigned_to.last_name }}
+                                    {% else %}
+                                        <span class="text-muted">Unassigned</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {{ lead.created_at.strftime('%b %d, %Y') }}
+                                    <br><small class="text-muted">{{ lead.created_at.strftime('%I:%M %p') }}</small>
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <a href="{{ url_for('sales.lead_detail', id=lead.id) }}" 
+                                           class="btn btn-outline-primary btn-sm">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        {% if current_user.can_view_all_activities() or lead.assigned_to_id == current_user.employee.id %}
+                                        <button class="btn btn-outline-secondary btn-sm" 
+                                                onclick="alert('Edit functionality coming soon!')">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        {% endif %}
+                                        {% if lead.status == 'Closed Won' %}
+                                        <button class="btn btn-outline-success btn-sm" 
+                                                onclick="alert('Convert to client functionality coming soon!')">
+                                            <i class="fas fa-exchange-alt"></i>
+                                        </button>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Lead Statistics -->
+        <div class="row mt-4">
+            <div class="col-md-2">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h4 class="text-secondary">{{ leads|selectattr('status', 'equalto', 'New')|list|length }}</h4>
+                        <small class="text-muted">New</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h4 class="text-info">{{ leads|selectattr('status', 'equalto', 'Qualified')|list|length }}</h4>
+                        <small class="text-muted">Qualified</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h4 class="text-warning">{{ leads|selectattr('status', 'equalto', 'Proposal')|list|length }}</h4>
+                        <small class="text-muted">Proposal</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h4 class="text-primary">{{ leads|selectattr('status', 'equalto', 'Negotiation')|list|length }}</h4>
+                        <small class="text-muted">Negotiation</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h4 class="text-success">{{ leads|selectattr('status', 'equalto', 'Closed Won')|list|length }}</h4>
+                        <small class="text-muted">Won</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h4 class="text-danger">{{ leads|selectattr('status', 'equalto', 'Closed Lost')|list|length }}</h4>
+                        <small class="text-muted">Lost</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        {% else %}
+        <div class="card">
+            <div class="card-body text-center py-5">
+                <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                <h5>No Leads Found</h5>
+                <p class="text-muted">No leads match your current filters.</p>
+                <a href="{{ url_for('sales.create_lead') }}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Create First Lead
+                </a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %} 

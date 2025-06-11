@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}{{ project.name }} - HRMS{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">{{ project.name }}</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <a href="{{ url_for('project.project_tasks', id=project.id) }}" class="btn btn-outline-primary me-2">
+            <i class="fas fa-tasks"></i> Tasks
+        </a>
+        <a href="{{ url_for('project.project_chat', id=project.id) }}" class="btn btn-outline-secondary">
+            <i class="fas fa-comments"></i> Chat
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0">Project Details</h6>
+            </div>
+            <div class="card-body">
+                <p><strong>Description:</strong></p>
+                <p>{{ project.description or 'No description provided' }}</p>
+                
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <p><strong>Start Date:</strong> {{ project.start_date.strftime('%B %d, %Y') if project.start_date else 'Not set' }}</p>
+                        <p><strong>End Date:</strong> {{ project.end_date.strftime('%B %d, %Y') if project.end_date else 'Not set' }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Status:</strong> 
+                            <span class="badge bg-{{ 'success' if project.status == 'Active' else 'secondary' }}">
+                                {{ project.status }}
+                            </span>
+                        </p>
+                        <p><strong>Priority:</strong> 
+                            <span class="badge bg-{{ 'danger' if project.priority == 'High' else 'warning' if project.priority == 'Medium' else 'info' }}">
+                                {{ project.priority }}
+                            </span>
+                        </p>
+                    </div>
+                </div>
+                
+                {% if project.budget %}
+                <p><strong>Budget:</strong> ${{ "{:,.2f}".format(project.budget) }}</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0">Progress</h6>
+            </div>
+            <div class="card-body">
+                <div class="progress mb-3" style="height: 25px;">
+                    <div class="progress-bar" role="progressbar" style="width: {{ project.progress or 0 }}%">
+                        {{ project.progress or 0 }}%
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <h4>{{ project.progress or 0 }}%</h4>
+                    <p class="text-muted">Complete</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header">
+                <h6 class="mb-0">Quick Actions</h6>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('project.project_tasks', id=project.id) }}" class="btn btn-outline-primary">
+                        <i class="fas fa-tasks"></i> View Tasks
+                    </a>
+                    <a href="{{ url_for('project.project_chat', id=project.id) }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-comments"></i> Project Chat
+                    </a>
+                    <a href="{{ url_for('project.upload_document', project_id=project.id) }}" class="btn btn-outline-info">
+                        <i class="fas fa-upload"></i> Upload Document
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

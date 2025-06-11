@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+
+{% block title %}Attendance - HRMS{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Attendance</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <button type="button" class="btn btn-success">
+            <i class="fas fa-clock"></i> Clock In
+        </button>
+        <button type="button" class="btn btn-warning ms-2">
+            <i class="fas fa-clock"></i> Clock Out
+        </button>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body text-center">
+                <h5 class="card-title">Today's Status</h5>
+                <div class="mb-3">
+                    <span class="badge bg-success fs-6">Present</span>
+                </div>
+                <p><strong>Clock In:</strong> 09:15 AM</p>
+                <p><strong>Clock Out:</strong> --:-- --</p>
+                <p><strong>Hours Worked:</strong> 6h 45m</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0">Recent Attendance</h6>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Clock In</th>
+                                <th>Clock Out</th>
+                                <th>Hours</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>2024-06-08</td>
+                                <td>09:15 AM</td>
+                                <td>--:-- --</td>
+                                <td>6h 45m</td>
+                                <td><span class="badge bg-success">Present</span></td>
+                            </tr>
+                            <tr>
+                                <td>2024-06-07</td>
+                                <td>09:00 AM</td>
+                                <td>06:00 PM</td>
+                                <td>8h 30m</td>
+                                <td><span class="badge bg-success">Present</span></td>
+                            </tr>
+                            <tr>
+                                <td>2024-06-06</td>
+                                <td>09:30 AM</td>
+                                <td>06:15 PM</td>
+                                <td>8h 15m</td>
+                                <td><span class="badge bg-warning">Late</span></td>
+                            </tr>
+                            <tr>
+                                <td>2024-06-05</td>
+                                <td>--:-- --</td>
+                                <td>--:-- --</td>
+                                <td>0h 0m</td>
+                                <td><span class="badge bg-danger">Absent</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0">Monthly Summary</h6>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-3">
+                        <h4 class="text-success">20</h4>
+                        <small>Present</small>
+                    </div>
+                    <div class="col-3">
+                        <h4 class="text-danger">2</h4>
+                        <small>Absent</small>
+                    </div>
+                    <div class="col-3">
+                        <h4 class="text-warning">3</h4>
+                        <small>Late</small>
+                    </div>
+                    <div class="col-3">
+                        <h4 class="text-info">1</h4>
+                        <small>Leave</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0">Leave Balance</h6>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-4">
+                        <h4 class="text-primary">15</h4>
+                        <small>Annual</small>
+                    </div>
+                    <div class="col-4">
+                        <h4 class="text-success">8</h4>
+                        <small>Sick</small>
+                    </div>
+                    <div class="col-4">
+                        <h4 class="text-warning">3</h4>
+                        <small>Casual</small>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <button class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-calendar-plus"></i> Apply for Leave
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

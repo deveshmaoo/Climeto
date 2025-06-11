@@ -1,0 +1,252 @@
+{% extends "base.html" %}
+
+{% block title %}Conference Rooms - HR{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-door-open text-primary"></i> Conference Room Management</h2>
+                <a href="{{ url_for('hr.book_conference_room') }}" class="btn btn-primary">
+                    <i class="fas fa-calendar-plus"></i> Book Room
+                </a>
+            </div>
+
+            <!-- Room Status Overview -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card text-center border-success">
+                        <div class="card-body">
+                            <h4 class="text-success">{{ rooms|selectattr('status', 'equalto', 'Available')|list|length }}</h4>
+                            <small class="text-muted">Available Now</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center border-warning">
+                        <div class="card-body">
+                            <h4 class="text-warning">{{ rooms|selectattr('status', 'equalto', 'Occupied')|list|length }}</h4>
+                            <small class="text-muted">Currently Occupied</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center border-info">
+                        <div class="card-body">
+                            <h4 class="text-info">{{ total_bookings_today or 0 }}</h4>
+                            <small class="text-muted">Bookings Today</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center border-primary">
+                        <div class="card-body">
+                            <h4 class="text-primary">{{ rooms|length }}</h4>
+                            <small class="text-muted">Total Rooms</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Conference Rooms Grid -->
+            {% if rooms %}
+            <div class="row">
+                {% for room in rooms %}
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card {{ 'border-success' if room.status == 'Available' else 'border-warning' if room.status == 'Occupied' else 'border-danger' }}">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">{{ room.name }}</h5>
+                            <span class="badge {{ 
+                                'bg-success' if room.status == 'Available' else
+                                'bg-warning' if room.status == 'Occupied' else
+                                'bg-danger' if room.status == 'Maintenance' else 'bg-secondary'
+                            }}">
+                                {{ room.status }}
+                            </span>
+                        </div>
+                        <div class="card-body">
+                            <div class="row mb-3">
+                                <div class="col-6">
+                                    <div class="text-center">
+                                        <i class="fas fa-users fa-2x text-muted mb-2"></i>
+                                        <div><strong>{{ room.capacity }}</strong></div>
+                                        <small class="text-muted">Capacity</small>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="text-center">
+                                        <i class="fas fa-map-marker-alt fa-2x text-muted mb-2"></i>
+                                        <div><strong>{{ room.location or 'N/A' }}</strong></div>
+                                        <small class="text-muted">Location</small>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            {% if room.equipment %}
+                            <div class="mb-3">
+                                <h6 class="small text-muted mb-2">EQUIPMENT</h6>
+                                <div class="d-flex flex-wrap">
+                                    {% for equipment in room.equipment.split(',') %}
+                                    <span class="badge bg-light text-dark me-1 mb-1">{{ equipment.strip() }}</span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            {% if room.description %}
+                            <div class="mb-3">
+                                <h6 class="small text-muted mb-2">DESCRIPTION</h6>
+                                <p class="small">{{ room.description[:100] }}{{ '...' if room.description|length > 100 else '' }}</p>
+                            </div>
+                            {% endif %}
+                            
+                            <!-- Today's Bookings -->
+                            {% set today_bookings = room.bookings|selectattr('booking_date', 'equalto', today)|list %}
+                            {% if today_bookings %}
+                            <div class="mb-3">
+                                <h6 class="small text-muted mb-2">TODAY'S BOOKINGS</h6>
+                                {% for booking in today_bookings[:3] %}
+                                <div class="small mb-1">
+                                    <i class="fas fa-clock text-muted"></i>
+                                    {% if booking.start_time and booking.end_time %}
+                                    {{ booking.start_time.strftime('%I:%M %p') }} - {{ booking.end_time.strftime('%I:%M %p') }}
+                                    {% else %}
+                                    Time not set
+                                    {% endif %}
+                                    <span class="text-muted">by {{ booking.booked_by.first_name }} {{ booking.booked_by.last_name }}</span>
+                                </div>
+                                {% endfor %}
+                                {% if today_bookings|length > 3 %}
+                                <div class="small text-muted">+{{ today_bookings|length - 3 }} more booking{{ 's' if today_bookings|length - 3 != 1 else '' }}</div>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="card-footer">
+                            <div class="d-flex justify-content-between">
+                                {% if room.status == 'Available' %}
+                                <a href="{{ url_for('hr.book_conference_room', room_id=room.id) }}" class="btn btn-sm btn-success">
+                                    <i class="fas fa-calendar-plus"></i> Book Now
+                                </a>
+                                {% else %}
+                                <span class="text-muted small">Currently Unavailable</span>
+                                {% endif %}
+                                <button type="button" class="btn btn-sm btn-outline-secondary" 
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#roomModal{{ room.id }}">
+                                    <i class="fas fa-info-circle"></i> Details
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Room Detail Modals -->
+            {% for room in rooms %}
+            <div class="modal fade" id="roomModal{{ room.id }}" tabindex="-1">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">{{ room.name }}</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6>Room Information</h6>
+                                    <p><strong>Capacity:</strong> {{ room.capacity }} people</p>
+                                    <p><strong>Location:</strong> {{ room.location or 'Not specified' }}</p>
+                                    <p><strong>Status:</strong> 
+                                        <span class="badge {{ 
+                                            'bg-success' if room.status == 'Available' else
+                                            'bg-warning' if room.status == 'Occupied' else
+                                            'bg-danger' if room.status == 'Maintenance' else 'bg-secondary'
+                                        }}">
+                                            {{ room.status }}
+                                        </span>
+                                    </p>
+                                </div>
+                                <div class="col-md-6">
+                                    {% if room.equipment %}
+                                    <h6>Available Equipment</h6>
+                                    <ul class="list-unstyled">
+                                        {% for equipment in room.equipment.split(',') %}
+                                        <li><i class="fas fa-check text-success"></i> {{ equipment.strip() }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            {% if room.description %}
+                            <div class="mt-3">
+                                <h6>Description</h6>
+                                <p>{{ room.description }}</p>
+                            </div>
+                            {% endif %}
+                            
+                            <div class="mt-3">
+                                <h6>Recent Bookings</h6>
+                                {% if room.bookings %}
+                                <div class="table-responsive">
+                                    <table class="table table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>Date</th>
+                                                <th>Time</th>
+                                                <th>Booked By</th>
+                                                <th>Purpose</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for booking in room.bookings[:5] %}
+                                            <tr>
+                                                <td>{% if booking.booking_date %}{{ booking.booking_date.strftime('%m/%d/%Y') }}{% else %}N/A{% endif %}</td>
+                                                <td>
+                                                    {% if booking.start_time and booking.end_time %}
+                                                    {{ booking.start_time.strftime('%I:%M %p') }} - {{ booking.end_time.strftime('%I:%M %p') }}
+                                                    {% else %}
+                                                    Time not set
+                                                    {% endif %}
+                                                </td>
+                                                <td>{{ booking.booked_by.first_name }} {{ booking.booked_by.last_name }}</td>
+                                                <td>{{ (booking.title or 'N/A')[:30] }}{{ '...' if (booking.title or '')|length > 30 else '' }}</td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                {% else %}
+                                <p class="text-muted">No recent bookings found.</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            {% if room.status == 'Available' %}
+                            <a href="{{ url_for('hr.book_conference_room', room_id=room.id) }}" class="btn btn-success">
+                                <i class="fas fa-calendar-plus"></i> Book This Room
+                            </a>
+                            {% endif %}
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+
+            {% else %}
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    <i class="fas fa-door-closed fa-4x text-muted mb-4"></i>
+                    <h4 class="text-muted">No Conference Rooms Available</h4>
+                    <p class="text-muted">No conference rooms have been configured yet.</p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

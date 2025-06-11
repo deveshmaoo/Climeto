@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Users - HRMS{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-users-cog"></i> Manage Users</h2>
+                <a href="{{ url_for('auth.create_user') }}" class="btn btn-primary">
+                    <i class="fas fa-user-plus"></i> Create New User
+                </a>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">All Users ({{ users|length }} total)</h5>
+                </div>
+                <div class="card-body p-0">
+                    {% if users %}
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Username</th>
+                                    <th>Email</th>
+                                    <th>Role</th>
+                                    <th>Department</th>
+                                    <th>Status</th>
+                                    <th>Last Login</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for user in users %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ user.username }}</strong>
+                                    </td>
+                                    <td>{{ user.email }}</td>
+                                    <td>
+                                        <span class="badge bg-info">
+                                            {{ user.role.name if user.role else 'No Role' }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if user.department %}
+                                        <span class="badge bg-secondary">{{ user.department }}</span>
+                                        {% else %}
+                                        <span class="text-muted">Not Assigned</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if user.is_active %}
+                                        <span class="badge bg-success">Active</span>
+                                        {% else %}
+                                        <span class="badge bg-danger">Inactive</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if user.last_login %}
+                                        <small class="text-muted">
+                                            {{ user.last_login.strftime('%Y-%m-%d %H:%M') }}
+                                        </small>
+                                        {% else %}
+                                        <span class="text-muted">Never</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            {% if current_user.can_edit_user(user) %}
+                                            <a href="{{ url_for('auth.edit_user', user_id=user.id) }}" 
+                                               class="btn btn-outline-primary" title="Edit User">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            {% else %}
+                                            <button class="btn btn-outline-secondary" disabled title="No permission to edit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            {% endif %}
+                                            
+                                            {% if current_user.can_edit_user(user) %}
+                                                {% if user.is_active %}
+                                                <form method="POST" action="{{ url_for('auth.deactivate_user', user_id=user.id) }}" 
+                                                      style="display: inline;" onsubmit="return confirm('Are you sure you want to deactivate this user?')">
+                                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                                                    <button type="submit" class="btn btn-outline-warning" title="Deactivate User">
+                                                        <i class="fas fa-user-slash"></i>
+                                                    </button>
+                                                </form>
+                                                {% else %}
+                                                <form method="POST" action="{{ url_for('auth.activate_user', user_id=user.id) }}" 
+                                                      style="display: inline;">
+                                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                                                    <button type="submit" class="btn btn-outline-success" title="Activate User">
+                                                        <i class="fas fa-user-check"></i>
+                                                    </button>
+                                                </form>
+                                                {% endif %}
+                                            {% else %}
+                                                <button class="btn btn-outline-secondary" disabled title="No permission">
+                                                    <i class="fas fa-user-slash"></i>
+                                                </button>
+                                            {% endif %}
+                                            
+                                            {% if current_user.can_reset_password(user) %}
+                                            <form method="POST" action="{{ url_for('auth.reset_password', user_id=user.id) }}" 
+                                                  style="display: inline;" onsubmit="return confirm('Are you sure you want to reset this user&apos;s password?')">
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                                                <button type="submit" class="btn btn-outline-danger" title="Reset Password">
+                                                    <i class="fas fa-key"></i>
+                                                </button>
+                                            </form>
+                                            {% else %}
+                                            <button class="btn btn-outline-secondary" disabled title="No permission to reset password">
+                                                <i class="fas fa-key"></i>
+                                            </button>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No users found</h5>
+                        <p class="text-muted">Create the first user to get started.</p>
+                        <a href="{{ url_for('auth.create_user') }}" class="btn btn-primary">
+                            <i class="fas fa-user-plus"></i> Create First User
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

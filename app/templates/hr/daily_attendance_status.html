@@ -1,0 +1,233 @@
+{% extends "base.html" %}
+
+{% block title %}Daily Attendance Status - {{ target_date.strftime('%Y-%m-%d') }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-users-cog text-primary"></i> Daily Attendance Status</h2>
+                <div>
+                    <input type="date" class="form-control d-inline-block" style="width: auto;" 
+                           value="{{ target_date.strftime('%Y-%m-%d') }}" 
+                           onchange="window.location.href='{{ url_for('hr.daily_attendance_status') }}?date=' + this.value">
+                    <a href="{{ url_for('hr.attendance_management') }}" class="btn btn-outline-secondary ms-2">
+                        <i class="fas fa-arrow-left"></i> Back
+                    </a>
+                </div>
+            </div>
+
+            <!-- Summary Cards -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card border-left-success shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Present</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ present_employees|length }}</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-user-check fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card border-left-warning shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">On Leave</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ on_leave_employees|length }}</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-calendar-times fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card border-left-danger shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Missing</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ missing_employees|length }}</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-user-times fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card border-left-info shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Total</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_employees }}</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-users fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Navigation -->
+            <ul class="nav nav-tabs mb-4" id="statusTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="present-tab" data-bs-toggle="tab" data-bs-target="#present" 
+                            type="button" role="tab">Present ({{ present_employees|length }})</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="leave-tab" data-bs-toggle="tab" data-bs-target="#leave" 
+                            type="button" role="tab">On Leave ({{ on_leave_employees|length }})</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="missing-tab" data-bs-toggle="tab" data-bs-target="#missing" 
+                            type="button" role="tab">Missing ({{ missing_employees|length }})</button>
+                </li>
+            </ul>
+
+            <div class="tab-content" id="statusTabsContent">
+                <!-- Present Employees -->
+                <div class="tab-pane fade show active" id="present" role="tabpanel">
+                    {% if present_employees %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Employee</th>
+                                    <th>Department</th>
+                                    <th>Check In</th>
+                                    <th>Check Out</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for emp_data in present_employees %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ emp_data.employee.full_name }}</strong><br>
+                                        <small class="text-muted">{{ emp_data.employee.employee_id }}</small>
+                                    </td>
+                                    <td>{{ emp_data.employee.department }}</td>
+                                    <td>{{ emp_data.attendance.in_time.strftime('%H:%M') if emp_data.attendance.in_time else '-' }}</td>
+                                    <td>{{ emp_data.attendance.out_time.strftime('%H:%M') if emp_data.attendance.out_time else '-' }}</td>
+                                    <td>
+                                        <span class="badge badge-success">{{ emp_data.attendance.status }}</span>
+                                    </td>
+                                    <td>
+                                        <a href="{{ url_for('hr.employee_attendance', employee_id=emp_data.employee.id) }}" 
+                                           class="btn btn-outline-primary btn-sm">
+                                            <i class="fas fa-eye"></i> View Records
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center py-4">No employees are marked as present today.</p>
+                    {% endif %}
+                </div>
+
+                <!-- On Leave Employees -->
+                <div class="tab-pane fade" id="leave" role="tabpanel">
+                    {% if on_leave_employees %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Employee</th>
+                                    <th>Department</th>
+                                    <th>Leave Type</th>
+                                    <th>Leave Period</th>
+                                    <th>Reason</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for emp_data in on_leave_employees %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ emp_data.employee.full_name }}</strong><br>
+                                        <small class="text-muted">{{ emp_data.employee.employee_id }}</small>
+                                    </td>
+                                    <td>{{ emp_data.employee.department }}</td>
+                                    <td><span class="badge badge-warning">{{ emp_data.leave.leave_type }}</span></td>
+                                    <td>
+                                        {{ emp_data.leave.start_date.strftime('%Y-%m-%d') }} to 
+                                        {{ emp_data.leave.end_date.strftime('%Y-%m-%d') }}
+                                    </td>
+                                    <td>{{ emp_data.leave.reason[:50] }}{% if emp_data.leave.reason|length > 50 %}...{% endif %}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center py-4">No employees are on approved leave today.</p>
+                    {% endif %}
+                </div>
+
+                <!-- Missing Employees -->
+                <div class="tab-pane fade" id="missing" role="tabpanel">
+                    {% if missing_employees %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Employee</th>
+                                    <th>Department</th>
+                                    <th>Designation</th>
+                                    <th>Contact</th>
+                                    <th>Manager</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for emp_data in missing_employees %}
+                                <tr class="table-danger">
+                                    <td>
+                                        <strong>{{ emp_data.employee.full_name }}</strong><br>
+                                        <small class="text-muted">{{ emp_data.employee.employee_id }}</small>
+                                    </td>
+                                    <td>{{ emp_data.employee.department }}</td>
+                                    <td>{{ emp_data.employee.designation }}</td>
+                                    <td>
+                                        {% if emp_data.employee.work_email %}
+                                            <a href="mailto:{{ emp_data.employee.work_email }}">{{ emp_data.employee.work_email }}</a><br>
+                                        {% endif %}
+                                        {{ emp_data.employee.personal_mobile or emp_data.employee.work_phone or 'N/A' }}
+                                    </td>
+                                    <td>
+                                        {% if emp_data.employee.reporting_manager %}
+                                            {{ emp_data.employee.reporting_manager.full_name }}
+                                        {% else %}
+                                            <span class="text-muted">No Manager</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center py-4">All employees are accounted for today!</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

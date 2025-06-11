@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Welcome to HRMS{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 text-center">
+            <h1 class="display-4 mb-4">Welcome to HRMS</h1>
+            <p class="lead mb-4">
+                Human Resource Management System - Your complete solution for managing employees, projects, and organizational workflows.
+            </p>
+            
+            {% if not current_user.is_authenticated %}
+            <div class="mb-4">
+                <a href="{{ url_for('auth.login') }}" class="btn btn-primary btn-lg me-3">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </a>
+                <a href="{{ url_for('auth.register') }}" class="btn btn-outline-primary btn-lg">
+                    <i class="fas fa-user-plus"></i> Register
+                </a>
+            </div>
+            {% else %}
+            <div class="mb-4">
+                <a href="{{ url_for('core.dashboard') }}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-tachometer-alt"></i> Go to Dashboard
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="row mt-5">
+        <div class="col-md-4 text-center mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <i class="fas fa-users text-primary mb-3" style="font-size: 3rem;"></i>
+                    <h5 class="card-title">Employee Management</h5>
+                    <p class="card-text">Manage employee profiles, attendance, performance reviews, and organizational hierarchy.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4 text-center mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <i class="fas fa-project-diagram text-success mb-3" style="font-size: 3rem;"></i>
+                    <h5 class="card-title">Project Tracking</h5>
+                    <p class="card-text">Track projects, assign tasks, monitor progress, and collaborate with team members.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4 text-center mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <i class="fas fa-chart-line text-info mb-3" style="font-size: 3rem;"></i>
+                    <h5 class="card-title">Analytics & Reporting</h5>
+                    <p class="card-text">Generate reports, analyze performance metrics, and make data-driven decisions.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

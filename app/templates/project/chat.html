@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}Chat - {{ project.name }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Project Chat - {{ project.name }}</h1>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="chat-container" style="height: 400px; overflow-y: auto; border: 1px solid #dee2e6; padding: 15px; margin-bottom: 15px;">
+            {% if chats %}
+                {% for chat in chats %}
+                <div class="chat-message mb-3">
+                    <div class="d-flex">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-user-circle fa-2x text-muted"></i>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <div class="fw-bold">{{ chat.sender.first_name }} {{ chat.sender.last_name if chat.sender else 'Unknown User' }}</div>
+                            <div class="text-muted small">{{ chat.created_at.strftime('%Y-%m-%d %H:%M') if chat.created_at else '' }}</div>
+                            <div class="mt-1">
+                                {{ chat.message }}
+                                {% if chat.message_type == 'file' and chat.file_path %}
+                                    <div class="mt-2">
+                                        <a href="{{ url_for('static', filename='uploads/' + chat.file_path) }}" class="btn btn-sm btn-outline-primary" target="_blank">
+                                            <i class="fas fa-download"></i> {{ chat.file_name }}
+                                            {% if chat.file_size %}
+                                                ({{ "%.1f"|format(chat.file_size / 1024) }} KB)
+                                            {% endif %}
+                                        </a>
+                                    </div>
+                                {% elif chat.message_type == 'image' and chat.file_path %}
+                                    <div class="mt-2">
+                                        <img src="{{ url_for('static', filename='uploads/' + chat.file_path) }}" 
+                                             class="img-fluid" style="max-width: 300px; border-radius: 8px;" 
+                                             alt="{{ chat.file_name }}">
+                                        <br><small class="text-muted">{{ chat.file_name }}</small>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="text-center text-muted">
+                    <i class="fas fa-comments fa-3x mb-3"></i>
+                    <p>No messages yet. Start the conversation!</p>
+                </div>
+            {% endif %}
+        </div>
+        
+        <form method="POST" enctype="multipart/form-data">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            <div class="mb-3">
+                <div class="input-group">
+                    <input type="text" class="form-control" name="message" placeholder="Type your message..." id="messageInput">
+                    <input type="file" class="form-control" name="file" id="fileInput" style="display: none;" accept="*/*">
+                    <button type="button" class="btn btn-outline-secondary" onclick="document.getElementById('fileInput').click();">
+                        <i class="fas fa-paperclip"></i>
+                    </button>
+                    <button class="btn btn-primary" type="submit">
+                        <i class="fas fa-paper-plane"></i> Send
+                    </button>
+                </div>
+                <div id="fileInfo" class="small text-muted mt-1" style="display: none;">
+                    <i class="fas fa-file"></i> <span id="fileName"></span>
+                    <button type="button" class="btn btn-link btn-sm text-danger p-0 ms-2" onclick="clearFile()">Remove</button>
+                </div>
+            </div>
+        </form>
+        
+        <script>
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                document.getElementById('fileName').textContent = file.name;
+                document.getElementById('fileInfo').style.display = 'block';
+            }
+        });
+        
+        function clearFile() {
+            document.getElementById('fileInput').value = '';
+            document.getElementById('fileInfo').style.display = 'none';
+        }
+        
+        // Auto-scroll to bottom of chat
+        const chatContainer = document.querySelector('.chat-container');
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+        </script>
+    </div>
+</div>
+{% endblock %} 

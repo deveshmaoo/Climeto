@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}Upload Attendance Data - HR{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-upload text-primary"></i> Upload Attendance Data</h2>
+                <a href="{{ url_for('hr.attendance_management') }}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Attendance
+                </a>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Upload CSV File</h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="POST" enctype="multipart/form-data">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                                
+                                <div class="mb-4">
+                                    <label for="file" class="form-label">Select CSV File</label>
+                                    <input type="file" class="form-control" id="file" name="file" 
+                                           accept=".csv" required>
+                                    <div class="form-text">
+                                        Please upload a CSV file with attendance data. Maximum file size: 10MB
+                                    </div>
+                                </div>
+
+                                <div class="d-flex justify-content-between">
+                                    <a href="{{ url_for('hr.attendance_management') }}" class="btn btn-outline-secondary">
+                                        <i class="fas fa-times"></i> Cancel
+                                    </a>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-upload"></i> Upload File
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">CSV Format Requirements</h5>
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Required Columns:</strong></p>
+                            <ul class="list-unstyled">
+                                <li><code>employee_id</code> - Employee ID</li>
+                                <li><code>date</code> - Date (YYYY-MM-DD)</li>
+                                <li><code>in_time</code> - Check in time (HH:MM)</li>
+                                <li><code>out_time</code> - Check out time (HH:MM)</li>
+                                <li><code>status</code> - Status (Present/Absent/Late/Half-Day)</li>
+                            </ul>
+
+                            <p><strong>Example:</strong></p>
+                            <div class="bg-light p-2 rounded small">
+                                <code>
+                                employee_id,date,in_time,out_time,status<br>
+                                1,2024-01-15,09:00,17:30,Present<br>
+                                2,2024-01-15,09:15,17:30,Late<br>
+                                3,2024-01-15,,,Absent
+                                </code>
+                            </div>
+
+                            <div class="alert alert-info mt-3">
+                                <small>
+                                    <i class="fas fa-info-circle"></i>
+                                    Excel support will be added in future updates. For now, please export your Excel file to CSV format.
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

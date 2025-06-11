@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}All Chats - HRMS{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">All Project Chats</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group me-2">
+            <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
+                <i class="fas fa-filter"></i> Filter
+            </button>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="?filter=all">All Messages</a></li>
+                <li><a class="dropdown-item" href="?filter=files">Files Only</a></li>
+                <li><a class="dropdown-item" href="?filter=today">Today</a></li>
+                <li><a class="dropdown-item" href="?filter=week">This Week</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        {% if chats %}
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Project</th>
+                        <th>Sender</th>
+                        <th>Message</th>
+                        <th>Type</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for chat in chats %}
+                    <tr>
+                        <td>
+                            <a href="{{ url_for('project.project_chat', id=chat.project.id) }}" class="text-decoration-none">
+                                {{ chat.project.name if chat.project else 'N/A' }}
+                            </a>
+                        </td>
+                        <td>{{ chat.sender.first_name }} {{ chat.sender.last_name if chat.sender else 'Unknown User' }}</td>
+                        <td>
+                            {{ chat.message[:50] }}{{ '...' if chat.message|length > 50 else '' }}
+                            {% if chat.message_type == 'file' and chat.file_name %}
+                                <br><small class="text-muted"><i class="fas fa-file"></i> {{ chat.file_name }}</small>
+                            {% elif chat.message_type == 'image' and chat.file_name %}
+                                <br><small class="text-muted"><i class="fas fa-image"></i> {{ chat.file_name }}</small>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if chat.message_type == 'text' %}
+                                <span class="badge bg-primary">Text</span>
+                            {% elif chat.message_type == 'file' %}
+                                <span class="badge bg-success">File</span>
+                            {% elif chat.message_type == 'image' %}
+                                <span class="badge bg-info">Image</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ chat.created_at.strftime('%Y-%m-%d %H:%M') if chat.created_at else 'N/A' }}</td>
+                        <td>
+                            <a href="{{ url_for('project.project_chat', id=chat.project.id) }}" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-comments"></i> View Chat
+                            </a>
+                            {% if chat.file_path %}
+                                <a href="{{ url_for('static', filename='uploads/' + chat.file_path) }}" class="btn btn-sm btn-outline-success" target="_blank">
+                                    <i class="fas fa-download"></i>
+                                </a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center text-muted">
+            <i class="fas fa-comments fa-3x mb-3"></i>
+            <p>No chat messages found</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %} 

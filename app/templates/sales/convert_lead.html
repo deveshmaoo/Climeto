@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+
+{% block title %}Convert Lead to Client - {{ lead.company_name }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">
+        <i class="fas fa-exchange-alt"></i> Convert Lead to Client
+        <span class="badge bg-success ms-2">{{ lead.company_name }}</span>
+    </h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group me-2">
+            <a href="{{ url_for('sales.lead_detail', id=lead.id) }}" class="btn btn-sm btn-outline-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Lead
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-user-tie"></i> Client Setup</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> 
+                        <strong>Converting Lead:</strong> {{ lead.company_name }} will be converted to a client and assigned to the selected account manager and EPR compliance team member.
+                    </div>
+                    
+                    <!-- Assignment Information -->
+                    <h6 class="mb-3"><i class="fas fa-users"></i> Team Assignment</h6>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.account_manager.label(class="form-label") }}
+                            {{ form.account_manager(class="form-select") }}
+                            {% for error in form.account_manager.errors %}
+                                <div class="text-danger small">{{ error }}</div>
+                            {% endfor %}
+                            <small class="text-muted">Primary contact for business relationship</small>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            {{ form.epr_assignee.label(class="form-label") }}
+                            {{ form.epr_assignee(class="form-select") }}
+                            {% for error in form.epr_assignee.errors %}
+                                <div class="text-danger small">{{ error }}</div>
+                            {% endfor %}
+                            <small class="text-muted">EPR compliance team member</small>
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <!-- Initial Project Information -->
+                    <h6 class="mb-3"><i class="fas fa-project-diagram"></i> Initial Project (Optional)</h6>
+                    <div class="mb-3">
+                        {{ form.project_name.label(class="form-label") }}
+                        {{ form.project_name(class="form-control") }}
+                        {% for error in form.project_name.errors %}
+                            <div class="text-danger small">{{ error }}</div>
+                        {% endfor %}
+                        <small class="text-muted">Name of the first project for this client</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.project_description.label(class="form-label") }}
+                        {{ form.project_description(class="form-control", rows="3") }}
+                        {% for error in form.project_description.errors %}
+                            <div class="text-danger small">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.project_value.label(class="form-label") }}
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            {{ form.project_value(class="form-control") }}
+                        </div>
+                        {% for error in form.project_value.errors %}
+                            <div class="text-danger small">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('sales.lead_detail', id=lead.id) }}" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Cancel
+                        </a>
+                        {{ form.submit(class="btn btn-success") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <!-- Lead Summary -->
+        <div class="card mb-3">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="fas fa-info-circle"></i> Lead Summary</h6>
+            </div>
+            <div class="card-body">
+                <table class="table table-borderless table-sm">
+                    <tr>
+                        <td><strong>Company:</strong></td>
+                        <td>{{ lead.company_name }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Contact:</strong></td>
+                        <td>{{ lead.contact_person }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Email:</strong></td>
+                        <td>{{ lead.email }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Phone:</strong></td>
+                        <td>{{ lead.phone or 'N/A' }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Industry:</strong></td>
+                        <td>{{ lead.industry or 'N/A' }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Estimated Value:</strong></td>
+                        <td>
+                            {% if lead.estimated_value %}
+                                ${{ "{:,.0f}".format(lead.estimated_value) }}
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Status:</strong></td>
+                        <td>
+                            <span class="badge bg-success">{{ lead.status }}</span>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Conversion Process -->
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="fas fa-list-ol"></i> Conversion Process</h6>
+            </div>
+            <div class="card-body">
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <span class="badge bg-success">1</span>
+                        <span class="ms-2">Create Client Record</span>
+                    </div>
+                    <div class="timeline-item mt-2">
+                        <span class="badge bg-success">2</span>
+                        <span class="ms-2">Assign Account Manager</span>
+                    </div>
+                    <div class="timeline-item mt-2">
+                        <span class="badge bg-success">3</span>
+                        <span class="ms-2">Assign EPR Compliance</span>
+                    </div>
+                    <div class="timeline-item mt-2">
+                        <span class="badge bg-info">4</span>
+                        <span class="ms-2">Create Initial Project (Optional)</span>
+                    </div>
+                    <div class="timeline-item mt-2">
+                        <span class="badge bg-warning">5</span>
+                        <span class="ms-2">Send Welcome Email</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

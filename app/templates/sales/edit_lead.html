@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Lead - {{ lead.company_name }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2"><i class="fas fa-edit"></i> Edit Lead - {{ lead.company_name }}</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group me-2">
+            <a href="{{ url_for('sales.lead_detail', id=lead.id) }}" class="btn btn-sm btn-outline-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Lead
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Update Lead Information</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.status.label(class="form-label") }}
+                            {{ form.status(class="form-select") }}
+                            {% for error in form.status.errors %}
+                                <div class="text-danger small">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            {{ form.priority.label(class="form-label") }}
+                            {{ form.priority(class="form-select") }}
+                            {% for error in form.priority.errors %}
+                                <div class="text-danger small">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.estimated_value.label(class="form-label") }}
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                {{ form.estimated_value(class="form-control") }}
+                            </div>
+                            {% for error in form.estimated_value.errors %}
+                                <div class="text-danger small">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            {{ form.expected_close_date.label(class="form-label") }}
+                            {{ form.expected_close_date(class="form-control") }}
+                            {% for error in form.expected_close_date.errors %}
+                                <div class="text-danger small">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.notes.label(class="form-label") }}
+                        {{ form.notes(class="form-control", rows="4") }}
+                        {% for error in form.notes.errors %}
+                            <div class="text-danger small">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('sales.lead_detail', id=lead.id) }}" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Cancel
+                        </a>
+                        {{ form.submit(class="btn btn-primary") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0">Current Lead Info</h6>
+            </div>
+            <div class="card-body">
+                <table class="table table-borderless table-sm">
+                    <tr>
+                        <td><strong>Company:</strong></td>
+                        <td>{{ lead.company_name }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Contact:</strong></td>
+                        <td>{{ lead.contact_person }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Email:</strong></td>
+                        <td>{{ lead.email }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Phone:</strong></td>
+                        <td>{{ lead.phone or 'N/A' }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Industry:</strong></td>
+                        <td>{{ lead.industry or 'N/A' }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Source:</strong></td>
+                        <td>{{ lead.source or 'N/A' }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Created:</strong></td>
+                        <td>{{ lead.created_at.strftime('%B %d, %Y') }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header">
+                <h6 class="mb-0">Status Guide</h6>
+            </div>
+            <div class="card-body">
+                <div class="mb-2">
+                    <span class="badge bg-secondary me-2">New</span>
+                    <small>Just received, needs qualification</small>
+                </div>
+                <div class="mb-2">
+                    <span class="badge bg-info me-2">Qualified</span>
+                    <small>Verified as potential customer</small>
+                </div>
+                <div class="mb-2">
+                    <span class="badge bg-warning me-2">Proposal</span>
+                    <small>Proposal sent, awaiting response</small>
+                </div>
+                <div class="mb-2">
+                    <span class="badge bg-primary me-2">Negotiation</span>
+                    <small>In active negotiation</small>
+                </div>
+                <div class="mb-2">
+                    <span class="badge bg-success me-2">Closed Won</span>
+                    <small>Successfully converted to client</small>
+                </div>
+                <div class="mb-2">
+                    <span class="badge bg-danger me-2">Closed Lost</span>
+                    <small>Did not convert to client</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

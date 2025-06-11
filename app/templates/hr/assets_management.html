@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}Assets Management - HR{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-laptop text-primary"></i> Assets Management</h2>
+                <a href="{{ url_for('hr.create_asset') }}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Add New Asset
+                </a>
+            </div>
+
+            {% if assets %}
+            <div class="row">
+                {% for asset in assets %}
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card shadow h-100">
+                        <div class="card-header bg-primary text-white">
+                            <h6 class="mb-0">{{ asset.name }}</h6>
+                            <small>{{ asset.asset_tag }}</small>
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Category:</strong> {{ asset.category }}</p>
+                            <p><strong>Status:</strong> 
+                                <span class="badge badge-{{ 'success' if asset.status == 'Available' else 'warning' if asset.status == 'In Use' else 'danger' }}">
+                                    {{ asset.status }}
+                                </span>
+                            </p>
+                            {% if asset.assigned_to %}
+                            <p><strong>Assigned to:</strong> {{ asset.assigned_employee.full_name }}</p>
+                            {% endif %}
+                            <p><strong>Purchase Date:</strong> {{ asset.purchase_date.strftime('%Y-%m-%d') if asset.purchase_date else 'N/A' }}</p>
+                            {% if asset.purchase_cost %}
+                            <p><strong>Cost:</strong> ${{ "{:,.2f}".format(asset.purchase_cost) }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-laptop fa-5x text-muted mb-4"></i>
+                <h4 class="text-muted">No Assets Found</h4>
+                <p class="text-muted">Add your first asset to get started.</p>
+                <a href="{{ url_for('hr.create_asset') }}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-plus"></i> Add First Asset
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

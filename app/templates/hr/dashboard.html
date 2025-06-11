@@ -1,0 +1,264 @@
+{% extends "base.html" %}
+
+{% block title %}HR Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3 mb-0 text-gray-800">
+                    <i class="fas fa-users-cog text-primary"></i> HR Dashboard
+                </h1>
+                <div class="btn-group" role="group">
+                    <a href="{{ url_for('hr.create_job_posting') }}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> New Job Posting
+                    </a>
+                    <a href="{{ url_for('hr.create_asset') }}" class="btn btn-outline-primary">
+                        <i class="fas fa-laptop"></i> Add Asset
+                    </a>
+                    <a href="{{ url_for('hr.add_petty_cash') }}" class="btn btn-outline-success">
+                        <i class="fas fa-money-bill"></i> Petty Cash
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Key Metrics Row -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Total Employees
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_employees }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-users fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Active Job Postings
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ active_job_postings }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-briefcase fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Pending Applications
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ pending_applications }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-file-alt fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Pending Leaves
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ pending_leaves }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-calendar-times fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Row -->
+    <div class="row">
+        <!-- Quick Actions -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Quick Actions</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <a href="{{ url_for('hr.job_postings') }}" class="btn btn-outline-primary btn-block">
+                                <i class="fas fa-briefcase"></i> Manage Jobs
+                            </a>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <a href="{{ url_for('hr.job_applications') }}" class="btn btn-outline-info btn-block">
+                                <i class="fas fa-file-alt"></i> Applications
+                            </a>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <a href="{{ url_for('hr.salary_management') }}" class="btn btn-outline-success btn-block">
+                                <i class="fas fa-dollar-sign"></i> Salary Management
+                            </a>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <a href="{{ url_for('hr.attendance_management') }}" class="btn btn-outline-warning btn-block">
+                                <i class="fas fa-clock"></i> Attendance
+                            </a>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <a href="{{ url_for('hr.employee_management') }}" class="btn btn-outline-secondary btn-block">
+                                <i class="fas fa-users"></i> Employees
+                            </a>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <a href="{{ url_for('hr.assets_management') }}" class="btn btn-outline-dark btn-block">
+                                <i class="fas fa-laptop"></i> Assets
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Upcoming Events -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Upcoming Events</h6>
+                    <a href="{{ url_for('hr.hr_calendar') }}" class="btn btn-sm btn-primary">
+                        <i class="fas fa-calendar"></i> View Calendar
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if upcoming_birthdays %}
+                        <h6 class="text-success"><i class="fas fa-birthday-cake"></i> Upcoming Birthdays</h6>
+                        {% for employee in upcoming_birthdays %}
+                            <div class="d-flex align-items-center mb-2">
+                                <div class="mr-3">
+                                    <div class="icon-circle bg-success">
+                                        <i class="fas fa-birthday-cake text-white"></i>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="small text-gray-500">{{ employee.date_of_birth.strftime('%B %d') if employee.date_of_birth else 'N/A' }}</div>
+                                    <div class="font-weight-bold">{{ employee.full_name }}</div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted">No upcoming birthdays in the next 30 days.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activities Row -->
+    <div class="row">
+        <!-- Recent Applications -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Recent Applications</h6>
+                </div>
+                <div class="card-body">
+                    {% if recent_applications %}
+                        {% for application in recent_applications %}
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="mr-3">
+                                    <div class="icon-circle bg-info">
+                                        <i class="fas fa-user text-white"></i>
+                                    </div>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="font-weight-bold">{{ application.applicant_name }}</div>
+                                    <div class="small text-gray-500">{{ application.job_posting.title }}</div>
+                                    <div class="small text-gray-500">{{ application.applied_date.strftime('%Y-%m-%d') }}</div>
+                                </div>
+                                <div>
+                                    <span class="badge badge-{{ 'success' if application.status == 'Applied' else 'secondary' }}">
+                                        {{ application.status }}
+                                    </span>
+                                </div>
+                            </div>
+                        {% endfor %}
+                        <a href="{{ url_for('hr.job_applications') }}" class="btn btn-sm btn-primary">View All Applications</a>
+                    {% else %}
+                        <p class="text-muted">No recent applications.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Leave Requests -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Recent Leave Requests</h6>
+                </div>
+                <div class="card-body">
+                    {% if recent_leaves %}
+                        {% for leave in recent_leaves %}
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="mr-3">
+                                    <div class="icon-circle bg-warning">
+                                        <i class="fas fa-calendar-times text-white"></i>
+                                    </div>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="font-weight-bold">{{ leave.employee.full_name }}</div>
+                                    <div class="small text-gray-500">{{ leave.leave_type }} - {{ leave.days }} days</div>
+                                    <div class="small text-gray-500">{{ leave.start_date.strftime('%Y-%m-%d') }} to {{ leave.end_date.strftime('%Y-%m-%d') }}</div>
+                                </div>
+                                <div>
+                                    <span class="badge badge-{{ 'warning' if leave.status == 'Pending' else 'success' if leave.status == 'Approved' else 'danger' }}">
+                                        {{ leave.status }}
+                                    </span>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted">No recent leave requests.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.icon-circle {
+    height: 2.5rem;
+    width: 2.5rem;
+    border-radius: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+</style>
+{% endblock %} 

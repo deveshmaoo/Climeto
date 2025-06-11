@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{% block title %}Application Detail - HR{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-user text-primary"></i> {{ application.applicant_name }}</h2>
+                <a href="{{ url_for('hr.job_applications') }}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Applications
+                </a>
+            </div>
+
+            <div class="row">
+                <!-- Applicant Information -->
+                <div class="col-lg-8">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">Applicant Information</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>Name:</strong> {{ application.applicant_name }}</p>
+                                    <p><strong>Email:</strong> {{ application.applicant_email }}</p>
+                                    {% if application.applicant_phone %}
+                                    <p><strong>Phone:</strong> {{ application.applicant_phone }}</p>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6">
+                                    {% if application.experience_years %}
+                                    <p><strong>Experience:</strong> {{ application.experience_years }} years</p>
+                                    {% endif %}
+                                    {% if application.current_salary %}
+                                    <p><strong>Current Salary:</strong> ${{ "{:,.0f}".format(application.current_salary) }}</p>
+                                    {% endif %}
+                                    {% if application.expected_salary %}
+                                    <p><strong>Expected Salary:</strong> ${{ "{:,.0f}".format(application.expected_salary) }}</p>
+                                    {% endif %}
+                                    {% if application.notice_period %}
+                                    <p><strong>Notice Period:</strong> {{ application.notice_period }}</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            {% if application.cover_letter %}
+                            <hr>
+                            <h6>Cover Letter</h6>
+                            <div class="bg-light p-3 rounded">
+                                {{ application.cover_letter|nl2br }}
+                            </div>
+                            {% endif %}
+                            
+                            {% if application.notes %}
+                            <hr>
+                            <h6>Notes</h6>
+                            <div class="bg-warning p-3 rounded">
+                                {{ application.notes|nl2br }}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Application Status & Actions -->
+                <div class="col-lg-4">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">Application Status</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <strong>Job Position:</strong>
+                                <div>{{ application.job_posting.title }}</div>
+                                <small class="text-muted">{{ application.job_posting.department }}</small>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <strong>Applied Date:</strong>
+                                <div>{{ application.applied_date.strftime('%Y-%m-%d %H:%M') }}</div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <strong>Current Status:</strong>
+                                <div>
+                                    <span class="badge badge-lg badge-primary">{{ application.status }}</span>
+                                </div>
+                            </div>
+                            
+                            {% if application.resume_path %}
+                            <div class="mb-3">
+                                <a href="/uploads/{{ application.resume_path }}" target="_blank" class="btn btn-outline-info btn-block">
+                                    <i class="fas fa-file-pdf"></i> View Resume
+                                </a>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Interview History -->
+                    {% if interviews %}
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Interview History</h5>
+                        </div>
+                        <div class="card-body">
+                            {% for interview in interviews %}
+                            <div class="border-bottom pb-3 mb-3">
+                                <div class="d-flex justify-content-between">
+                                    <strong>{{ interview.interview_type }}</strong>
+                                    <span class="badge badge-{{ 'success' if interview.status == 'Completed' else 'warning' }}">
+                                        {{ interview.status }}
+                                    </span>
+                                </div>
+                                <div class="small text-muted">
+                                    {{ interview.scheduled_date.strftime('%Y-%m-%d %H:%M') }}
+                                </div>
+                                <div class="small">
+                                    <strong>Interviewer:</strong> {{ interview.interviewer.full_name }}
+                                </div>
+                                {% if interview.rating %}
+                                <div class="small">
+                                    <strong>Rating:</strong> {{ interview.rating }}/10
+                                </div>
+                                {% endif %}
+                                {% if interview.feedback %}
+                                <div class="small mt-2">
+                                    <strong>Feedback:</strong> {{ interview.feedback }}
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

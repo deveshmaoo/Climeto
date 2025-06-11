@@ -1,0 +1,236 @@
+{% extends "base.html" %}
+
+{% block title %}Clients - HRMS{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2"><i class="fas fa-users"></i> Clients</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group me-2">
+            <a href="{{ url_for('sales.create_lead') }}" class="btn btn-sm btn-outline-secondary">
+                <i class="fas fa-plus"></i> Add Lead
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="row mb-3">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="GET" class="row g-3">
+                    <div class="col-md-4">
+                        <label for="status" class="form-label">Status</label>
+                        <select name="status" id="status" class="form-select">
+                            <option value="all" {% if filters.status == 'all' %}selected{% endif %}>All Status</option>
+                            <option value="Active" {% if filters.status == 'Active' %}selected{% endif %}>Active</option>
+                            <option value="Inactive" {% if filters.status == 'Inactive' %}selected{% endif %}>Inactive</option>
+                            <option value="Suspended" {% if filters.status == 'Suspended' %}selected{% endif %}>Suspended</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="industry" class="form-label">Industry</label>
+                        <select name="industry" id="industry" class="form-select">
+                            <option value="all" {% if filters.industry == 'all' %}selected{% endif %}>All Industries</option>
+                            {% for industry in industries %}
+                                <option value="{{ industry }}" {% if filters.industry == industry %}selected{% endif %}>{{ industry }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="submit" class="form-label">&nbsp;</label>
+                        <div>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-filter"></i> Filter
+                            </button>
+                            <a href="{{ url_for('sales.list_clients') }}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Clear
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Clients List -->
+<div class="row">
+    <div class="col-md-12">
+        {% if clients %}
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    Client List 
+                    <span class="badge bg-primary ms-2">{{ clients|length }} clients</span>
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Company</th>
+                                <th>Industry</th>
+                                <th>Contact</th>
+                                <th>Status</th>
+                                <th>Account Manager</th>
+                                <th>EPR Assigned</th>
+                                <th>Projects</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for client in clients %}
+                            <tr>
+                                <td>
+                                    <strong>{{ client.company_name }}</strong>
+                                    <br>
+                                    <small class="text-muted">Client since {{ client.created_at.strftime('%b %Y') }}</small>
+                                </td>
+                                <td>
+                                    <span class="badge bg-info">{{ client.industry or 'N/A' }}</span>
+                                </td>
+                                <td>
+                                    <div>
+                                        <strong>{{ client.contact_name }}</strong><br>
+                                        <small class="text-muted">
+                                            <i class="fas fa-envelope"></i> {{ client.contact_email }}<br>
+                                            {% if client.contact_phone %}
+                                            <i class="fas fa-phone"></i> {{ client.contact_phone }}
+                                            {% endif %}
+                                        </small>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge 
+                                        {% if client.status == 'Active' %}bg-success
+                                        {% elif client.status == 'Inactive' %}bg-secondary
+                                        {% else %}bg-warning{% endif %}">
+                                        {{ client.status }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if client.account_manager %}
+                                        {{ client.account_manager.first_name }} {{ client.account_manager.last_name }}
+                                    {% else %}
+                                        <span class="text-muted">Unassigned</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if client.assigned_to_epr %}
+                                        {{ client.assigned_to_epr.first_name }} {{ client.assigned_to_epr.last_name }}
+                                    {% else %}
+                                        <span class="text-muted">Not Assigned</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="badge bg-primary">{{ client.projects.count() }}</span>
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <a href="{{ url_for('sales.client_detail', id=client.id) }}" 
+                                           class="btn btn-outline-primary btn-sm">
+                                            <i class="fas fa-eye"></i> View
+                                        </a>
+                                        <button class="btn btn-outline-secondary btn-sm" 
+                                                onclick="alert('Edit functionality coming soon!')">
+                                            <i class="fas fa-edit"></i> Edit
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Client Statistics -->
+        <div class="row mt-4">
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h4 class="text-success">{{ clients|selectattr('status', 'equalto', 'Active')|list|length }}</h4>
+                        <small class="text-muted">Active Clients</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h4 class="text-secondary">{{ clients|selectattr('status', 'equalto', 'Inactive')|list|length }}</h4>
+                        <small class="text-muted">Inactive Clients</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h4 class="text-info">
+                            {% set total_projects = clients|sum(attribute='projects')|list|length %}
+                            {{ total_projects if total_projects else 0 }}
+                        </h4>
+                        <small class="text-muted">Total Projects</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h4 class="text-primary">{{ industries|length }}</h4>
+                        <small class="text-muted">Industries</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        {% else %}
+        <div class="card">
+            <div class="card-body text-center py-5">
+                <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                <h5>No Clients Found</h5>
+                <p class="text-muted">No clients match your current filters.</p>
+                <a href="{{ url_for('sales.create_lead') }}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Create First Lead
+                </a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Quick Actions Modal -->
+<div class="modal fade" id="quickActionModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Quick Actions</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('sales.create_lead') }}" class="btn btn-primary">
+                        <i class="fas fa-user-plus"></i> Add New Lead
+                    </a>
+                    <a href="{{ url_for('sales.analytics') }}" class="btn btn-info">
+                        <i class="fas fa-chart-bar"></i> View Analytics
+                    </a>
+                    <a href="{{ url_for('sales.sales_funnel') }}" class="btn btn-success">
+                        <i class="fas fa-funnel-dollar"></i> Sales Funnel
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Floating Action Button -->
+<div class="position-fixed bottom-0 end-0 p-3">
+    <button class="btn btn-primary btn-lg rounded-circle" data-bs-toggle="modal" data-bs-target="#quickActionModal">
+        <i class="fas fa-plus"></i>
+    </button>
+</div>
+{% endblock %} 

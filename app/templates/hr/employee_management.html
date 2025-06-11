@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block title %}Employee Management - HR{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-users text-primary"></i> Employee Management</h2>
+                <a href="{{ url_for('auth.create_user') }}" class="btn btn-primary">
+                    <i class="fas fa-user-plus"></i> Add New Employee
+                </a>
+            </div>
+
+            <!-- Filters -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form method="GET" class="row g-3">
+                        <div class="col-md-3">
+                            <input type="text" class="form-control" name="search" placeholder="Search employees..."
+                                   value="{{ search }}" onchange="this.form.submit()">
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-select" name="department" onchange="this.form.submit()">
+                                <option value="all">All Departments</option>
+                                {% for dept in departments %}
+                                <option value="{{ dept[0] }}" {{ 'selected' if department_filter == dept[0] else '' }}>
+                                    {{ dept[0] }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-select" name="status" onchange="this.form.submit()">
+                                <option value="all">All Status</option>
+                                <option value="active" {{ 'selected' if status_filter == 'active' else '' }}>Active</option>
+                                <option value="inactive" {{ 'selected' if status_filter == 'inactive' else '' }}>Inactive</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="{{ url_for('hr.employee_management') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-refresh"></i> Clear
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Employee List -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Employees ({{ employees|length }} found)</h5>
+                </div>
+                <div class="card-body p-0">
+                    {% if employees %}
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Employee</th>
+                                    <th>Department</th>
+                                    <th>Designation</th>
+                                    <th>Joining Date</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for employee in employees %}
+                                <tr>
+                                    <td>
+                                        <div>
+                                            <strong>{{ employee.full_name }}</strong>
+                                            <br>
+                                            <small class="text-muted">{{ employee.employee_id }}</small>
+                                            <br>
+                                            <small class="text-muted">{{ employee.work_email }}</small>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-info">{{ employee.department }}</span>
+                                    </td>
+                                    <td>{{ employee.designation }}</td>
+                                    <td>{{ employee.joining_date.strftime('%Y-%m-%d') }}</td>
+                                    <td>
+                                        <span class="badge badge-{{ 'success' if employee.employment_status == 'Active' else 'danger' }}">
+                                            {{ employee.employment_status }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <a href="{{ url_for('employee.profile', employee_id=employee.id) }}" 
+                                               class="btn btn-outline-primary" title="View Profile">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="{{ url_for('hr.set_employee_salary', employee_id=employee.id) }}" 
+                                               class="btn btn-outline-success" title="Manage Salary">
+                                                <i class="fas fa-dollar-sign"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No Employees Found</h5>
+                        <p class="text-muted">
+                            {% if search or department_filter != 'all' or status_filter != 'all' %}
+                                No employees match your current filters.
+                            {% else %}
+                                Add employees to get started.
+                            {% endif %}
+                        </p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+
+{% block title %}Job Applications - HR{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-file-alt text-primary"></i> Job Applications</h2>
+                <a href="{{ url_for('hr.job_postings') }}" class="btn btn-outline-primary">
+                    <i class="fas fa-briefcase"></i> Manage Job Postings
+                </a>
+            </div>
+
+            <!-- Filters -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form method="GET" class="row g-3">
+                        <div class="col-md-4">
+                            <label for="status" class="form-label">Filter by Status</label>
+                            <select class="form-select" id="status" name="status" onchange="this.form.submit()">
+                                <option value="all" {{ 'selected' if status_filter == 'all' else '' }}>All Statuses</option>
+                                <option value="Applied" {{ 'selected' if status_filter == 'Applied' else '' }}>Applied</option>
+                                <option value="Screening" {{ 'selected' if status_filter == 'Screening' else '' }}>Screening</option>
+                                <option value="Interview" {{ 'selected' if status_filter == 'Interview' else '' }}>Interview</option>
+                                <option value="Rejected" {{ 'selected' if status_filter == 'Rejected' else '' }}>Rejected</option>
+                                <option value="Hired" {{ 'selected' if status_filter == 'Hired' else '' }}>Hired</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="job" class="form-label">Filter by Job</label>
+                            <select class="form-select" id="job" name="job" onchange="this.form.submit()">
+                                <option value="all" {{ 'selected' if job_filter == 'all' else '' }}>All Jobs</option>
+                                {% for job in job_postings %}
+                                <option value="{{ job.id }}" {{ 'selected' if job_filter == job.id|string else '' }}>
+                                    {{ job.title }} - {{ job.department }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4 d-flex align-items-end">
+                            <a href="{{ url_for('hr.job_applications') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-refresh"></i> Clear Filters
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Applications List -->
+            {% if applications %}
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Applications ({{ applications|length }} found)</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Applicant</th>
+                                    <th>Job Position</th>
+                                    <th>Experience</th>
+                                    <th>Expected Salary</th>
+                                    <th>Applied Date</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for application in applications %}
+                                <tr>
+                                    <td>
+                                        <div>
+                                            <strong>{{ application.applicant_name }}</strong>
+                                            <br>
+                                            <small class="text-muted">
+                                                <i class="fas fa-envelope"></i> {{ application.applicant_email }}
+                                            </small>
+                                            {% if application.applicant_phone %}
+                                            <br>
+                                            <small class="text-muted">
+                                                <i class="fas fa-phone"></i> {{ application.applicant_phone }}
+                                            </small>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div>
+                                            <strong>{{ application.job_posting.title }}</strong>
+                                            <br>
+                                            <small class="text-muted">{{ application.job_posting.department }}</small>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        {% if application.experience_years %}
+                                            <span class="badge badge-info">{{ application.experience_years }} years</span>
+                                        {% else %}
+                                            <span class="text-muted">Not specified</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if application.expected_salary %}
+                                            <span class="text-success">${{ "{:,.0f}".format(application.expected_salary) }}</span>
+                                        {% else %}
+                                            <span class="text-muted">Not specified</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <small>{{ application.applied_date.strftime('%Y-%m-%d') }}</small>
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-{{ 
+                                            'success' if application.status == 'Hired' else
+                                            'primary' if application.status == 'Applied' else
+                                            'info' if application.status == 'Screening' else
+                                            'warning' if application.status == 'Interview' else
+                                            'danger' if application.status == 'Rejected' else 'secondary'
+                                        }}">
+                                            {{ application.status }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <a href="{{ url_for('hr.application_detail', id=application.id) }}" 
+                                               class="btn btn-outline-primary" title="View Details">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            {% if application.resume_path %}
+                                            <a href="/uploads/{{ application.resume_path }}" target="_blank"
+                                               class="btn btn-outline-info" title="View Resume">
+                                                <i class="fas fa-file-pdf"></i>
+                                            </a>
+                                            {% endif %}
+                                            <div class="dropdown">
+                                                <button class="btn btn-outline-secondary dropdown-toggle" 
+                                                        type="button" data-bs-toggle="dropdown">
+                                                    <i class="fas fa-cog"></i>
+                                                </button>
+                                                <ul class="dropdown-menu">
+                                                    <li><a class="dropdown-item" href="#" onclick="updateStatus({{ application.id }}, 'Screening')">Move to Screening</a></li>
+                                                    <li><a class="dropdown-item" href="#" onclick="updateStatus({{ application.id }}, 'Interview')">Schedule Interview</a></li>
+                                                    <li><a class="dropdown-item" href="#" onclick="updateStatus({{ application.id }}, 'Hired')">Mark as Hired</a></li>
+                                                    <li><hr class="dropdown-divider"></li>
+                                                    <li><a class="dropdown-item text-danger" href="#" onclick="updateStatus({{ application.id }}, 'Rejected')">Reject</a></li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-file-alt fa-5x text-muted mb-4"></i>
+                <h4 class="text-muted">No Applications Found</h4>
+                <p class="text-muted">
+                    {% if status_filter != 'all' or job_filter != 'all' %}
+                        No applications match your current filters.
+                    {% else %}
+                        No applications have been received yet.
+                    {% endif %}
+                </p>
+                {% if status_filter != 'all' or job_filter != 'all' %}
+                <a href="{{ url_for('hr.job_applications') }}" class="btn btn-primary">
+                    <i class="fas fa-refresh"></i> Clear Filters
+                </a>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+function updateStatus(applicationId, newStatus) {
+    if (confirm(`Are you sure you want to update this application to "${newStatus}"?`)) {
+        // This would typically be an AJAX call to update the status
+        // For now, we'll implement this feature later
+        alert('Status update feature will be implemented soon.');
+    }
+}
+</script>
+{% endblock %} 

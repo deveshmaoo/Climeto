@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+
+{% block title %}Attendance Management - HR{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-clock text-primary"></i> Attendance Management</h2>
+                <a href="{{ url_for('hr.upload_attendance') }}" class="btn btn-primary">
+                    <i class="fas fa-upload"></i> Upload Attendance Data
+                </a>
+            </div>
+
+            <!-- Summary Cards -->
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <div class="card border-left-primary shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                        Total Employees
+                                    </div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_employees }}</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-users fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card border-left-success shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                        Present Today
+                                    </div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ present_today }}</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-user-check fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card border-left-info shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                        Attendance Rate
+                                    </div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                        {% if total_employees > 0 %}
+                                            {{ "%.1f"|format((present_today / total_employees) * 100) }}%
+                                        {% else %}
+                                            0%
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-percentage fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Attendance Records -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Recent Attendance Records</h5>
+                </div>
+                <div class="card-body p-0">
+                    {% if recent_attendance %}
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Employee</th>
+                                    <th>Date</th>
+                                    <th>Check In</th>
+                                    <th>Check Out</th>
+                                    <th>Hours Worked</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for attendance in recent_attendance %}
+                                <tr>
+                                    <td>
+                                        <div>
+                                            <strong>{{ attendance.employee.full_name }}</strong>
+                                            <br>
+                                            <small class="text-muted">{{ attendance.employee.employee_id }}</small>
+                                        </div>
+                                    </td>
+                                    <td>{{ attendance.date.strftime('%Y-%m-%d') }}</td>
+                                    <td>
+                                        {% if attendance.in_time %}
+                                            {{ attendance.in_time.strftime('%H:%M') }}
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if attendance.out_time %}
+                                            {{ attendance.out_time.strftime('%H:%M') }}
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if attendance.in_time and attendance.out_time %}
+                                            {{ "%.2f"|format(attendance.calculate_hours_worked()) }} hrs
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-{{ 
+                                            'success' if attendance.status == 'Present' else
+                                            'warning' if attendance.status == 'Late' else
+                                            'danger' if attendance.status == 'Absent' else
+                                            'info' if attendance.status == 'Half-Day' else 'secondary'
+                                        }}">
+                                            {{ attendance.status }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-clock fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No Attendance Records</h5>
+                        <p class="text-muted">Upload attendance data to view records here.</p>
+                        <a href="{{ url_for('hr.upload_attendance') }}" class="btn btn-primary">
+                            <i class="fas fa-upload"></i> Upload Attendance Data
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

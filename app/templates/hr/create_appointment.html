@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+
+{% block title %}Schedule Appointment - HR{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-calendar-plus text-primary"></i> Schedule New Appointment</h2>
+                <a href="{{ url_for('hr.appointments') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Appointments
+                </a>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Appointment Details</h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="POST">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                                <div class="mb-3">
+                                    <label for="title" class="form-label">Appointment Title *</label>
+                                    <input type="text" class="form-control" id="title" name="title" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="description" class="form-label">Description</label>
+                                    <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="appointment_date" class="form-label">Date *</label>
+                                        <input type="date" class="form-control" id="appointment_date" name="appointment_date" required>
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <label for="start_time" class="form-label">Start Time *</label>
+                                        <input type="time" class="form-control" id="start_time" name="start_time" required>
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <label for="end_time" class="form-label">End Time</label>
+                                        <input type="time" class="form-control" id="end_time" name="end_time">
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="location" class="form-label">Location</label>
+                                    <input type="text" class="form-control" id="location" name="location" placeholder="Meeting room, address, or virtual link">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="meeting_type" class="form-label">Meeting Type *</label>
+                                    <select class="form-select" id="meeting_type" name="meeting_type" required>
+                                        <option value="">Select meeting type</option>
+                                        <option value="Interview">Interview</option>
+                                        <option value="Performance Review">Performance Review</option>
+                                        <option value="Team Meeting">Team Meeting</option>
+                                        <option value="Client Meeting">Client Meeting</option>
+                                        <option value="Training">Training</option>
+                                        <option value="One-on-One">One-on-One</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="participants" class="form-label">Participants</label>
+                                    <select class="form-select" id="participants" name="participants" multiple>
+                                        {% for employee in employees %}
+                                        <option value="{{ employee.id }}">{{ employee.first_name }} {{ employee.last_name }} ({{ employee.department }})</option>
+                                        {% endfor %}
+                                    </select>
+                                    <small class="text-muted">Hold Ctrl/Cmd to select multiple participants</small>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="notes" class="form-label">Additional Notes</label>
+                                    <textarea class="form-control" id="notes" name="notes" rows="3"></textarea>
+                                </div>
+
+                                <div class="d-flex justify-content-end">
+                                    <a href="{{ url_for('hr.appointments') }}" class="btn btn-secondary me-2">Cancel</a>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-calendar-check"></i> Schedule Appointment
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h6 class="mb-0">Meeting Types</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-2">
+                                <span class="badge bg-primary me-2">Interview</span>
+                                <small>Job interviews, candidate meetings</small>
+                            </div>
+                            <div class="mb-2">
+                                <span class="badge bg-success me-2">Performance Review</span>
+                                <small>Employee evaluations, feedback sessions</small>
+                            </div>
+                            <div class="mb-2">
+                                <span class="badge bg-info me-2">Team Meeting</span>
+                                <small>Department meetings, project discussions</small>
+                            </div>
+                            <div class="mb-2">
+                                <span class="badge bg-warning me-2">Training</span>
+                                <small>Workshops, skill development sessions</small>
+                            </div>
+                            <div class="mb-2">
+                                <span class="badge bg-secondary me-2">One-on-One</span>
+                                <small>Individual meetings, mentoring</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card mt-3">
+                        <div class="card-header">
+                            <h6 class="mb-0">Tips</h6>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-unstyled mb-0">
+                                <li class="mb-2">
+                                    <i class="fas fa-clock text-info me-2"></i>
+                                    Schedule appointments during business hours
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-users text-success me-2"></i>
+                                    Add all relevant participants
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-map-marker-alt text-warning me-2"></i>
+                                    Include meeting room or virtual link
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-file-alt text-primary me-2"></i>
+                                    Add agenda or notes for better preparation
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Set minimum date to today
+document.getElementById('appointment_date').min = new Date().toISOString().split('T')[0];
+
+// Auto-set end time when start time is selected
+document.getElementById('start_time').addEventListener('change', function() {
+    const startTime = this.value;
+    if (startTime && !document.getElementById('end_time').value) {
+        const [hours, minutes] = startTime.split(':');
+        const endHours = (parseInt(hours) + 1).toString().padStart(2, '0');
+        document.getElementById('end_time').value = `${endHours}:${minutes}`;
+    }
+});
+</script>
+{% endblock %} 

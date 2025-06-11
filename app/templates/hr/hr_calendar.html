@@ -1,0 +1,205 @@
+{% extends "base.html" %}
+
+{% block title %}HR Calendar - HR{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-calendar text-primary"></i> HR Calendar</h2>
+                <button class="btn btn-primary" onclick="refreshCalendar()">
+                    <i class="fas fa-sync"></i> Refresh
+                </button>
+            </div>
+
+            <!-- Filter Tabs -->
+            <ul class="nav nav-tabs mb-4" id="calendarTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="all-tab" data-bs-toggle="tab" data-bs-target="#all" 
+                            type="button" role="tab">All Events</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="birthdays-tab" data-bs-toggle="tab" data-bs-target="#birthdays" 
+                            type="button" role="tab">Birthdays</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="anniversaries-tab" data-bs-toggle="tab" data-bs-target="#anniversaries" 
+                            type="button" role="tab">Work Anniversaries</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="events-tab" data-bs-toggle="tab" data-bs-target="#events" 
+                            type="button" role="tab">HR Events</button>
+                </li>
+            </ul>
+
+            <div class="tab-content" id="calendarTabContent">
+                <!-- All Events Tab -->
+                <div class="tab-pane fade show active" id="all" role="tabpanel">
+                    <div class="row">
+                        {% for event in calendar_events %}
+                        <div class="col-lg-4 col-md-6 mb-4">
+                            <div class="card border-left-{{ 
+                                'info' if event.type == 'Birthday' else
+                                'success' if event.type == 'Anniversary' else
+                                'primary' if event.type == 'Meeting' else
+                                'warning' if event.type == 'Training' else 'secondary'
+                            }} shadow h-100">
+                                <div class="card-header">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <h6 class="mb-0">{{ event.title }}</h6>
+                                        <span class="badge badge-{{ 
+                                            'info' if event.type == 'Birthday' else
+                                            'success' if event.type == 'Anniversary' else
+                                            'primary' if event.type == 'Meeting' else
+                                            'warning' if event.type == 'Training' else 'secondary'
+                                        }}">
+                                            {{ event.type }}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <p class="mb-2">
+                                        <strong><i class="fas fa-calendar-day"></i> Date:</strong>
+                                        {{ event.date.strftime('%B %d, %Y') }}
+                                    </p>
+                                    {% if event.event_time %}
+                                    <p class="mb-2">
+                                        <strong><i class="fas fa-clock"></i> Time:</strong>
+                                        {{ event.event_time.strftime('%H:%M') }}
+                                    </p>
+                                    {% endif %}
+                                    {% if event.location %}
+                                    <p class="mb-2">
+                                        <strong><i class="fas fa-map-marker-alt"></i> Location:</strong>
+                                        {{ event.location }}
+                                    </p>
+                                    {% endif %}
+                                    {% if event.description %}
+                                    <p class="small text-muted">{{ event.description }}</p>
+                                    {% endif %}
+                                    
+                                    <!-- Days until event -->
+                                    {% set days_diff = (event.date - today).days %}
+                                    {% if days_diff == 0 %}
+                                        <div class="alert alert-warning small py-1">Today!</div>
+                                    {% elif days_diff == 1 %}
+                                        <div class="alert alert-info small py-1">Tomorrow</div>
+                                    {% elif days_diff > 0 and days_diff <= 7 %}
+                                        <div class="alert alert-info small py-1">In {{ days_diff }} days</div>
+                                    {% elif days_diff < 0 %}
+                                        <div class="alert alert-secondary small py-1">{{ (-days_diff) }} days ago</div>
+                                    {% endif %}
+                                </div>
+                                {% if event.participants %}
+                                <div class="card-footer">
+                                    <small class="text-muted">
+                                        <i class="fas fa-users"></i> {{ event.participants.count() }} participant{{ 's' if event.participants.count() != 1 else '' }}
+                                    </small>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Birthdays Tab -->
+                <div class="tab-pane fade" id="birthdays" role="tabpanel">
+                    <div class="row">
+                        {% for event in calendar_events %}
+                        {% if event.type == 'Birthday' %}
+                        <div class="col-lg-4 col-md-6 mb-4">
+                            <div class="card border-left-info shadow h-100">
+                                <div class="card-header bg-info text-white">
+                                    <h6 class="mb-0">🎂 {{ event.title }}</h6>
+                                </div>
+                                <div class="card-body">
+                                    <p><strong>Date:</strong> {{ event.date.strftime('%B %d') }}</p>
+                                    {% set days_diff = (event.date - today).days %}
+                                    {% if days_diff == 0 %}
+                                        <div class="alert alert-warning">🎉 Birthday Today!</div>
+                                    {% elif days_diff == 1 %}
+                                        <div class="alert alert-info">🎈 Birthday Tomorrow</div>
+                                    {% elif days_diff > 0 and days_diff <= 30 %}
+                                        <div class="alert alert-info">Birthday in {{ days_diff }} days</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Anniversaries Tab -->
+                <div class="tab-pane fade" id="anniversaries" role="tabpanel">
+                    <div class="row">
+                        {% for event in calendar_events %}
+                        {% if event.type == 'Anniversary' %}
+                        <div class="col-lg-4 col-md-6 mb-4">
+                            <div class="card border-left-success shadow h-100">
+                                <div class="card-header bg-success text-white">
+                                    <h6 class="mb-0">🏆 {{ event.title }}</h6>
+                                </div>
+                                <div class="card-body">
+                                    <p><strong>Date:</strong> {{ event.date.strftime('%B %d, %Y') }}</p>
+                                    {% if event.description %}
+                                    <p class="small">{{ event.description }}</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- HR Events Tab -->
+                <div class="tab-pane fade" id="events" role="tabpanel">
+                    <div class="row">
+                        {% for event in calendar_events %}
+                        {% if event.type not in ['Birthday', 'Anniversary'] %}
+                        <div class="col-lg-4 col-md-6 mb-4">
+                            <div class="card shadow h-100">
+                                <div class="card-header">
+                                    <h6 class="mb-0">{{ event.title }}</h6>
+                                    <small class="text-muted">{{ event.type }}</small>
+                                </div>
+                                <div class="card-body">
+                                    <p><strong>Date:</strong> {{ event.date.strftime('%B %d, %Y') }}</p>
+                                    {% if event.event_time %}
+                                    <p><strong>Time:</strong> {{ event.event_time.strftime('%H:%M') }}</p>
+                                    {% endif %}
+                                    {% if event.location %}
+                                    <p><strong>Location:</strong> {{ event.location }}</p>
+                                    {% endif %}
+                                    {% if event.description %}
+                                    <p class="small">{{ event.description }}</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            {% if not calendar_events %}
+            <div class="text-center py-5">
+                <i class="fas fa-calendar fa-5x text-muted mb-4"></i>
+                <h4 class="text-muted">No Events Found</h4>
+                <p class="text-muted">HR events, birthdays, and anniversaries will appear here.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+function refreshCalendar() {
+    location.reload();
+}
+</script>
+{% endblock %} 

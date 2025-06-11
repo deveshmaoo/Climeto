@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+
+{% block title %}Calendar - HRMS{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2"><i class="fas fa-calendar"></i> Calendar Events</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group me-2">
+            <a href="{{ url_for('core.create_event') }}" class="btn btn-sm btn-outline-secondary">
+                <i class="fas fa-plus"></i> Add Event
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        {% if events %}
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Upcoming Events</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Event</th>
+                                <th>Type</th>
+                                <th>Department</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for event in events %}
+                            <tr>
+                                <td>
+                                    <strong>{{ event.event_date.strftime('%b %d, %Y') }}</strong>
+                                    <br>
+                                    <small class="text-muted">{{ event.event_date.strftime('%A') }}</small>
+                                </td>
+                                <td>
+                                    <strong>{{ event.title }}</strong>
+                                </td>
+                                <td>
+                                    <span class="badge 
+                                        {% if event.event_type == 'Meeting' %}bg-primary
+                                        {% elif event.event_type == 'Deadline' %}bg-danger
+                                        {% elif event.event_type == 'Birthday' %}bg-success
+                                        {% elif event.event_type == 'Holiday' %}bg-warning
+                                        {% elif event.event_type == 'Training' %}bg-info
+                                        {% else %}bg-secondary{% endif %}">
+                                        {{ event.event_type }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if event.department %}
+                                        {{ event.department }}
+                                    {% else %}
+                                        <span class="text-muted">All Departments</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if event.description %}
+                                        {{ event.description[:100] }}{% if event.description|length > 100 %}...{% endif %}
+                                    {% else %}
+                                        <span class="text-muted">No description</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Quick Stats -->
+        <div class="row mt-4">
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h5 class="text-primary">{{ events|selectattr('event_type', 'equalto', 'Meeting')|list|length }}</h5>
+                        <small class="text-muted">Meetings</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h5 class="text-danger">{{ events|selectattr('event_type', 'equalto', 'Deadline')|list|length }}</h5>
+                        <small class="text-muted">Deadlines</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h5 class="text-success">{{ events|selectattr('event_type', 'equalto', 'Birthday')|list|length }}</h5>
+                        <small class="text-muted">Birthdays</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h5 class="text-info">{{ events|selectattr('event_type', 'equalto', 'Training')|list|length }}</h5>
+                        <small class="text-muted">Training</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        {% else %}
+        <div class="card">
+            <div class="card-body text-center py-5">
+                <i class="fas fa-calendar-alt fa-3x text-muted mb-3"></i>
+                <h5>No Events Scheduled</h5>
+                <p class="text-muted">No events are currently scheduled.</p>
+                <a href="{{ url_for('core.create_event') }}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Create First Event
+                </a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %} 

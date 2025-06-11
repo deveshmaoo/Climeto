@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+
+{% block title %}My Training - HRMS{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2"><i class="fas fa-book-reader"></i> My Training Assignments</h1>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        {% if assignments %}
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Assigned Training Programs</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Training Title</th>
+                                <th>Type</th>
+                                <th>Due Date</th>
+                                <th>Status</th>
+                                <th>Progress</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for assignment in assignments %}
+                            <tr>
+                                <td>
+                                    <strong>{{ assignment.training_title }}</strong>
+                                    <br>
+                                    <small class="text-muted">{{ assignment.description[:100] }}{% if assignment.description|length > 100 %}...{% endif %}</small>
+                                </td>
+                                <td>
+                                    <span class="badge 
+                                        {% if assignment.training_type == 'Performance Improvement' %}bg-warning
+                                        {% elif assignment.training_type == 'Compliance Training' %}bg-danger
+                                        {% elif assignment.training_type == 'Leadership Development' %}bg-success
+                                        {% else %}bg-primary{% endif %}">
+                                        {{ assignment.training_type }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {{ assignment.due_date.strftime('%b %d, %Y') }}
+                                    {% if assignment.due_date < current_date %}
+                                        <br><small class="text-danger"><i class="fas fa-exclamation-triangle"></i> Overdue</small>
+                                    {% elif (assignment.due_date - current_date).days <= 7 %}
+                                        <br><small class="text-warning"><i class="fas fa-clock"></i> Due Soon</small>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if assignment.status == 'Completed' %}
+                                        <span class="badge bg-success">Completed</span>
+                                    {% elif assignment.status == 'In Progress' %}
+                                        <span class="badge bg-info">In Progress</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Assigned</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="progress" style="height: 20px;">
+                                        {% set progress = 100 if assignment.status == 'Completed' else (50 if assignment.status == 'In Progress' else 0) %}
+                                        <div class="progress-bar 
+                                            {% if progress == 100 %}bg-success
+                                            {% elif progress > 0 %}bg-info
+                                            {% else %}bg-secondary{% endif %}" 
+                                            style="width: {{ progress }}%">
+                                            {{ progress }}%
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    {% if assignment.status != 'Completed' %}
+                                        <form method="POST" action="{{ url_for('core.complete_training', id=assignment.id) }}" style="display: inline;">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                                            <button type="submit" class="btn btn-sm btn-success" 
+                                                    onclick="return confirm('Mark this training as completed?')">
+                                                <i class="fas fa-check"></i> Complete
+                                            </button>
+                                        </form>
+                                    {% else %}
+                                        <span class="text-success">
+                                            <i class="fas fa-check-circle"></i> Completed
+                                        </span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Training Statistics -->
+        <div class="row mt-4">
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h5 class="text-primary">{{ assignments|selectattr('status', 'equalto', 'Assigned')|list|length }}</h5>
+                        <small class="text-muted">Pending</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h5 class="text-info">{{ assignments|selectattr('status', 'equalto', 'In Progress')|list|length }}</h5>
+                        <small class="text-muted">In Progress</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h5 class="text-success">{{ assignments|selectattr('status', 'equalto', 'Completed')|list|length }}</h5>
+                        <small class="text-muted">Completed</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h5 class="text-warning">
+                            {{ assignments|selectattr('due_date', 'lt', current_date)|selectattr('status', 'ne', 'Completed')|list|length }}
+                        </h5>
+                        <small class="text-muted">Overdue</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        {% else %}
+        <div class="card">
+            <div class="card-body text-center py-5">
+                <i class="fas fa-graduation-cap fa-3x text-muted mb-3"></i>
+                <h5>No Training Assignments</h5>
+                <p class="text-muted">You currently have no training assignments.</p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %} 
