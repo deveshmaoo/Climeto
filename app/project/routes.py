@@ -24,6 +24,10 @@ from ..services.project_service import ProjectService
 @login_required
 def dashboard():
     """Employee dashboard showing all assigned tasks across projects"""
+    if not current_user.employee:
+        flash("No employee profile found for the current user.", "warning")
+        return redirect(url_for('core.dashboard'))
+        
     employee = current_user.employee
     assigned_tasks = ProjectService.get_tasks_by_assignee(employee.id)
     created_tasks = ProjectService.get_tasks_by_creator(employee.id)
@@ -38,6 +42,9 @@ def dashboard():
 @login_required
 def list_projects():
     """List all projects the current user has access to"""
+    if not current_user.employee:
+        flash("No employee profile found for the current user.", "warning")
+        return redirect(url_for('core.dashboard'))
     employee = current_user.employee
     projects = ProjectService.get_accessible_projects(employee.id)
     
@@ -108,6 +115,9 @@ def project_tasks(id):
 @login_required
 def project_chat(id):
     """View project chat"""
+    if not current_user.employee:
+        flash("No employee profile found for the current user.", "warning")
+        return redirect(url_for('core.dashboard'))
     try:
         project = ProjectService.get_project_by_id(id)
         
@@ -159,6 +169,8 @@ def project_chat(id):
 @login_required
 def send_chat(id):
     """Send a chat message"""
+    if not current_user.employee:
+        return jsonify({'error': 'No employee profile found for the current user.'}), 403
     try:
         message = request.form.get('message')
         if not message:
@@ -170,12 +182,19 @@ def send_chat(id):
             message=message
         )
         
-        return jsonify({
+        # Process @mentions in the message
+        notifications = chat.process_mentions()
+        
+        response_data = {
             'id': chat.id,
             'message': chat.message,
             'sender_name': f"{chat.sender.first_name} {chat.sender.last_name}",
-            'created_at': chat.created_at.strftime('%Y-%m-%d %H:%M:%S')
-        })
+            'created_at': chat.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+            'has_mentions': chat.has_mentions,
+            'mentions_count': len(notifications) if notifications else 0
+        }
+        
+        return jsonify(response_data)
     except Exception as e:
         return jsonify({'error': str(e)}), 400
 
@@ -183,6 +202,9 @@ def send_chat(id):
 @login_required
 def all_tasks():
     """View all tasks across projects"""
+    if not current_user.employee:
+        flash("No employee profile found for the current user.", "warning")
+        return redirect(url_for('core.dashboard'))
     employee = current_user.employee
     tasks = ProjectService.get_accessible_tasks(employee.id)
     
@@ -192,6 +214,9 @@ def all_tasks():
 @login_required
 def all_chats():
     """View all chats across projects"""
+    if not current_user.employee:
+        flash("No employee profile found for the current user.", "warning")
+        return redirect(url_for('core.dashboard'))
     employee = current_user.employee
     filter_type = request.args.get('filter', 'all')
     
@@ -215,6 +240,9 @@ def all_chats():
 @login_required
 def create_task(project_id):
     """Create a new task in the project"""
+    if not current_user.employee:
+        flash("No employee profile found for the current user.", "warning")
+        return redirect(url_for('core.dashboard'))
     try:
         project = ProjectService.get_project_by_id(project_id)
         
@@ -247,6 +275,9 @@ def create_task(project_id):
 @login_required
 def rate_task(task_id):
     """Rate a completed task"""
+    if not current_user.employee:
+        flash("No employee profile found for the current user.", "warning")
+        return redirect(url_for('core.dashboard'))
     try:
         task = ProjectService.get_task_by_id(task_id)
         
@@ -276,6 +307,9 @@ def rate_task(task_id):
 @login_required
 def create_query(task_id):
     """Create a new query on a task"""
+    if not current_user.employee:
+        flash("No employee profile found for the current user.", "warning")
+        return redirect(url_for('core.dashboard'))
     try:
         query_text = request.form.get('query_text')
         if not query_text:
@@ -298,6 +332,9 @@ def create_query(task_id):
 @login_required
 def respond_to_query(query_id):
     """Respond to a task query"""
+    if not current_user.employee:
+        flash("No employee profile found for the current user.", "warning")
+        return redirect(url_for('core.dashboard'))
     try:
         response_text = request.form.get('response_text')
         if not response_text:
@@ -320,6 +357,9 @@ def respond_to_query(query_id):
 @login_required
 def upload_document(project_id):
     """Upload a new document to the project"""
+    if not current_user.employee:
+        flash("No employee profile found for the current user.", "warning")
+        return redirect(url_for('core.dashboard'))
     try:
         project = ProjectService.get_project_by_id(project_id)
         form = DocumentUploadForm()
@@ -350,6 +390,9 @@ def upload_document(project_id):
 @login_required
 def upload_new_version(doc_id):
     """Upload a new version of an existing document"""
+    if not current_user.employee:
+        flash("No employee profile found for the current user.", "warning")
+        return redirect(url_for('core.dashboard'))
     try:
         document = ProjectService.get_document_by_id(doc_id)
         
@@ -384,6 +427,9 @@ def upload_new_version(doc_id):
 @login_required
 def add_comment(version_id):
     """Add a comment to a document version"""
+    if not current_user.employee:
+        flash("No employee profile found for the current user.", "warning")
+        return redirect(url_for('core.dashboard'))
     try:
         version = ProjectService.get_document_version(version_id)
         form = DocumentCommentForm()
@@ -417,6 +463,9 @@ def task_detail(task_id):
 @login_required
 def update_task_status(task_id):
     """Update task status"""
+    if not current_user.employee:
+        flash("No employee profile found for the current user.", "warning")
+        return redirect(url_for('core.dashboard'))
     try:
         task = ProjectService.get_task_by_id(task_id)
         
@@ -445,6 +494,9 @@ def update_task_status(task_id):
 @login_required
 def add_member(project_id):
     """Add a team member to the project"""
+    if not current_user.employee:
+        flash("No employee profile found for the current user.", "warning")
+        return redirect(url_for('core.dashboard'))
     try:
         employee_id = request.form.get('employee_id')
         role = request.form.get('role', 'Team Member')

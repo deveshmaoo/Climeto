@@ -1,0 +1,378 @@
+{% extends "base.html" %}
+
+{% block title %}Notifications{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-bell text-primary"></i> Notifications</h2>
+                <div>
+                    <button class="btn btn-outline-secondary" onclick="refreshNotifications()">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                    <a href="{{ url_for('core.notification_preferences') }}" class="btn btn-outline-primary">
+                        <i class="fas fa-cog"></i> Preferences
+                    </a>
+                    {% if unread_count > 0 %}
+                    <button class="btn btn-primary" onclick="markAllAsRead()">
+                        <i class="fas fa-check-double"></i> Mark All Read ({{ unread_count }})
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Notification Stats -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card border-left-primary shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ notifications|length }}</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-bell fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card border-left-warning shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Unread</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ unread_count }}</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-exclamation-circle fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card border-left-info shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Mentions</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                        {{ notifications | selectattr('notification_type', 'equalto', 'mention') | list | length }}
+                                    </div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-at fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card border-left-success shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Meetings</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                        {{ notifications | selectattr('notification_type', 'equalto', 'meeting') | list | length }}
+                                    </div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-calendar-alt fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filter Tabs -->
+            <div class="card shadow mb-4">
+                <div class="card-header">
+                    <ul class="nav nav-tabs card-header-tabs" id="notificationTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="all-tab" data-bs-toggle="tab" data-bs-target="#all" 
+                                    type="button" role="tab">All</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="unread-tab" data-bs-toggle="tab" data-bs-target="#unread" 
+                                    type="button" role="tab">Unread ({{ unread_count }})</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="mentions-tab" data-bs-toggle="tab" data-bs-target="#mentions" 
+                                    type="button" role="tab">Mentions</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="meetings-tab" data-bs-toggle="tab" data-bs-target="#meetings" 
+                                    type="button" role="tab">Meetings</button>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-body p-0">
+                    <div class="tab-content" id="notificationTabContent">
+                        <!-- All Notifications -->
+                        <div class="tab-pane fade show active" id="all" role="tabpanel">
+                            <div id="notifications-container">
+                                {% for notification in notifications %}
+                                {% include 'core/_notification_item.html' %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <!-- Unread Notifications -->
+                        <div class="tab-pane fade" id="unread" role="tabpanel">
+                            {% for notification in notifications %}
+                                {% if not notification.is_read %}
+                                {% include 'core/_notification_item.html' %}
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        
+                        <!-- Mention Notifications -->
+                        <div class="tab-pane fade" id="mentions" role="tabpanel">
+                            {% for notification in notifications %}
+                                {% if notification.notification_type == 'mention' %}
+                                {% include 'core/_notification_item.html' %}
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        
+                        <!-- Meeting Notifications -->
+                        <div class="tab-pane fade" id="meetings" role="tabpanel">
+                            {% for notification in notifications %}
+                                {% if notification.notification_type == 'meeting' %}
+                                {% include 'core/_notification_item.html' %}
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Empty State -->
+            {% if not notifications %}
+            <div class="text-center py-5">
+                <i class="fas fa-bell-slash fa-5x text-muted mb-4"></i>
+                <h4 class="text-muted">No Notifications</h4>
+                <p class="text-muted">You're all caught up! New notifications will appear here.</p>
+            </div>
+            {% endif %}
+
+            <!-- Pagination -->
+            {% if pagination.pages > 1 %}
+            <nav aria-label="Notifications pagination">
+                <ul class="pagination justify-content-center">
+                    {% if pagination.has_prev %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('core.notifications', page=pagination.prev_num) }}">Previous</a>
+                    </li>
+                    {% endif %}
+                    
+                    {% for page_num in pagination.iter_pages() %}
+                        {% if page_num %}
+                            {% if page_num != pagination.page %}
+                            <li class="page-item">
+                                <a class="page-link" href="{{ url_for('core.notifications', page=page_num) }}">{{ page_num }}</a>
+                            </li>
+                            {% else %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ page_num }}</span>
+                            </li>
+                            {% endif %}
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if pagination.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('core.notifications', page=pagination.next_num) }}">Next</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Test Mention Modal (Admin Only) -->
+{% if current_user.has_role('Admin') %}
+<div class="modal fade" id="testMentionModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Test Mention Notification</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ url_for('core.test_mention') }}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="text" class="form-label">Text with @mention</label>
+                        <textarea class="form-control" id="text" name="text" rows="3" 
+                                  placeholder="Type a message with @username or @email">@admin This is a test mention!</textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Send Test</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="position-fixed bottom-0 end-0 p-3">
+    <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#testMentionModal">
+        <i class="fas fa-vial"></i> Test Mention
+    </button>
+</div>
+{% endif %}
+
+<script>
+let notificationRefreshInterval;
+
+function refreshNotifications() {
+    fetch('{{ url_for("core.api_recent_notifications") }}')
+        .then(response => response.json())
+        .then(data => {
+            updateNotificationBadge(data.unread_count);
+            // Optionally update the notification list
+            console.log('Notifications refreshed:', data);
+        })
+        .catch(error => console.error('Error refreshing notifications:', error));
+}
+
+function markNotificationAsRead(notificationId) {
+    fetch(`{{ url_for('core.mark_notification_read', notification_id=0) }}`.replace('0', notificationId), {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token() }}'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const notificationElement = document.querySelector(`[data-notification-id="${notificationId}"]`);
+            if (notificationElement) {
+                notificationElement.classList.remove('notification-unread');
+                notificationElement.classList.add('notification-read');
+                const badge = notificationElement.querySelector('.badge-warning');
+                if (badge) badge.remove();
+            }
+            refreshNotifications();
+        }
+    })
+    .catch(error => console.error('Error marking notification as read:', error));
+}
+
+function markAllAsRead() {
+    if (confirm('Mark all notifications as read?')) {
+        fetch('{{ url_for("core.mark_all_notifications_read") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token() }}'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            }
+        })
+        .catch(error => console.error('Error marking all notifications as read:', error));
+    }
+}
+
+function updateNotificationBadge(count) {
+    const badge = document.querySelector('.notification-badge');
+    if (badge) {
+        if (count > 0) {
+            badge.textContent = count > 99 ? '99+' : count;
+            badge.style.display = 'inline';
+        } else {
+            badge.style.display = 'none';
+        }
+    }
+}
+
+// Auto-refresh notifications every 30 seconds
+document.addEventListener('DOMContentLoaded', function() {
+    notificationRefreshInterval = setInterval(refreshNotifications, 30000);
+});
+
+// Clean up interval when page is unloaded
+window.addEventListener('beforeunload', function() {
+    if (notificationRefreshInterval) {
+        clearInterval(notificationRefreshInterval);
+    }
+});
+
+// Real-time notification updates using Server-Sent Events (if available)
+if (typeof(EventSource) !== "undefined") {
+    // This would require implementing SSE endpoint
+    // const eventSource = new EventSource('/notifications/stream');
+    // eventSource.onmessage = function(event) {
+    //     const data = JSON.parse(event.data);
+    //     updateNotificationBadge(data.unread_count);
+    // };
+}
+</script>
+
+<style>
+.notification-unread {
+    background-color: #f8f9fa;
+    border-left: 4px solid #007bff;
+}
+
+.notification-read {
+    background-color: white;
+    border-left: 4px solid transparent;
+}
+
+.notification-item:hover {
+    background-color: #f8f9fa;
+    cursor: pointer;
+}
+
+.notification-time {
+    font-size: 0.875rem;
+    color: #6c757d;
+}
+
+.notification-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 12px;
+}
+
+.border-left-primary {
+    border-left: 0.25rem solid #4e73df !important;
+}
+
+.border-left-warning {
+    border-left: 0.25rem solid #f6c23e !important;
+}
+
+.border-left-info {
+    border-left: 0.25rem solid #36b9cc !important;
+}
+
+.border-left-success {
+    border-left: 0.25rem solid #1cc88a !important;
+}
+</style>
+{% endblock %} 

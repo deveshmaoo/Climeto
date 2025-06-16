@@ -1,96 +1,68 @@
-2025-06-08 22:33:16,926 ERROR: Exception on /project/list [GET] [in /Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py:1414]
-Traceback (most recent call last):
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 2190, in wsgi_app
-    response = self.full_dispatch_request()
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1486, in full_dispatch_request
-    rv = self.handle_user_exception(e)
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request
-    rv = self.dispatch_request()
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request
-    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask_login/utils.py", line 290, in decorated_view
-    return current_app.ensure_sync(func)(*args, **kwargs)
-  File "/Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/project/routes.py", line 40, in list_projects
-    projects = ProjectService.get_accessible_projects(employee.id)
-AttributeError: 'InstrumentedList' object has no attribute 'id'
-2025-06-08 22:33:16,935 ERROR: Server Error: 500 Internal Server Error: The server encountered an internal error and was unable to complete your request. Either the server is overloaded or there is an error in the application. [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:93]
-2025-06-08 22:33:25,646 ERROR: Exception on /project/list [GET] [in /Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py:1414]
-Traceback (most recent call last):
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 2190, in wsgi_app
-    response = self.full_dispatch_request()
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1486, in full_dispatch_request
-    rv = self.handle_user_exception(e)
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request
-    rv = self.dispatch_request()
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request
-    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask_login/utils.py", line 290, in decorated_view
-    return current_app.ensure_sync(func)(*args, **kwargs)
-  File "/Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/project/routes.py", line 40, in list_projects
-    projects = ProjectService.get_accessible_projects(employee.id)
-AttributeError: 'InstrumentedList' object has no attribute 'id'
-2025-06-08 22:33:25,647 ERROR: Server Error: 500 Internal Server Error: The server encountered an internal error and was unable to complete your request. Either the server is overloaded or there is an error in the application. [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:93]
-2025-06-08 22:33:38,655 ERROR: Exception on /project/list [GET] [in /Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py:1414]
-Traceback (most recent call last):
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 2190, in wsgi_app
-    response = self.full_dispatch_request()
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1486, in full_dispatch_request
-    rv = self.handle_user_exception(e)
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request
-    rv = self.dispatch_request()
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request
-    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask_login/utils.py", line 290, in decorated_view
-    return current_app.ensure_sync(func)(*args, **kwargs)
-  File "/Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/project/routes.py", line 40, in list_projects
-    projects = ProjectService.get_accessible_projects(employee.id)
-AttributeError: 'InstrumentedList' object has no attribute 'id'
-2025-06-08 22:33:38,657 ERROR: Server Error: 500 Internal Server Error: The server encountered an internal error and was unable to complete your request. Either the server is overloaded or there is an error in the application. [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:93]
-2025-06-08 22:33:39,684 ERROR: Exception on /project/dashboard [GET] [in /Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py:1414]
-Traceback (most recent call last):
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 2190, in wsgi_app
-    response = self.full_dispatch_request()
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1486, in full_dispatch_request
-    rv = self.handle_user_exception(e)
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request
-    rv = self.dispatch_request()
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request
-    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask_login/utils.py", line 290, in decorated_view
-    return current_app.ensure_sync(func)(*args, **kwargs)
-  File "/Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/project/routes.py", line 26, in dashboard
-    assigned_tasks = ProjectService.get_tasks_by_assignee(employee.id)
-AttributeError: type object 'ProjectService' has no attribute 'get_tasks_by_assignee'
-2025-06-08 22:33:39,684 ERROR: Server Error: 500 Internal Server Error: The server encountered an internal error and was unable to complete your request. Either the server is overloaded or there is an error in the application. [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:93]
-2025-06-08 22:36:46,845 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
-2025-06-08 22:37:00,505 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
-2025-06-08 22:37:14,570 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
-2025-06-08 22:38:19,376 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
-2025-06-08 22:41:35,361 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
-2025-06-08 22:43:00,586 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
-2025-06-08 22:45:21,606 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
-2025-06-08 22:52:56,282 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
-2025-06-08 22:53:02,040 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
-2025-06-08 22:53:20,131 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
-2025-06-09 12:59:46,822 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
-2025-06-09 12:59:47,044 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
-2025-06-09 12:59:56,717 ERROR: Page not found: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again. [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:80]
-2025-06-10 04:11:50,748 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
-2025-06-10 04:11:50,962 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
-2025-06-10 04:13:00,018 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
-2025-06-10 04:13:41,816 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
-2025-06-10 04:30:20,230 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
-2025-06-10 04:38:24,605 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
-2025-06-10 04:38:39,641 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
-2025-06-10 04:38:47,815 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
-2025-06-10 04:39:09,567 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
-2025-06-10 04:39:15,901 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
-2025-06-10 04:39:42,858 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
-2025-06-10 04:39:43,102 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
-2025-06-10 04:41:37,391 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
-2025-06-10 04:41:49,895 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
-2025-06-10 04:42:03,592 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
-2025-06-10 04:42:23,953 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
-2025-06-10 04:43:19,068 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
-2025-06-10 04:43:27,695 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
-2025-06-10 04:43:35,247 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 11:32:42,706 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:172]
+2025-06-14 11:32:51,295 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 11:32:51,401 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:172]
+2025-06-14 11:32:51,736 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 11:32:51,838 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:172]
+2025-06-14 11:33:00,421 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 11:33:00,525 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:172]
+2025-06-14 11:33:09,190 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 11:33:09,296 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:172]
+2025-06-14 11:33:09,596 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 11:33:09,700 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:172]
+2025-06-14 11:33:21,302 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 11:33:21,407 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:172]
+2025-06-14 11:33:24,791 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 11:33:24,901 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:172]
+2025-06-14 11:33:30,357 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 11:33:30,459 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:172]
+2025-06-14 11:33:56,775 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 11:33:56,878 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:172]
+2025-06-14 11:33:57,105 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 11:33:57,217 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:172]
+2025-06-14 11:36:02,323 ERROR: Page not found: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again. [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:101]
+2025-06-14 11:36:02,323 ERROR: Page not found: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again. [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:101]
+2025-06-14 11:38:07,345 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 11:38:07,446 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:172]
+2025-06-14 11:38:21,081 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 11:38:21,186 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:172]
+2025-06-14 11:38:32,793 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 11:38:32,895 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:172]
+2025-06-14 11:38:49,575 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 11:38:49,679 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:172]
+2025-06-14 11:43:44,743 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 11:43:44,839 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:172]
+2025-06-14 11:43:45,054 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 11:43:45,153 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:172]
+2025-06-14 11:46:06,791 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 11:46:06,903 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:172]
+2025-06-14 11:47:11,092 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 11:47:11,198 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:172]
+2025-06-14 11:47:11,420 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 11:47:11,517 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:172]
+2025-06-14 11:51:38,993 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 11:51:39,086 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:172]
+2025-06-14 11:51:39,306 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 11:51:39,402 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:172]
+2025-06-14 11:56:43,805 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 11:56:43,902 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:172]
+2025-06-14 11:56:44,123 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 11:56:44,223 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:172]
+2025-06-14 11:59:07,447 ERROR: Page not found: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again. [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:101]
+2025-06-14 11:59:14,360 ERROR: Page not found: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again. [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:101]
+2025-06-14 11:59:14,360 ERROR: Page not found: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again. [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:101]
+2025-06-14 11:59:32,332 ERROR: Page not found: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again. [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:101]
+2025-06-14 12:02:08,632 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 12:02:08,740 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:172]
+2025-06-14 12:02:08,969 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 12:02:09,066 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:172]
+2025-06-14 12:02:23,512 ERROR: Page not found: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again. [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:101]
+2025-06-14 12:02:23,512 ERROR: Page not found: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again. [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:101]
+2025-06-14 12:11:51,496 ERROR: Page not found: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again. [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:101]
+2025-06-14 12:11:51,497 ERROR: Page not found: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again. [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:101]
+2025-06-14 12:13:06,900 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 12:13:07,009 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:172]
+2025-06-14 12:13:47,446 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 12:13:47,556 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:172]
+2025-06-14 12:13:48,893 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 12:13:48,995 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:172]
+2025-06-14 12:15:36,742 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]

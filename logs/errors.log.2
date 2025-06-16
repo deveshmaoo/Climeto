@@ -1,75 +1,5 @@
-[2025-06-08 22:22:10,714] 127.0.0.1 requested http://127.0.0.1:5001/auth/login?next=/
-ERROR in __init__: Server Error: 500 Internal Server Error: The server encountered an internal error and was unable to complete your request. Either the server is overloaded or there is an error in the application.
-[2025-06-08 22:23:45,385] 127.0.0.1 requested http://127.0.0.1:5001/auth/login?next=/
-ERROR in app: Exception on /auth/login [POST]
-Traceback (most recent call last):
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 2190, in wsgi_app
-    response = self.full_dispatch_request()
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1486, in full_dispatch_request
-    rv = self.handle_user_exception(e)
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request
-    rv = self.dispatch_request()
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request
-    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
-  File "/Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/auth/routes.py", line 25, in login
-    if user and user.check_password(password):
-AttributeError: 'User' object has no attribute 'password'
-[2025-06-08 22:23:45,388] 127.0.0.1 requested http://127.0.0.1:5001/auth/login?next=/
-ERROR in __init__: Server Error: 500 Internal Server Error: The server encountered an internal error and was unable to complete your request. Either the server is overloaded or there is an error in the application.
-[2025-06-08 22:24:00,531] 127.0.0.1 requested http://127.0.0.1:5001/auth/login?next=/
-ERROR in app: Exception on /auth/login [POST]
-Traceback (most recent call last):
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 2190, in wsgi_app
-    response = self.full_dispatch_request()
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1486, in full_dispatch_request
-    rv = self.handle_user_exception(e)
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request
-    rv = self.dispatch_request()
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request
-    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
-  File "/Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/auth/routes.py", line 25, in login
-    if user and user.check_password(password):
-AttributeError: 'User' object has no attribute 'password'
-[2025-06-08 22:24:00,532] 127.0.0.1 requested http://127.0.0.1:5001/auth/login?next=/
-ERROR in __init__: Server Error: 500 Internal Server Error: The server encountered an internal error and was unable to complete your request. Either the server is overloaded or there is an error in the application.
-[2025-06-08 22:25:09,993] 127.0.0.1 requested http://127.0.0.1:5001/
-ERROR in app: Exception on / [GET]
-Traceback (most recent call last):
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 2190, in wsgi_app
-    response = self.full_dispatch_request()
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1486, in full_dispatch_request
-    rv = self.handle_user_exception(e)
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request
-    rv = self.dispatch_request()
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request
-    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask_login/utils.py", line 290, in decorated_view
-    return current_app.ensure_sync(func)(*args, **kwargs)
-  File "/Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/core/routes.py", line 14, in dashboard
-    return render_template('core/dashboard.html')
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/templating.py", line 151, in render_template
-    return _render(app, template, context)
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/templating.py", line 132, in _render
-    rv = template.render(context)
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/jinja2/environment.py", line 1295, in render
-    self.environment.handle_exception()
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/jinja2/environment.py", line 942, in handle_exception
-    raise rewrite_traceback_stack(source=source)
-  File "/Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/templates/core/dashboard.html", line 1, in top-level template code
-    {% extends "base.html" %}
-  File "/Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/templates/base.html", line 131, in top-level template code
-    <a class="nav-link" href="{{ url_for('project.list') }}">
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1697, in url_for
-    return self.handle_url_build_error(error, endpoint, values)
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1686, in url_for
-    rv = url_adapter.build(  # type: ignore[union-attr]
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/werkzeug/routing/map.py", line 950, in build
-    raise BuildError(endpoint, values, method, self)
-werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'project.list'. Did you mean 'project.list_projects' instead?
-[2025-06-08 22:25:10,000] 127.0.0.1 requested http://127.0.0.1:5001/
-ERROR in __init__: Server Error: 500 Internal Server Error: The server encountered an internal error and was unable to complete your request. Either the server is overloaded or there is an error in the application.
-[2025-06-08 22:30:19,051] 127.0.0.1 requested http://127.0.0.1:5001/
-ERROR in app: Exception on / [GET]
+[2025-06-08 22:30:27,289] 127.0.0.1 requested http://127.0.0.1:5001/dashboard
+ERROR in app: Exception on /dashboard [GET]
 Traceback (most recent call last):
   File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 2190, in wsgi_app
     response = self.full_dispatch_request()
@@ -104,5 +34,83 @@ Traceback (most recent call last):
   File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/werkzeug/routing/map.py", line 950, in build
     raise BuildError(endpoint, values, method, self)
 werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'project.list'. Did you mean 'project.list_projects' instead?
-[2025-06-08 22:30:19,057] 127.0.0.1 requested http://127.0.0.1:5001/
+[2025-06-08 22:30:27,294] 127.0.0.1 requested http://127.0.0.1:5001/dashboard
 ERROR in __init__: Server Error: 500 Internal Server Error: The server encountered an internal error and was unable to complete your request. Either the server is overloaded or there is an error in the application.
+[2025-06-08 22:33:16,926] 127.0.0.1 requested http://127.0.0.1:5001/project/list
+ERROR in app: Exception on /project/list [GET]
+Traceback (most recent call last):
+  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 2190, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1486, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask_login/utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+  File "/Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/project/routes.py", line 40, in list_projects
+    projects = ProjectService.get_accessible_projects(employee.id)
+AttributeError: 'InstrumentedList' object has no attribute 'id'
+[2025-06-08 22:33:16,935] 127.0.0.1 requested http://127.0.0.1:5001/project/list
+ERROR in __init__: Server Error: 500 Internal Server Error: The server encountered an internal error and was unable to complete your request. Either the server is overloaded or there is an error in the application.
+[2025-06-08 22:33:25,646] 127.0.0.1 requested http://127.0.0.1:5001/project/list
+ERROR in app: Exception on /project/list [GET]
+Traceback (most recent call last):
+  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 2190, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1486, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask_login/utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+  File "/Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/project/routes.py", line 40, in list_projects
+    projects = ProjectService.get_accessible_projects(employee.id)
+AttributeError: 'InstrumentedList' object has no attribute 'id'
+[2025-06-08 22:33:25,647] 127.0.0.1 requested http://127.0.0.1:5001/project/list
+ERROR in __init__: Server Error: 500 Internal Server Error: The server encountered an internal error and was unable to complete your request. Either the server is overloaded or there is an error in the application.
+[2025-06-08 22:33:38,655] 127.0.0.1 requested http://127.0.0.1:5001/project/list
+ERROR in app: Exception on /project/list [GET]
+Traceback (most recent call last):
+  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 2190, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1486, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask_login/utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+  File "/Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/project/routes.py", line 40, in list_projects
+    projects = ProjectService.get_accessible_projects(employee.id)
+AttributeError: 'InstrumentedList' object has no attribute 'id'
+[2025-06-08 22:33:38,657] 127.0.0.1 requested http://127.0.0.1:5001/project/list
+ERROR in __init__: Server Error: 500 Internal Server Error: The server encountered an internal error and was unable to complete your request. Either the server is overloaded or there is an error in the application.
+[2025-06-08 22:33:39,684] 127.0.0.1 requested http://127.0.0.1:5001/project/dashboard
+ERROR in app: Exception on /project/dashboard [GET]
+Traceback (most recent call last):
+  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 2190, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1486, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask_login/utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+  File "/Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/project/routes.py", line 26, in dashboard
+    assigned_tasks = ProjectService.get_tasks_by_assignee(employee.id)
+AttributeError: type object 'ProjectService' has no attribute 'get_tasks_by_assignee'
+[2025-06-08 22:33:39,684] 127.0.0.1 requested http://127.0.0.1:5001/project/dashboard
+ERROR in __init__: Server Error: 500 Internal Server Error: The server encountered an internal error and was unable to complete your request. Either the server is overloaded or there is an error in the application.
+[2025-06-09 12:59:56,717] 127.0.0.1 requested http://127.0.0.1:5000/favicon.ico
+ERROR in __init__: Page not found: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
+[2025-06-10 05:48:53,217] 127.0.0.1 requested http://127.0.0.1:5000/sales/lead/1/interaction
+ERROR in __init__: CSRF Error: The CSRF token is missing.
+[2025-06-10 05:48:53,217] 127.0.0.1 requested http://127.0.0.1:5000/sales/lead/1/interaction
+ERROR in __init__: Request Method: POST

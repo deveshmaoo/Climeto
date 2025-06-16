@@ -6,12 +6,16 @@ from flask import render_template, redirect, url_for, request, flash, jsonify
 from flask_login import login_required, current_user
 from datetime import datetime, date, timedelta
 from . import bp
-from ..models.project import Task, ActivityLog, CalendarEvent, Lead, Client
+from ..models.project import Task, ActivityLog, Lead, Client
 from ..models.employee import Employee
 from ..models.project import TrainingAssignment
 from ..project.forms import CalendarEventForm, TrainingAssignmentForm
 from ..database import db
 from ..utils.decorators import role_required
+from ..models.project import ProjectActivity
+from ..models.calendar import CalendarEvent
+from .forms import EventForm, TrainingForm
+from ..models.notifications import Notification, NotificationPreference, NotificationService
 
 @bp.route('/')
 def index():
@@ -76,15 +80,15 @@ def management_dashboard():
     # Calendar events for the next 30 days
     end_date = date.today() + timedelta(days=30)
     upcoming_events = CalendarEvent.query.filter(
-        CalendarEvent.event_date.between(date.today(), end_date)
-    ).order_by(CalendarEvent.event_date).all()
+        db.func.date(CalendarEvent.start).between(date.today(), end_date)
+    ).order_by(CalendarEvent.start).all()
     
     # Employee birthdays this month
     current_month = date.today().month
     birthday_events = CalendarEvent.query.filter(
         CalendarEvent.event_type == 'Birthday'
     ).filter(
-        db.extract('month', CalendarEvent.event_date) == current_month
+        db.extract('month', CalendarEvent.start) == current_month
     ).all()
     
     # Sales metrics
@@ -249,67 +253,106 @@ def activity_log():
 @bp.route('/calendar')
 @login_required
 def calendar():
-    """Calendar view showing events and deadlines."""
-    # Get events for the current month
-    today = date.today()
-    start_date = today.replace(day=1)
-    if today.month == 12:
-        end_date = today.replace(year=today.year + 1, month=1, day=1) - timedelta(days=1)
-    else:
-        end_date = today.replace(month=today.month + 1, day=1) - timedelta(days=1)
-    
-    events = CalendarEvent.query.filter(
-        CalendarEvent.event_date.between(start_date, end_date)
-    ).order_by(CalendarEvent.event_date).all()
-    
-    # Add task deadlines as events
-    task_deadlines = Task.query.filter(
-        Task.due_date.between(start_date, end_date),
-        Task.status != 'Completed'
-    ).all()
-    
-    return render_template('core/calendar.html',
-                         events=events,
-                         task_deadlines=task_deadlines,
-                         current_month=today.month,
-                         current_year=today.year)
+    """Renders the unified calendar view."""
+    return render_template('core/calendar.html')
 
-@bp.route('/calendar/create-event', methods=['GET', 'POST'])
+@bp.route('/api/calendar/events')
 @login_required
-@role_required('Admin', 'HR', 'Management', 'General Manager')
-def create_event():
-    """Create a new calendar event."""
-    form = CalendarEventForm()
+def get_events():
+    """API endpoint to fetch calendar events for the logged-in user."""
+    start = request.args.get('start')
+    end = request.args.get('end')
     
-    if form.validate_on_submit():
-        event = CalendarEvent(
-            title=form.title.data,
-            description=form.description.data,
-            event_type=form.event_type.data,
-            event_date=form.event_date.data,
-            department=form.department.data,
-            created_by_id=current_user.employee.id
-        )
+    if not start or not end:
+        return jsonify({'error': 'Start and end dates are required.'}), 400
+
+    try:
+        start_dt = datetime.fromisoformat(start.replace('Z', '+00:00'))
+        end_dt = datetime.fromisoformat(end.replace('Z', '+00:00'))
+
+        # Get events for the current user
+        events = CalendarEvent.query.filter(
+            CalendarEvent.user_id == current_user.id,
+            CalendarEvent.start < end_dt,
+            CalendarEvent.start >= start_dt
+        ).all()
         
+        return jsonify([event.to_dict() for event in events])
+    except ValueError as e:
+        return jsonify({'error': f'Invalid date format: {e}'}), 400
+
+@bp.route('/api/calendar/events', methods=['POST'])
+@login_required
+def create_event_api():
+    """API endpoint to create a new calendar event."""
+    data = request.get_json()
+    
+    if not data or not data.get('title') or not data.get('start'):
+        return jsonify({'error': 'Title and start date are required.'}), 400
+    
+    try:
+        # Set employee_id if user has an employee profile
+        employee_id = None
+        if hasattr(current_user, 'employee') and current_user.employee:
+            employee_id = current_user.employee.id
+            
+        event = CalendarEvent(
+            title=data['title'],
+            start=datetime.fromisoformat(data['start'].replace('Z', '+00:00')),
+            end=datetime.fromisoformat(data['end'].replace('Z', '+00:00')) if data.get('end') else None,
+            all_day=data.get('allDay', False),
+            description=data.get('description'),
+            event_type=data.get('event_type', 'Personal'),
+            priority=data.get('priority', 'Medium'),
+            user_id=current_user.id,
+            employee_id=employee_id
+        )
         db.session.add(event)
         db.session.commit()
+        return jsonify(event.to_dict()), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
+@bp.route('/api/calendar/events/<int:event_id>', methods=['PUT'])
+@login_required
+def update_event(event_id):
+    """API endpoint to update an existing event (e.g., drag and drop)."""
+    event = CalendarEvent.query.get_or_404(event_id)
+    if event.user_id != current_user.id:
+        return jsonify({'error': 'Unauthorized'}), 403
+
+    data = request.get_json()
+    try:
+        event.title = data.get('title', event.title)
+        event.start = datetime.fromisoformat(data['start'].replace('Z', '+00:00')) if data.get('start') else event.start
+        event.end = datetime.fromisoformat(data['end'].replace('Z', '+00:00')) if data.get('end') else event.end
+        event.all_day = data.get('allDay', event.all_day)
+        event.description = data.get('description', event.description)
+        event.event_type = data.get('event_type', event.event_type)
+        event.priority = data.get('priority', event.priority)
         
-        # Log activity
-        activity = ActivityLog(
-            activity_type='Event Created',
-            description=f'Calendar event created: {event.title}',
-            department=current_user.department,
-            performed_by_id=current_user.employee.id,
-            entity_type='Event',
-            entity_id=event.id
-        )
-        db.session.add(activity)
         db.session.commit()
+        return jsonify(event.to_dict())
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
+@bp.route('/api/calendar/events/<int:event_id>', methods=['DELETE'])
+@login_required
+def delete_event(event_id):
+    """API endpoint to delete an event."""
+    event = CalendarEvent.query.get_or_404(event_id)
+    if event.user_id != current_user.id:
+        return jsonify({'error': 'Unauthorized'}), 403
         
-        flash('Event created successfully!', 'success')
-        return redirect(url_for('core.calendar'))
-    
-    return render_template('core/create_event.html', form=form)
+    try:
+        db.session.delete(event)
+        db.session.commit()
+        return jsonify({'message': 'Event deleted successfully'})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
 
 @bp.route('/training/assign', methods=['GET', 'POST'])
 @login_required
@@ -426,4 +469,196 @@ def all_chats():
                          filters={
                              'filter_type': filter_type,
                              'project': project_filter
-                         }) 
+                         })
+
+@bp.route('/calendar/add', methods=['GET', 'POST'])
+@login_required
+def add_calendar_event():
+    """Add a new event to the calendar."""
+    if request.method == 'POST':
+        try:
+            # Parse date and time
+            event_date = datetime.strptime(request.form['event_date'], '%Y-%m-%d').date()
+            start_time = None
+            end_time = None
+            
+            if request.form.get('start_time'):
+                start_time = datetime.strptime(request.form['start_time'], '%H:%M').time()
+                start_datetime = datetime.combine(event_date, start_time)
+            else:
+                start_datetime = datetime.combine(event_date, datetime.min.time())
+                
+            if request.form.get('end_time'):
+                end_time = datetime.strptime(request.form['end_time'], '%H:%M').time()
+                end_datetime = datetime.combine(event_date, end_time)
+            else:
+                end_datetime = None
+            
+            # Set employee_id if user has an employee profile
+            employee_id = None
+            if hasattr(current_user, 'employee') and current_user.employee:
+                employee_id = current_user.employee.id
+                
+            event = CalendarEvent(
+                user_id=current_user.id,
+                employee_id=employee_id,
+                title=request.form['title'],
+                description=request.form.get('description'),
+                start=start_datetime,
+                end=end_datetime,
+                event_type=request.form['event_type'],
+                priority=request.form['priority'],
+                all_day=bool(request.form.get('is_all_day')),
+                reminder_minutes=int(request.form.get('reminder_minutes', 15))
+            )
+            
+            db.session.add(event)
+            db.session.commit()
+            flash('Event added to your calendar!', 'success')
+            return redirect(url_for('core.calendar'))
+        except Exception as e:
+            flash(f'Error adding event: {str(e)}', 'danger')
+    
+    return render_template('core/add_calendar_event.html')
+
+@bp.route('/notifications')
+@login_required
+def notifications():
+    """View all notifications for the current user."""
+    page = request.args.get('page', 1, type=int)
+    per_page = 20
+    
+    notifications_query = Notification.query.filter_by(
+        user_id=current_user.id
+    ).order_by(Notification.created_at.desc())
+    
+    notifications_paginated = notifications_query.paginate(
+        page=page, per_page=per_page, error_out=False
+    )
+    
+    # Get unread count
+    unread_count = NotificationService.get_unread_count(current_user.id)
+    
+    return render_template('core/notifications.html',
+                         notifications=notifications_paginated.items,
+                         pagination=notifications_paginated,
+                         unread_count=unread_count)
+
+@bp.route('/notifications/api/recent')
+@login_required
+def api_recent_notifications():
+    """API endpoint for recent notifications (for real-time updates)."""
+    limit = request.args.get('limit', 10, type=int)
+    notifications = NotificationService.get_recent_notifications(current_user.id, limit)
+    unread_count = NotificationService.get_unread_count(current_user.id)
+    
+    notifications_data = []
+    for notification in notifications:
+        notifications_data.append({
+            'id': notification.id,
+            'title': notification.title,
+            'message': notification.message,
+            'type': notification.notification_type,
+            'is_read': notification.is_read,
+            'time_ago': notification.time_ago,
+            'icon_class': notification.icon_class,
+            'color_class': notification.color_class,
+            'created_at': notification.created_at.isoformat()
+        })
+    
+    return jsonify({
+        'notifications': notifications_data,
+        'unread_count': unread_count
+    })
+
+@bp.route('/notifications/<int:notification_id>/mark-read', methods=['POST'])
+@login_required
+def mark_notification_read(notification_id):
+    """Mark a specific notification as read."""
+    notification = Notification.query.filter_by(
+        id=notification_id,
+        user_id=current_user.id
+    ).first_or_404()
+    
+    notification.mark_as_read()
+    
+    if request.is_json:
+        return jsonify({'success': True, 'message': 'Notification marked as read'})
+    
+    flash('Notification marked as read.', 'success')
+    return redirect(url_for('core.notifications'))
+
+@bp.route('/notifications/mark-all-read', methods=['POST'])
+@login_required
+def mark_all_notifications_read():
+    """Mark all notifications as read for the current user."""
+    count = NotificationService.mark_all_as_read(current_user.id)
+    
+    if request.is_json:
+        return jsonify({'success': True, 'message': f'{count} notifications marked as read'})
+    
+    flash(f'{count} notifications marked as read.', 'success')
+    return redirect(url_for('core.notifications'))
+
+@bp.route('/notifications/preferences', methods=['GET', 'POST'])
+@login_required
+def notification_preferences():
+    """Manage notification preferences."""
+    preferences = NotificationPreference.query.filter_by(
+        user_id=current_user.id
+    ).first()
+    
+    if not preferences:
+        preferences = NotificationPreference(user_id=current_user.id)
+        db.session.add(preferences)
+        db.session.commit()
+    
+    if request.method == 'POST':
+        try:
+            # Update preferences from form
+            preferences.mentions_enabled = 'mentions_enabled' in request.form
+            preferences.meeting_reminders_enabled = 'meeting_reminders_enabled' in request.form
+            preferences.task_notifications_enabled = 'task_notifications_enabled' in request.form
+            preferences.project_notifications_enabled = 'project_notifications_enabled' in request.form
+            preferences.system_notifications_enabled = 'system_notifications_enabled' in request.form
+            
+            preferences.meeting_reminder_minutes = int(request.form.get('meeting_reminder_minutes', 15))
+            preferences.daily_digest_enabled = 'daily_digest_enabled' in request.form
+            
+            if request.form.get('daily_digest_time'):
+                preferences.daily_digest_time = datetime.strptime(
+                    request.form['daily_digest_time'], '%H:%M'
+                ).time()
+            
+            preferences.email_notifications_enabled = 'email_notifications_enabled' in request.form
+            preferences.email_mentions_only = 'email_mentions_only' in request.form
+            
+            preferences.updated_at = datetime.utcnow()
+            db.session.commit()
+            
+            flash('Notification preferences updated successfully!', 'success')
+            return redirect(url_for('core.notification_preferences'))
+            
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error updating preferences: {str(e)}', 'danger')
+    
+    return render_template('core/notification_preferences.html', preferences=preferences)
+
+@bp.route('/notifications/test-mention', methods=['POST'])
+@login_required
+def test_mention():
+    """Test endpoint for creating mention notifications (for development)."""
+    if not current_user.has_role('Admin'):
+        abort(403)
+    
+    text = request.form.get('text', '@admin test mention')
+    NotificationService.process_mentions_in_text(
+        text=text,
+        author_id=current_user.employee.id,
+        entity_type='test',
+        entity_id=1
+    )
+    
+    flash('Test mention notification created!', 'success')
+    return redirect(url_for('core.notifications')) 

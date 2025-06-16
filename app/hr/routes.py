@@ -1,13 +1,14 @@
-from flask import render_template, request, flash, redirect, url_for, jsonify, send_file
+from flask import render_template, request, flash, redirect, url_for, jsonify, send_file, current_app
 from flask_login import login_required, current_user
 from ..models.hr import (
-    JobPosting, JobApplication, Interview, Salary, Payroll, 
-    HREvent, Asset, AssetMaintenance, CleaningLog, PettyCash,
-    Appointment, AppointmentParticipant, ConferenceRoom, ConferenceBooking, PersonalCalendar
+    JobPosting, JobApplication, Interview, InterviewParticipant, JobRequest,
+    Salary, Payroll, HREvent, Asset, AssetMaintenance, CleaningLog, PettyCash,
+    Appointment, AppointmentParticipant, ConferenceRoom, ConferenceBooking
 )
-from ..models.attendance import Attendance
+from ..models.attendance import Attendance, AttendanceSetting
 from ..models.employee import Leave
 from ..models.employee import Employee
+from ..models.calendar import CalendarEvent
 from ..database import db
 from . import bp
 from ..utils.decorators import role_required
@@ -118,11 +119,72 @@ def job_applications():
 @bp.route('/hiring/application/<int:id>')
 @login_required
 @role_required('HR', 'Admin', 'Management')
-def application_detail():
+def application_detail(id):
     """View detailed application information."""
     application = JobApplication.query.get_or_404(id)
     interviews = Interview.query.filter_by(application_id=id).order_by(Interview.scheduled_date.desc()).all()
-    return render_template('hr/application_detail.html', application=application, interviews=interviews)
+    
+    # Get available interviewers for scheduling
+    employees = Employee.query.filter_by(employment_status='Active').all()
+    conference_rooms = ConferenceRoom.query.filter_by(is_active=True).all()
+    
+    return render_template('hr/application_detail.html', 
+                         application=application, 
+                         interviews=interviews,
+                         employees=employees,
+                         conference_rooms=conference_rooms)
+
+@bp.route('/hiring/application/<int:application_id>/download-resume')
+@login_required
+@role_required('HR', 'Admin', 'Management')
+def download_resume(application_id):
+    """Download applicant's resume."""
+    application = JobApplication.query.get_or_404(application_id)
+    
+    if not application.resume_path:
+        flash('No resume found for this application.', 'warning')
+        return redirect(url_for('hr.application_detail', id=application_id))
+    
+    try:
+        resume_path = os.path.join(current_app.config.get('UPLOAD_FOLDER', 'uploads'), application.resume_path)
+        if os.path.exists(resume_path):
+            return send_file(resume_path, 
+                           as_attachment=True, 
+                           download_name=application.resume_filename or f"{application.applicant_name}_resume.pdf")
+        else:
+            flash('Resume file not found on server.', 'danger')
+            return redirect(url_for('hr.application_detail', id=application_id))
+    except Exception as e:
+        flash(f'Error downloading resume: {str(e)}', 'danger')
+        return redirect(url_for('hr.application_detail', id=application_id))
+
+@bp.route('/hiring/application/<int:application_id>/update-status', methods=['POST'])
+@login_required
+@role_required('HR', 'Admin', 'Management')
+def update_application_status(application_id):
+    """Update application status."""
+    try:
+        application = JobApplication.query.get_or_404(application_id)
+        new_status = request.form['status']
+        notes = request.form.get('notes', '')
+        
+        application.status = new_status
+        application.reviewed_by = current_user.employee.id
+        application.review_date = datetime.utcnow()
+        if notes:
+            application.notes = (application.notes or '') + f"\n[{datetime.utcnow().strftime('%Y-%m-%d %H:%M')}] {current_user.employee.full_name}: {notes}"
+        
+        if request.form.get('hr_rating'):
+            application.hr_rating = int(request.form['hr_rating'])
+        
+        db.session.commit()
+        flash(f'Application status updated to {new_status}.', 'success')
+        
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error updating application status: {str(e)}', 'danger')
+    
+    return redirect(url_for('hr.application_detail', id=application_id))
 
 # SALARY MANAGEMENT
 @bp.route('/salary/employees')
@@ -719,82 +781,345 @@ def book_conference_room():
     rooms = ConferenceRoom.query.filter_by(is_active=True).all()
     return render_template('hr/book_conference_room.html', rooms=rooms)
 
-# PERSONAL CALENDAR
-@bp.route('/my-calendar')
+# ATTENDANCE SETTINGS
+@bp.route('/attendance-settings', methods=['GET', 'POST'])
 @login_required
-def personal_calendar():
-    """Personal calendar view."""
-    view = request.args.get('view', 'monthly')  # monthly, weekly, daily
-    target_date = request.args.get('date')
-    
-    if target_date:
-        target_date = datetime.strptime(target_date, '%Y-%m-%d').date()
-    else:
-        target_date = date.today()
-    
-    employee_id = current_user.employee.id
-    
-    if view == 'daily':
-        # Daily view
-        events = PersonalCalendar.query.filter(
-            PersonalCalendar.employee_id == employee_id,
-            PersonalCalendar.event_date == target_date
-        ).order_by(PersonalCalendar.start_time).all()
-        
-    elif view == 'weekly':
-        # Weekly view - get events for the week containing target_date
-        week_start = target_date - timedelta(days=target_date.weekday())
-        week_end = week_start + timedelta(days=6)
-        
-        events = PersonalCalendar.query.filter(
-            PersonalCalendar.employee_id == employee_id,
-            PersonalCalendar.event_date >= week_start,
-            PersonalCalendar.event_date <= week_end
-        ).order_by(PersonalCalendar.event_date, PersonalCalendar.start_time).all()
-        
-    else:
-        # Monthly view
-        month_start = target_date.replace(day=1)
-        if target_date.month == 12:
-            month_end = target_date.replace(year=target_date.year + 1, month=1, day=1) - timedelta(days=1)
-        else:
-            month_end = target_date.replace(month=target_date.month + 1, day=1) - timedelta(days=1)
-        
-        events = PersonalCalendar.query.filter(
-            PersonalCalendar.employee_id == employee_id,
-            PersonalCalendar.event_date >= month_start,
-            PersonalCalendar.event_date <= month_end
-        ).order_by(PersonalCalendar.event_date, PersonalCalendar.start_time).all()
-    
-    return render_template('hr/personal_calendar.html', 
-                         events=events, 
-                         view=view, 
-                         target_date=target_date)
-
-@bp.route('/my-calendar/add', methods=['GET', 'POST'])
-@login_required
-def add_calendar_event():
-    """Add personal calendar event."""
+@role_required('Admin')
+def attendance_settings():
+    """Manage attendance clock-in settings."""
     if request.method == 'POST':
         try:
-            event = PersonalCalendar(
-                employee_id=current_user.employee.id,
+            setting_type = request.form.get('setting_type')
+            value = request.form.get('value')
+            description = request.form.get('description')
+
+            if not setting_type or not value:
+                flash('Setting Type and Value are required.', 'danger')
+            else:
+                new_setting = AttendanceSetting(
+                    setting_type=setting_type,
+                    value=value,
+                    description=description
+                )
+                db.session.add(new_setting)
+                db.session.commit()
+                flash('New attendance setting has been added.', 'success')
+            return redirect(url_for('hr.attendance_settings'))
+
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error adding setting: {str(e)}', 'danger')
+
+    # For GET request
+    allowed_ips = AttendanceSetting.query.filter_by(setting_type='allowed_ip', is_active=True).all()
+    allowed_locations = AttendanceSetting.query.filter_by(setting_type='allowed_location', is_active=True).all()
+
+    return render_template(
+        'hr/attendance_settings.html',
+        allowed_ips=allowed_ips,
+        allowed_locations=allowed_locations
+    )
+
+@bp.route('/attendance-settings/delete/<int:setting_id>', methods=['POST'])
+@login_required
+@role_required('Admin')
+def delete_attendance_setting(setting_id):
+    """Delete an attendance setting."""
+    try:
+        setting = AttendanceSetting.query.get_or_404(setting_id)
+        db.session.delete(setting)
+        db.session.commit()
+        flash('Setting deleted successfully.', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error deleting setting: {str(e)}', 'danger')
+    
+    return redirect(url_for('hr.attendance_settings'))
+
+# JOB REQUEST MANAGEMENT
+@bp.route('/job-requests')
+@login_required
+@role_required('HR', 'Admin', 'Management', 'General Manager', 'Manager')
+def job_requests():
+    """List all job requests with role-based filtering."""
+    # Get requests based on user role
+    if current_user.has_role('HR') or current_user.has_role('Admin'):
+        # HR and Admin can see all requests
+        requests = JobRequest.query.order_by(JobRequest.request_date.desc()).all()
+    elif current_user.has_role('Management') or current_user.has_role('General Manager'):
+        # Management can see all requests for approval
+        requests = JobRequest.query.order_by(JobRequest.request_date.desc()).all()
+    else:
+        # Managers can only see their own requests
+        requests = JobRequest.query.filter_by(requested_by=current_user.employee.id).order_by(JobRequest.request_date.desc()).all()
+    
+    return render_template('hr/job_requests.html', requests=requests)
+
+@bp.route('/job-requests/create', methods=['GET', 'POST'])
+@login_required
+@role_required('HR', 'Admin', 'Management', 'General Manager', 'Manager')
+def create_job_request():
+    """Create a new job request."""
+    if request.method == 'POST':
+        try:
+            job_request = JobRequest(
                 title=request.form['title'],
-                description=request.form.get('description'),
-                event_date=datetime.strptime(request.form['event_date'], '%Y-%m-%d').date(),
-                start_time=datetime.strptime(request.form['start_time'], '%H:%M').time() if request.form.get('start_time') else None,
-                end_time=datetime.strptime(request.form['end_time'], '%H:%M').time() if request.form.get('end_time') else None,
-                event_type=request.form['event_type'],
-                priority=request.form['priority'],
-                is_all_day=bool(request.form.get('is_all_day')),
-                reminder_minutes=int(request.form.get('reminder_minutes', 15))
+                department=request.form['department'],
+                description=request.form['description'],
+                requirements=request.form['requirements'],
+                justification=request.form['justification'],
+                budget_min=float(request.form['budget_min']) if request.form['budget_min'] else None,
+                budget_max=float(request.form['budget_max']) if request.form['budget_max'] else None,
+                employment_type=request.form['employment_type'],
+                location=request.form['location'],
+                openings=int(request.form['openings']),
+                urgency=request.form['urgency'],
+                expected_start_date=datetime.strptime(request.form['expected_start_date'], '%Y-%m-%d').date() if request.form['expected_start_date'] else None,
+                application_deadline=datetime.strptime(request.form['application_deadline'], '%Y-%m-%d').date() if request.form['application_deadline'] else None,
+                requested_by=current_user.employee.id
             )
             
-            db.session.add(event)
+            db.session.add(job_request)
             db.session.commit()
-            flash('Event added to your calendar!', 'success')
-            return redirect(url_for('hr.personal_calendar'))
+            flash('Job request submitted successfully! It will be reviewed by management.', 'success')
+            return redirect(url_for('hr.job_requests'))
         except Exception as e:
-            flash(f'Error adding event: {str(e)}', 'danger')
+            db.session.rollback()
+            flash(f'Error creating job request: {str(e)}', 'danger')
     
-    return render_template('hr/add_calendar_event.html') 
+    return render_template('hr/create_job_request.html')
+
+@bp.route('/job-requests/<int:request_id>')
+@login_required
+@role_required('HR', 'Admin', 'Management', 'General Manager', 'Manager')
+def job_request_detail(request_id):
+    """View detailed job request information."""
+    job_request = JobRequest.query.get_or_404(request_id)
+    
+    # Check permissions
+    if not (current_user.has_role('HR') or current_user.has_role('Admin') or 
+            current_user.has_role('Management') or current_user.has_role('General Manager') or
+            job_request.requested_by == current_user.employee.id):
+        flash('You do not have permission to view this job request.', 'danger')
+        return redirect(url_for('hr.job_requests'))
+    
+    return render_template('hr/job_request_detail.html', job_request=job_request)
+
+@bp.route('/job-requests/<int:request_id>/approve', methods=['POST'])
+@login_required
+@role_required('Management', 'General Manager', 'Admin')
+def approve_job_request(request_id):
+    """Approve a job request."""
+    try:
+        job_request = JobRequest.query.get_or_404(request_id)
+        
+        if job_request.status != 'Pending':
+            flash('This request has already been processed.', 'warning')
+            return redirect(url_for('hr.job_request_detail', request_id=request_id))
+        
+        job_request.status = 'Approved'
+        job_request.approved_by = current_user.employee.id
+        job_request.approval_date = datetime.utcnow()
+        job_request.approval_notes = request.form.get('approval_notes', '')
+        
+        db.session.commit()
+        flash('Job request approved successfully! HR can now create the job posting.', 'success')
+        
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error approving job request: {str(e)}', 'danger')
+    
+    return redirect(url_for('hr.job_request_detail', request_id=request_id))
+
+@bp.route('/job-requests/<int:request_id>/reject', methods=['POST'])
+@login_required
+@role_required('Management', 'General Manager', 'Admin')
+def reject_job_request(request_id):
+    """Reject a job request."""
+    try:
+        job_request = JobRequest.query.get_or_404(request_id)
+        
+        if job_request.status != 'Pending':
+            flash('This request has already been processed.', 'warning')
+            return redirect(url_for('hr.job_request_detail', request_id=request_id))
+        
+        job_request.status = 'Rejected'
+        job_request.approved_by = current_user.employee.id
+        job_request.approval_date = datetime.utcnow()
+        job_request.approval_notes = request.form.get('rejection_reason', '')
+        
+        db.session.commit()
+        flash('Job request rejected.', 'info')
+        
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error rejecting job request: {str(e)}', 'danger')
+    
+    return redirect(url_for('hr.job_request_detail', request_id=request_id))
+
+@bp.route('/job-requests/<int:request_id>/create-posting', methods=['GET', 'POST'])
+@login_required
+@role_required('HR', 'Admin')
+def create_posting_from_request(request_id):
+    """Create a job posting from an approved job request."""
+    job_request = JobRequest.query.get_or_404(request_id)
+    
+    if job_request.status != 'Approved':
+        flash('Only approved job requests can be converted to job postings.', 'danger')
+        return redirect(url_for('hr.job_request_detail', request_id=request_id))
+    
+    if job_request.job_posting_id:
+        flash('A job posting has already been created for this request.', 'warning')
+        return redirect(url_for('hr.job_postings'))
+    
+    if request.method == 'POST':
+        try:
+            job_posting = JobPosting(
+                title=job_request.title,
+                department=job_request.department,
+                description=job_request.description,
+                requirements=job_request.requirements,
+                salary_range_min=job_request.budget_min,
+                salary_range_max=job_request.budget_max,
+                employment_type=job_request.employment_type,
+                location=job_request.location,
+                openings=job_request.openings,
+                application_deadline=job_request.application_deadline,
+                posted_by=current_user.employee.id
+            )
+            
+            db.session.add(job_posting)
+            db.session.flush()  # Get the ID
+            
+            # Link the job posting to the request
+            job_request.job_posting_id = job_posting.id
+            job_request.hr_assigned_to = current_user.employee.id
+            job_request.hr_notes = request.form.get('hr_notes', '')
+            
+            db.session.commit()
+            flash('Job posting created successfully from the approved request!', 'success')
+            return redirect(url_for('hr.job_postings'))
+            
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error creating job posting: {str(e)}', 'danger')
+    
+    return render_template('hr/create_posting_from_request.html', job_request=job_request)
+
+# INTERVIEW MANAGEMENT
+@bp.route('/interviews')
+@login_required
+@role_required('HR', 'Admin', 'Management')
+def interviews():
+    """List all interviews."""
+    interviews = Interview.query.order_by(Interview.scheduled_date.desc()).all()
+    return render_template('hr/interviews.html', interviews=interviews)
+
+@bp.route('/interviews/create', methods=['GET', 'POST'])
+@login_required
+@role_required('HR', 'Admin', 'Management')
+def create_interview():
+    """Create a new interview."""
+    if request.method == 'POST':
+        try:
+            interview = Interview(
+                title=request.form['title'],
+                description=request.form['description'],
+                scheduled_date=datetime.strptime(request.form['scheduled_date'], '%Y-%m-%d').date() if request.form['scheduled_date'] else None,
+                scheduled_time=datetime.strptime(request.form['scheduled_time'], '%H:%M').time() if request.form['scheduled_time'] else None,
+                location=request.form['location'],
+                interviewer_id=int(request.form['interviewer_id']) if request.form['interviewer_id'] else None,
+                status=request.form['status']
+            )
+            
+            db.session.add(interview)
+            db.session.commit()
+            flash('Interview created successfully!', 'success')
+            return redirect(url_for('hr.interviews'))
+        except Exception as e:
+            flash(f'Error creating interview: {str(e)}', 'danger')
+    
+    employees = Employee.query.filter_by(employment_status='Active').all()
+    return render_template('hr/create_interview.html', employees=employees)
+
+@bp.route('/interviews/approve/<int:interview_id>', methods=['POST'])
+@login_required
+@role_required('HR', 'Admin', 'Management')
+def approve_interview(interview_id):
+    """Approve an interview."""
+    try:
+        interview = Interview.query.get_or_404(interview_id)
+        interview.status = 'Approved'
+        db.session.commit()
+        flash('Interview approved successfully!', 'success')
+        return redirect(url_for('hr.interviews'))
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error approving interview: {str(e)}', 'danger')
+    
+    return redirect(url_for('hr.interviews'))
+
+@bp.route('/interviews/reject/<int:interview_id>', methods=['POST'])
+@login_required
+@role_required('HR', 'Admin', 'Management')
+def reject_interview(interview_id):
+    """Reject an interview."""
+    try:
+        interview = Interview.query.get_or_404(interview_id)
+        interview.status = 'Rejected'
+        db.session.commit()
+        flash('Interview rejected successfully!', 'success')
+        return redirect(url_for('hr.interviews'))
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error rejecting interview: {str(e)}', 'danger')
+    
+    return redirect(url_for('hr.interviews'))
+
+# INTERVIEW PARTICIPANT MANAGEMENT
+@bp.route('/interview-participants')
+@login_required
+@role_required('HR', 'Admin', 'Management')
+def interview_participants():
+    """List all interview participants."""
+    participants = InterviewParticipant.query.order_by(InterviewParticipant.interview_id.desc()).all()
+    return render_template('hr/interview_participants.html', participants=participants)
+
+@bp.route('/interview-participants/create', methods=['GET', 'POST'])
+@login_required
+@role_required('HR', 'Admin', 'Management')
+def create_interview_participant():
+    """Create a new interview participant."""
+    if request.method == 'POST':
+        try:
+            participant = InterviewParticipant(
+                interview_id=int(request.form['interview_id']),
+                employee_id=int(request.form['employee_id'])
+            )
+            
+            db.session.add(participant)
+            db.session.commit()
+            flash('Interview participant created successfully!', 'success')
+            return redirect(url_for('hr.interview_participants'))
+        except Exception as e:
+            flash(f'Error creating interview participant: {str(e)}', 'danger')
+    
+    interviews = Interview.query.filter_by(status='Scheduled').all()
+    employees = Employee.query.filter_by(employment_status='Active').all()
+    return render_template('hr/create_interview_participant.html', interviews=interviews, employees=employees)
+
+@bp.route('/interview-participants/delete/<int:participant_id>', methods=['POST'])
+@login_required
+@role_required('HR', 'Admin', 'Management')
+def delete_interview_participant(participant_id):
+    """Delete an interview participant."""
+    try:
+        participant = InterviewParticipant.query.get_or_404(participant_id)
+        db.session.delete(participant)
+        db.session.commit()
+        flash('Interview participant deleted successfully!', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error deleting interview participant: {str(e)}', 'danger')
+    
+    return redirect(url_for('hr.interview_participants')) 

@@ -1,9 +1,11 @@
 # HRMSV3_optimized/app/models/employee.py
 from datetime import datetime
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import UserMixin
 from ..database import db
 from .users import User
 
-class Employee(db.Model):
+class Employee(UserMixin, db.Model):
     __tablename__ = 'employees'
 
     # Management and Regular Employee Types
@@ -24,11 +26,18 @@ class Employee(db.Model):
     }
 
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), unique=True, nullable=False)
-    
-    # Personal Details
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    password_hash = db.Column(db.String(128))
     first_name = db.Column(db.String(50), nullable=False)
     last_name = db.Column(db.String(50), nullable=False)
+    department = db.Column(db.String(50))
+    position = db.Column(db.String(50))
+    role = db.Column(db.String(20), default='Employee')  # Admin, HR, Management, Employee
+    is_active = db.Column(db.Boolean, default=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    # Personal Details
     date_of_birth = db.Column(db.Date)
     gender = db.Column(db.String(10))
     marital_status = db.Column(db.String(20))
@@ -43,7 +52,6 @@ class Employee(db.Model):
     
     # Work Details
     employee_id = db.Column(db.String(20), unique=True, nullable=False)
-    department = db.Column(db.String(50), nullable=False)
     designation = db.Column(db.String(50), nullable=False)
     joining_date = db.Column(db.Date, nullable=False)
     resignation_date = db.Column(db.Date)
@@ -58,9 +66,10 @@ class Employee(db.Model):
     notice_period_days = db.Column(db.Integer, default=30)
     
     # Relationships
-    user = db.relationship('User', backref=db.backref('employee', uselist=False))
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), unique=True)
+    user = db.relationship('User', back_populates='employee', uselist=False)
     reporting_manager = db.relationship('Employee', remote_side=[id], backref='direct_reports')
-    attendance_records = db.relationship('Attendance', back_populates='employee', lazy='dynamic')
+    attendance = db.relationship('Attendance', back_populates='employee', lazy='dynamic')
     salary_history = db.relationship('SalaryDetail', back_populates='employee', lazy='dynamic')
     performance_reviews = db.relationship('PerformanceReview', 
                                         foreign_keys='PerformanceReview.employee_id',
@@ -69,11 +78,11 @@ class Employee(db.Model):
                            foreign_keys='Leave.employee_id',
                            backref='employee', lazy='dynamic')
     
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-
-    def __repr__(self):
-        return f'<Employee {self.first_name} {self.last_name}>'
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+        
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
 
     @property
     def full_name(self):
@@ -104,6 +113,9 @@ class Employee(db.Model):
             year = datetime.now().year
         # Implementation depends on your leave tracking system
         return {'annual': 20, 'sick': 10, 'casual': 5}  # Example
+
+    def __repr__(self):
+        return f'<Employee {self.email}>'
 
 class PerformanceReview(db.Model):
     __tablename__ = 'performance_reviews'

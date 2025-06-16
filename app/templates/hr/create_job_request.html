@@ -1,0 +1,266 @@
+{% extends "base.html" %}
+
+{% block title %}Create Job Request - HR{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-plus text-primary"></i> Create Job Request</h2>
+                <a href="{{ url_for('hr.job_requests') }}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Job Requests
+                </a>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="card shadow">
+                        <div class="card-header">
+                            <h5 class="mb-0">Job Request Details</h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="POST">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                                
+                                <!-- Basic Information -->
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <div class="mb-3">
+                                            <label for="title" class="form-label">Job Title <span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" id="title" name="title" required
+                                                   placeholder="e.g., Senior Software Engineer">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label for="department" class="form-label">Department <span class="text-danger">*</span></label>
+                                            <select class="form-select" id="department" name="department" required>
+                                                <option value="">Select Department</option>
+                                                <option value="Management">Management</option>
+                                                <option value="HR">HR</option>
+                                                <option value="EPR Compliance">EPR Compliance</option>
+                                                <option value="Project Development">Project Development</option>
+                                                <option value="Digital Marketing">Digital Marketing</option>
+                                                <option value="Business Development">Business Development</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Employment Details -->
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label for="employment_type" class="form-label">Employment Type</label>
+                                            <select class="form-select" id="employment_type" name="employment_type">
+                                                <option value="Full-time">Full-time</option>
+                                                <option value="Part-time">Part-time</option>
+                                                <option value="Contract">Contract</option>
+                                                <option value="Intern">Intern</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label for="openings" class="form-label">Number of Openings</label>
+                                            <input type="number" class="form-control" id="openings" name="openings" 
+                                                   value="1" min="1" max="50">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label for="urgency" class="form-label">Urgency Level</label>
+                                            <select class="form-select" id="urgency" name="urgency">
+                                                <option value="Low">Low</option>
+                                                <option value="Medium" selected>Medium</option>
+                                                <option value="High">High</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Budget Information -->
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="budget_min" class="form-label">Minimum Budget (Annual)</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text">$</span>
+                                                <input type="number" class="form-control" id="budget_min" name="budget_min"
+                                                       placeholder="50000" step="1000">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="budget_max" class="form-label">Maximum Budget (Annual)</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text">$</span>
+                                                <input type="number" class="form-control" id="budget_max" name="budget_max"
+                                                       placeholder="80000" step="1000">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Location -->
+                                <div class="mb-3">
+                                    <label for="location" class="form-label">Work Location</label>
+                                    <input type="text" class="form-control" id="location" name="location"
+                                           placeholder="e.g., New York Office, Remote, Hybrid">
+                                </div>
+
+                                <!-- Timeline -->
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="expected_start_date" class="form-label">Expected Start Date</label>
+                                            <input type="date" class="form-control" id="expected_start_date" name="expected_start_date">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="application_deadline" class="form-label">Application Deadline</label>
+                                            <input type="date" class="form-control" id="application_deadline" name="application_deadline">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Job Description -->
+                                <div class="mb-3">
+                                    <label for="description" class="form-label">Job Description <span class="text-danger">*</span></label>
+                                    <textarea class="form-control" id="description" name="description" rows="6" required
+                                              placeholder="Detailed job description, responsibilities, and what the role entails..."></textarea>
+                                    <div class="form-text">Provide a comprehensive description of the role, key responsibilities, and day-to-day activities.</div>
+                                </div>
+
+                                <!-- Requirements -->
+                                <div class="mb-3">
+                                    <label for="requirements" class="form-label">Requirements & Qualifications <span class="text-danger">*</span></label>
+                                    <textarea class="form-control" id="requirements" name="requirements" rows="6" required
+                                              placeholder="Required skills, experience, education, and qualifications..."></textarea>
+                                    <div class="form-text">List all required and preferred qualifications, skills, and experience.</div>
+                                </div>
+
+                                <!-- Business Justification -->
+                                <div class="mb-3">
+                                    <label for="justification" class="form-label">Business Justification <span class="text-danger">*</span></label>
+                                    <textarea class="form-control" id="justification" name="justification" rows="4" required
+                                              placeholder="Explain why this position is needed, how it will benefit the organization, and the impact of not filling it..."></textarea>
+                                    <div class="form-text">Provide a clear business case for why this position should be approved.</div>
+                                </div>
+
+                                <!-- Form Actions -->
+                                <div class="d-flex justify-content-between">
+                                    <a href="{{ url_for('hr.job_requests') }}" class="btn btn-outline-secondary">
+                                        <i class="fas fa-times"></i> Cancel
+                                    </a>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-paper-plane"></i> Submit Job Request
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sidebar with Guidelines -->
+                <div class="col-lg-4">
+                    <div class="card shadow">
+                        <div class="card-header">
+                            <h6 class="mb-0">Request Guidelines</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <h6 class="text-primary">Approval Process</h6>
+                                <ol class="small">
+                                    <li>Submit your job request with complete details</li>
+                                    <li>Management/General Manager reviews and approves</li>
+                                    <li>HR creates the job posting and manages recruitment</li>
+                                    <li>Interview process begins with your involvement</li>
+                                </ol>
+                            </div>
+
+                            <div class="mb-3">
+                                <h6 class="text-success">Tips for Approval</h6>
+                                <ul class="small">
+                                    <li>Provide clear business justification</li>
+                                    <li>Include realistic budget expectations</li>
+                                    <li>Be specific about requirements</li>
+                                    <li>Consider urgency level carefully</li>
+                                    <li>Align with department goals</li>
+                                </ul>
+                            </div>
+
+                            <div class="mb-3">
+                                <h6 class="text-info">Required Information</h6>
+                                <ul class="small">
+                                    <li><strong>Job Title:</strong> Clear, specific position name</li>
+                                    <li><strong>Description:</strong> Detailed role overview</li>
+                                    <li><strong>Requirements:</strong> Skills and qualifications</li>
+                                    <li><strong>Justification:</strong> Why this role is needed</li>
+                                </ul>
+                            </div>
+
+                            <div class="alert alert-warning small">
+                                <i class="fas fa-info-circle"></i>
+                                <strong>Note:</strong> All job requests require management approval before HR can proceed with posting and recruitment.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Budget Guidelines -->
+                    <div class="card shadow mt-3">
+                        <div class="card-header">
+                            <h6 class="mb-0">Budget Guidelines</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="small">
+                                <p><strong>Consider these factors:</strong></p>
+                                <ul>
+                                    <li>Market rates for similar positions</li>
+                                    <li>Internal salary equity</li>
+                                    <li>Department budget constraints</li>
+                                    <li>Benefits and additional costs</li>
+                                    <li>Growth potential and career path</li>
+                                </ul>
+                                
+                                <div class="alert alert-info mt-3">
+                                    <i class="fas fa-lightbulb"></i>
+                                    <strong>Tip:</strong> Research industry standards and consult with HR for budget guidance.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Set minimum dates to today
+document.addEventListener('DOMContentLoaded', function() {
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('expected_start_date').min = today;
+    document.getElementById('application_deadline').min = today;
+});
+
+// Budget validation
+document.getElementById('budget_max').addEventListener('blur', function() {
+    const minBudget = parseFloat(document.getElementById('budget_min').value);
+    const maxBudget = parseFloat(this.value);
+    
+    if (minBudget && maxBudget && maxBudget < minBudget) {
+        alert('Maximum budget should be greater than minimum budget');
+        this.focus();
+    }
+});
+
+// Auto-set department based on current user (if available)
+{% if current_user.department %}
+document.getElementById('department').value = '{{ current_user.department }}';
+{% endif %}
+</script>
+{% endblock %} 

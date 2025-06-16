@@ -63,12 +63,45 @@
                 
                 <ul class="navbar-nav">
                     {% if current_user.is_authenticated %}
+                    <!-- Notifications -->
+                    <li class="nav-item dropdown me-3">
+                        <a class="nav-link position-relative" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-bell text-white"></i>
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger notification-badge" 
+                                  id="notification-count" style="display: none;">0</span>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end notification-dropdown" style="width: 350px; max-height: 400px; overflow-y: auto;">
+                            <div class="dropdown-header d-flex justify-content-between align-items-center">
+                                <span>Notifications</span>
+                                <a href="{{ url_for('core.notifications') }}" class="btn btn-sm btn-outline-primary">View All</a>
+                            </div>
+                            <div id="notification-list">
+                                <div class="dropdown-item text-center text-muted">
+                                    <i class="fas fa-spinner fa-spin"></i> Loading...
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    
+                    <!-- Live Clock -->
+                    <li class="nav-item d-flex align-items-center me-3">
+                        <i class="fas fa-clock text-white me-1"></i>
+                        <span class="nav-link text-white p-0" id="live-clock-ist"></span>
+                    </li>
+
+                    <!-- Nav Item - User Information -->
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
                             <i class="fas fa-user-circle"></i> {{ current_user.email }}
                         </a>
-                        <ul class="dropdown-menu">
+                        <ul class="dropdown-menu dropdown-menu-end">
                             <li><a class="dropdown-item" href="{{ url_for('employee.profile') }}">Profile</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('core.notifications') }}">
+                                <i class="fas fa-bell"></i> Notifications
+                            </a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('core.notification_preferences') }}">
+                                <i class="fas fa-cog"></i> Notification Settings
+                            </a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="{{ url_for('auth.logout') }}">Logout</a></li>
                         </ul>
@@ -106,228 +139,80 @@
             <!-- Sidebar -->
             <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
                 <div class="position-sticky pt-3">
-                    <ul class="nav flex-column">
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('core.dashboard') }}">
-                                <i class="fas fa-tachometer-alt"></i> Dashboard
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('employee.profile') }}">
-                                <i class="fas fa-user"></i> My Profile
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('employee.attendance') }}">
-                                <i class="fas fa-calendar-check"></i> Attendance
-                            </a>
-                        </li>
+                    <nav class="sidebar-nav">
+                        {% set modules = get_accessible_modules(current_user) %}
                         
-                        <!-- Projects Section -->
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('project.dashboard') }}">
-                                <i class="fas fa-project-diagram"></i> Projects
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('project.list_projects') }}">
-                                <i class="fas fa-list"></i> Project List
-                            </a>
-                        </li>
-                        
-                        <!-- Admin/Management Section -->
-                        {% if current_user.can_view_all_activities() %}
-                        <hr class="text-muted">
-                        <li class="nav-item">
-                            <strong class="nav-link text-muted small">ADMINISTRATION</strong>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('auth.manage_users') }}">
-                                <i class="fas fa-users-cog"></i> Manage Users
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('auth.create_user') }}">
-                                <i class="fas fa-user-plus"></i> Create User
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('core.activity_log') }}">
-                                <i class="fas fa-list-alt"></i> Activity Log
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('core.calendar') }}">
-                                <i class="fas fa-calendar"></i> Calendar Events
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('core.assign_training') }}">
-                                <i class="fas fa-graduation-cap"></i> Training Management
-                            </a>
-                        </li>
+                        <!-- Personal Modules -->
+                        {% if modules.personal %}
+                        <div class="nav-section">
+                            <h6 class="sidebar-heading">Personal</h6>
+                            <ul class="nav flex-column">
+                                {% for name, data in modules.personal.items() %}
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ url_for(data.route) }}">
+                                        <i class="fas fa-user"></i> {{ data.label }}
+                                    </a>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
                         {% endif %}
                         
-                        <!-- Sales Department Section -->
-                        {% if current_user.department in ['Digital Marketing', 'Business Development'] %}
-                        <hr class="text-muted">
-                        <li class="nav-item">
-                            <strong class="nav-link text-muted small">SALES & MARKETING</strong>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('sales.dashboard') }}">
-                                <i class="fas fa-chart-line"></i> Sales Dashboard
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('sales.sales_funnel') }}">
-                                <i class="fas fa-funnel-dollar"></i> Sales Funnel
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('sales.list_leads') }}">
-                                <i class="fas fa-bullseye"></i> Leads
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('sales.list_clients') }}">
-                                <i class="fas fa-handshake"></i> Clients
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('sales.analytics') }}">
-                                <i class="fas fa-chart-bar"></i> Sales Analytics
-                            </a>
-                        </li>
+                        <!-- Work Modules -->
+                        {% if modules.work %}
+                        <div class="nav-section">
+                            <h6 class="sidebar-heading">Work</h6>
+                            <ul class="nav flex-column">
+                                {% for name, data in modules.work.items() %}
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ url_for(data.route) }}">
+                                        <i class="fas fa-briefcase"></i> {{ data.label }}
+                                    </a>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
                         {% endif %}
                         
-                        <!-- EPR Compliance Section -->
-                        {% if current_user.department == 'EPR Compliance' %}
-                        <hr class="text-muted">
-                        <li class="nav-item">
-                            <strong class="nav-link text-muted small">EPR COMPLIANCE</strong>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('sales.list_clients') }}">
-                                <i class="fas fa-shield-alt"></i> Assigned Clients
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('core.my_training_assignments') }}">
-                                <i class="fas fa-book-reader"></i> My Training
-                            </a>
-                        </li>
+                        <!-- HR Modules -->
+                        {% if modules.hr %}
+                        <div class="nav-section">
+                            <h6 class="sidebar-heading">HR</h6>
+                            <ul class="nav flex-column">
+                                {% for name, data in modules.hr.items() %}
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ url_for(data.route) }}">
+                                        <i class="fas fa-users-cog"></i> {{ data.label }}
+                                    </a>
+                                </li>
+                                {% endfor %}
+                                {% if current_user.has_role('Admin') %}
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ url_for('hr.attendance_settings') }}">
+                                        <i class="fas fa-cogs"></i> Attendance Settings
+                                    </a>
+                                </li>
+                                {% endif %}
+                            </ul>
+                        </div>
                         {% endif %}
                         
-                        <!-- Project Development Section -->
-                        {% if current_user.department == 'Project Development' %}
-                        <hr class="text-muted">
-                        <li class="nav-item">
-                            <strong class="nav-link text-muted small">PROJECT DEVELOPMENT</strong>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('project.all_tasks') }}">
-                                <i class="fas fa-tasks"></i> All Tasks
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('core.my_training_assignments') }}">
-                                <i class="fas fa-book-reader"></i> My Training
-                            </a>
-                        </li>
+                        <!-- Management Modules -->
+                        {% if modules.management %}
+                        <div class="nav-section">
+                            <h6 class="sidebar-heading">Management</h6>
+                            <ul class="nav flex-column">
+                                {% for name, data in modules.management.items() %}
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ url_for(data.route) }}">
+                                        <i class="fas fa-chart-line"></i> {{ data.label }}
+                                    </a>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
                         {% endif %}
-                        
-                        <!-- HR Section -->
-                        {% if current_user.department == 'HR' or current_user.is_admin() %}
-                        <hr class="text-muted">
-                        <li class="nav-item">
-                            <strong class="nav-link text-muted small">HUMAN RESOURCES</strong>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('hr.dashboard') }}">
-                                <i class="fas fa-users-cog"></i> HR Dashboard
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('hr.employee_management') }}">
-                                <i class="fas fa-users"></i> Employee Management
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('hr.job_postings') }}">
-                                <i class="fas fa-briefcase"></i> Job Postings
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('hr.job_applications') }}">
-                                <i class="fas fa-file-alt"></i> Applications
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('hr.salary_management') }}">
-                                <i class="fas fa-dollar-sign"></i> Salary Management
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('hr.attendance_management') }}">
-                                <i class="fas fa-clock"></i> Attendance
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('hr.assets_management') }}">
-                                <i class="fas fa-laptop"></i> Assets
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('hr.petty_cash_management') }}">
-                                <i class="fas fa-money-bill"></i> Petty Cash
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('hr.hr_calendar') }}">
-                                <i class="fas fa-calendar"></i> HR Calendar
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('hr.daily_attendance_status') }}">
-                                <i class="fas fa-users-cog"></i> Daily Status
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('hr.appointments') }}">
-                                <i class="fas fa-handshake"></i> Appointments
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('hr.conference_rooms') }}">
-                                <i class="fas fa-door-open"></i> Conference Rooms
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('core.assign_training') }}">
-                                <i class="fas fa-graduation-cap"></i> Training Programs
-                            </a>
-                        </li>
-                        {% endif %}
-                        
-                        <!-- Common Links -->
-                        <hr class="text-muted">
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('hr.personal_calendar') }}">
-                                <i class="fas fa-calendar-alt"></i> My Calendar
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('project.all_chats') }}">
-                                <i class="fas fa-comments"></i> Team Chats
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('core.my_training_assignments') }}">
-                                <i class="fas fa-book-reader"></i> My Training
-                            </a>
-                        </li>
-                    </ul>
+                    </nav>
                 </div>
             </nav>
             
@@ -343,6 +228,130 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-    {% block extra_js %}{% endblock %}
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        function updateISTClock() {
+            const now = new Date();
+            const istTime = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Kolkata"}));
+            
+            const options = { 
+                weekday: 'short', 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric', 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                second: '2-digit', 
+                hour12: true 
+            };
+            const formattedString = istTime.toLocaleString('en-IN', options);
+
+            const clockElement = document.getElementById('live-clock-ist');
+            if (clockElement) {
+                clockElement.textContent = formattedString;
+            }
+        }
+        setInterval(updateISTClock, 1000);
+        updateISTClock();
+
+        // Notification system
+        {% if current_user.is_authenticated %}
+        function loadNotifications() {
+            fetch('{{ url_for("core.api_recent_notifications") }}')
+                .then(response => response.json())
+                .then(data => {
+                    updateNotificationBadge(data.unread_count);
+                    updateNotificationDropdown(data.notifications);
+                })
+                .catch(error => console.error('Error loading notifications:', error));
+        }
+
+        function updateNotificationBadge(count) {
+            const badge = document.getElementById('notification-count');
+            if (badge) {
+                if (count > 0) {
+                    badge.textContent = count > 99 ? '99+' : count;
+                    badge.style.display = 'inline';
+                } else {
+                    badge.style.display = 'none';
+                }
+            }
+        }
+
+        function updateNotificationDropdown(notifications) {
+            const notificationList = document.getElementById('notification-list');
+            if (!notificationList) return;
+
+            if (notifications.length === 0) {
+                notificationList.innerHTML = `
+                    <div class="dropdown-item text-center text-muted">
+                        <i class="fas fa-bell-slash"></i><br>
+                        No new notifications
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+            notifications.slice(0, 5).forEach(notification => {
+                const isUnread = !notification.is_read;
+                html += `
+                    <div class="dropdown-item ${isUnread ? 'bg-light' : ''}" style="white-space: normal;">
+                        <div class="d-flex align-items-start">
+                            <div class="me-2">
+                                <i class="${notification.icon_class} ${notification.color_class}"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="fw-bold small">${notification.title}</div>
+                                <div class="text-muted small">${notification.message}</div>
+                                <div class="text-muted small">${notification.time_ago}</div>
+                            </div>
+                            ${isUnread ? '<div class="ms-2"><span class="badge bg-primary">New</span></div>' : ''}
+                        </div>
+                    </div>
+                `;
+            });
+
+            if (notifications.length > 5) {
+                html += `
+                    <div class="dropdown-item text-center">
+                        <a href="{{ url_for('core.notifications') }}" class="btn btn-sm btn-outline-primary">
+                            View All ${notifications.length} Notifications
+                        </a>
+                    </div>
+                `;
+            }
+
+            notificationList.innerHTML = html;
+        }
+
+        // Load notifications on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadNotifications();
+            // Refresh notifications every 30 seconds
+            setInterval(loadNotifications, 30000);
+        });
+
+        // Mark notification as read when clicked
+        function markNotificationAsRead(notificationId) {
+            fetch(`{{ url_for('core.mark_notification_read', notification_id=0) }}`.replace('0', notificationId), {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    loadNotifications(); // Refresh notifications
+                }
+            })
+            .catch(error => console.error('Error marking notification as read:', error));
+        }
+        {% endif %}
+    </script>
+    {% block scripts %}{% endblock %}
 </body>
 </html> 

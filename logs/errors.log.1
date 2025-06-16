@@ -1,116 +1,52 @@
-[2025-06-08 22:30:27,289] 127.0.0.1 requested http://127.0.0.1:5001/dashboard
-ERROR in app: Exception on /dashboard [GET]
-Traceback (most recent call last):
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 2190, in wsgi_app
-    response = self.full_dispatch_request()
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1486, in full_dispatch_request
-    rv = self.handle_user_exception(e)
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request
-    rv = self.dispatch_request()
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request
-    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask_login/utils.py", line 290, in decorated_view
-    return current_app.ensure_sync(func)(*args, **kwargs)
-  File "/Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/core/routes.py", line 14, in dashboard
-    return render_template('core/dashboard.html')
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/templating.py", line 151, in render_template
-    return _render(app, template, context)
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/templating.py", line 132, in _render
-    rv = template.render(context)
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/jinja2/environment.py", line 1295, in render
-    self.environment.handle_exception()
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/jinja2/environment.py", line 942, in handle_exception
-    raise rewrite_traceback_stack(source=source)
-  File "/Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/templates/core/dashboard.html", line 1, in top-level template code
-    {% extends "base.html" %}
-  File "/Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/templates/base.html", line 144, in top-level template code
-    {% block content %}{% endblock %}
-  File "/Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/templates/core/dashboard.html", line 101, in block 'content'
-    <a href="{{ url_for('project.list') }}" class="btn btn-primary">View All Projects</a>
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1697, in url_for
-    return self.handle_url_build_error(error, endpoint, values)
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1686, in url_for
-    rv = url_adapter.build(  # type: ignore[union-attr]
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/werkzeug/routing/map.py", line 950, in build
-    raise BuildError(endpoint, values, method, self)
-werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'project.list'. Did you mean 'project.list_projects' instead?
-[2025-06-08 22:30:27,294] 127.0.0.1 requested http://127.0.0.1:5001/dashboard
-ERROR in __init__: Server Error: 500 Internal Server Error: The server encountered an internal error and was unable to complete your request. Either the server is overloaded or there is an error in the application.
-[2025-06-08 22:33:16,926] 127.0.0.1 requested http://127.0.0.1:5001/project/list
-ERROR in app: Exception on /project/list [GET]
-Traceback (most recent call last):
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 2190, in wsgi_app
-    response = self.full_dispatch_request()
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1486, in full_dispatch_request
-    rv = self.handle_user_exception(e)
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request
-    rv = self.dispatch_request()
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request
-    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask_login/utils.py", line 290, in decorated_view
-    return current_app.ensure_sync(func)(*args, **kwargs)
-  File "/Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/project/routes.py", line 40, in list_projects
-    projects = ProjectService.get_accessible_projects(employee.id)
-AttributeError: 'InstrumentedList' object has no attribute 'id'
-[2025-06-08 22:33:16,935] 127.0.0.1 requested http://127.0.0.1:5001/project/list
-ERROR in __init__: Server Error: 500 Internal Server Error: The server encountered an internal error and was unable to complete your request. Either the server is overloaded or there is an error in the application.
-[2025-06-08 22:33:25,646] 127.0.0.1 requested http://127.0.0.1:5001/project/list
-ERROR in app: Exception on /project/list [GET]
-Traceback (most recent call last):
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 2190, in wsgi_app
-    response = self.full_dispatch_request()
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1486, in full_dispatch_request
-    rv = self.handle_user_exception(e)
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request
-    rv = self.dispatch_request()
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request
-    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask_login/utils.py", line 290, in decorated_view
-    return current_app.ensure_sync(func)(*args, **kwargs)
-  File "/Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/project/routes.py", line 40, in list_projects
-    projects = ProjectService.get_accessible_projects(employee.id)
-AttributeError: 'InstrumentedList' object has no attribute 'id'
-[2025-06-08 22:33:25,647] 127.0.0.1 requested http://127.0.0.1:5001/project/list
-ERROR in __init__: Server Error: 500 Internal Server Error: The server encountered an internal error and was unable to complete your request. Either the server is overloaded or there is an error in the application.
-[2025-06-08 22:33:38,655] 127.0.0.1 requested http://127.0.0.1:5001/project/list
-ERROR in app: Exception on /project/list [GET]
-Traceback (most recent call last):
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 2190, in wsgi_app
-    response = self.full_dispatch_request()
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1486, in full_dispatch_request
-    rv = self.handle_user_exception(e)
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request
-    rv = self.dispatch_request()
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request
-    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask_login/utils.py", line 290, in decorated_view
-    return current_app.ensure_sync(func)(*args, **kwargs)
-  File "/Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/project/routes.py", line 40, in list_projects
-    projects = ProjectService.get_accessible_projects(employee.id)
-AttributeError: 'InstrumentedList' object has no attribute 'id'
-[2025-06-08 22:33:38,657] 127.0.0.1 requested http://127.0.0.1:5001/project/list
-ERROR in __init__: Server Error: 500 Internal Server Error: The server encountered an internal error and was unable to complete your request. Either the server is overloaded or there is an error in the application.
-[2025-06-08 22:33:39,684] 127.0.0.1 requested http://127.0.0.1:5001/project/dashboard
-ERROR in app: Exception on /project/dashboard [GET]
-Traceback (most recent call last):
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 2190, in wsgi_app
-    response = self.full_dispatch_request()
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1486, in full_dispatch_request
-    rv = self.handle_user_exception(e)
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request
-    rv = self.dispatch_request()
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request
-    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask_login/utils.py", line 290, in decorated_view
-    return current_app.ensure_sync(func)(*args, **kwargs)
-  File "/Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/project/routes.py", line 26, in dashboard
-    assigned_tasks = ProjectService.get_tasks_by_assignee(employee.id)
-AttributeError: type object 'ProjectService' has no attribute 'get_tasks_by_assignee'
-[2025-06-08 22:33:39,684] 127.0.0.1 requested http://127.0.0.1:5001/project/dashboard
-ERROR in __init__: Server Error: 500 Internal Server Error: The server encountered an internal error and was unable to complete your request. Either the server is overloaded or there is an error in the application.
-[2025-06-09 12:59:56,717] 127.0.0.1 requested http://127.0.0.1:5000/favicon.ico
-ERROR in __init__: Page not found: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
-[2025-06-10 05:48:53,217] 127.0.0.1 requested http://127.0.0.1:5000/sales/lead/1/interaction
+[2025-06-10 05:48:53,218] 127.0.0.1 requested http://127.0.0.1:5000/sales/lead/1/interaction
+ERROR in __init__: Request Headers: {'Host': '127.0.0.1:5000', 'Connection': 'keep-alive', 'Content-Length': '108', 'Cache-Control': 'max-age=0', 'Sec-Ch-Ua': '"Google Chrome";v="137", "Chromium";v="137", "Not/A)Brand";v="24"', 'Sec-Ch-Ua-Mobile': '?0', 'Sec-Ch-Ua-Platform': '"macOS"', 'Origin': 'http://127.0.0.1:5000', 'Content-Type': 'application/x-www-form-urlencoded', 'Upgrade-Insecure-Requests': '1', 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36', 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7', 'Sec-Fetch-Site': 'same-origin', 'Sec-Fetch-Mode': 'navigate', 'Sec-Fetch-User': '?1', 'Sec-Fetch-Dest': 'document', 'Referer': 'http://127.0.0.1:5000/sales/lead/1', 'Accept-Encoding': 'gzip, deflate, br, zstd', 'Accept-Language': 'en-IN,en;q=0.9,hi-IN;q=0.8,hi;q=0.7,en-GB;q=0.6,en-US;q=0.5', 'Cookie': 'session=.eJwljklqBDEMAP_icw6yFsuezzSSJZEQSKB75hTy9zTkWAUF9dOOOvN6b4_n-cq3dnxEe7SVamSyO3tXANFCw61hU0E8PF1xoy4qhL6SB5m5FolmTjb3zXNDzoqQwUpLIkM7jE4TY4w-KM1tsTt05zujFABUL4xQavfI68rz_6bfuK-zjuf3Z37dQsHn4OTlUcgVLosFVJhhaeQeCGIB2H7_ABOoPzg.aEd5ig.XqdwQBzjTzBG1jUQkW0gKsBJHxQ'}
+[2025-06-10 05:48:53,220] 127.0.0.1 requested http://127.0.0.1:5000/sales/lead/1/interaction
+ERROR in __init__: Request Form Data: ImmutableMultiDict([('interaction_type', 'Call'), ('description', 'They have asked to set the meeting for tomorrow.'), ('next_follow_up', '2025-06-11')])
+[2025-06-10 05:53:43,214] 127.0.0.1 requested http://127.0.0.1:5000/sales/lead/1/interaction
 ERROR in __init__: CSRF Error: The CSRF token is missing.
-[2025-06-10 05:48:53,217] 127.0.0.1 requested http://127.0.0.1:5000/sales/lead/1/interaction
+[2025-06-10 05:53:43,215] 127.0.0.1 requested http://127.0.0.1:5000/sales/lead/1/interaction
+ERROR in __init__: Request Method: POST
+[2025-06-10 05:53:43,215] 127.0.0.1 requested http://127.0.0.1:5000/sales/lead/1/interaction
+ERROR in __init__: Request Headers: {'Host': '127.0.0.1:5000', 'Connection': 'keep-alive', 'Content-Length': '65', 'Cache-Control': 'max-age=0', 'Sec-Ch-Ua': '"Google Chrome";v="137", "Chromium";v="137", "Not/A)Brand";v="24"', 'Sec-Ch-Ua-Mobile': '?0', 'Sec-Ch-Ua-Platform': '"macOS"', 'Origin': 'http://127.0.0.1:5000', 'Content-Type': 'application/x-www-form-urlencoded', 'Upgrade-Insecure-Requests': '1', 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36', 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7', 'Sec-Fetch-Site': 'same-origin', 'Sec-Fetch-Mode': 'navigate', 'Sec-Fetch-User': '?1', 'Sec-Fetch-Dest': 'document', 'Referer': 'http://127.0.0.1:5000/sales/lead/1', 'Accept-Encoding': 'gzip, deflate, br, zstd', 'Accept-Language': 'en-IN,en;q=0.9,hi-IN;q=0.8,hi;q=0.7,en-GB;q=0.6,en-US;q=0.5', 'Cookie': 'session=.eJwljkFqBEEIAP_S5xxstbXdzwxtqyQEEpjZPYX8PQM5VkFB_bSjzrze2-N5vvKtHR_RHs1SF62xO3tXgKGFC7fGmgrDw9MVN6pRIXRLFlrLtWho5uTlvnluyFkRQ1jJRmRoB-k0MUS6UC5fxu7Qne-McgCgemGEUrtHXlee_zf9xn2ddTy_P_PrFrmLLTcT0PQ-cAlLbTUjmgwp5hUoZO33DxlUP0o.aEd66w.k1t1PdyMeL8-hn_HYa5gkJCPRFg'}
+[2025-06-10 05:53:43,221] 127.0.0.1 requested http://127.0.0.1:5000/sales/lead/1/interaction
+ERROR in __init__: Request Form Data: ImmutableMultiDict([('interaction_type', 'Call'), ('description', 'sdffs'), ('next_follow_up', '2025-06-11')])
+[2025-06-10 21:12:53,173] 127.0.0.1 requested http://127.0.0.1:5000/hr/my-calendar/add
+ERROR in __init__: CSRF Error: The CSRF token is missing.
+[2025-06-10 21:12:53,174] 127.0.0.1 requested http://127.0.0.1:5000/hr/my-calendar/add
+ERROR in __init__: Request Method: POST
+[2025-06-10 21:12:53,175] 127.0.0.1 requested http://127.0.0.1:5000/hr/my-calendar/add
+ERROR in __init__: Request Headers: {'Host': '127.0.0.1:5000', 'Connection': 'keep-alive', 'Content-Length': '119', 'Cache-Control': 'max-age=0', 'Sec-Ch-Ua': '"Google Chrome";v="137", "Chromium";v="137", "Not/A)Brand";v="24"', 'Sec-Ch-Ua-Mobile': '?0', 'Sec-Ch-Ua-Platform': '"macOS"', 'Origin': 'http://127.0.0.1:5000', 'Content-Type': 'application/x-www-form-urlencoded', 'Upgrade-Insecure-Requests': '1', 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36', 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7', 'Sec-Fetch-Site': 'same-origin', 'Sec-Fetch-Mode': 'navigate', 'Sec-Fetch-User': '?1', 'Sec-Fetch-Dest': 'document', 'Referer': 'http://127.0.0.1:5000/hr/my-calendar/add', 'Accept-Encoding': 'gzip, deflate, br, zstd', 'Accept-Language': 'en-IN,en;q=0.9,hi-IN;q=0.8,hi;q=0.7,en-GB;q=0.6,en-US;q=0.5', 'Cookie': 'session=.eJwljkFqBDEMBP_icw6SJbvt_cwgWTIJgQRmdk8hf89AjlVQUD_l2Gde7-XxPF_5Vo6PKI8yEybWFqsziBp2tboQNkDNw9NRV8WUXYlnahczx5aGzKHmvnQsyrEjWlfIbJEBps4yavTOXdLcproTu96ZZCOq8F0jIOUeeV15_t_wjes69_H8_syvWyR5EHeswTpoEY0ADGisqqS6Rk3sTeX3DwhWPs4.aEhSTg.11t4fmGWs5XQx2XC7IKggc5k6xs'}
+[2025-06-10 21:12:53,175] 127.0.0.1 requested http://127.0.0.1:5000/hr/my-calendar/add
+ERROR in __init__: Request Form Data: ImmutableMultiDict([('title', 'asad'), ('description', 'sadsad'), ('event_type', 'Work'), ('priority', 'Medium'), ('event_date', '2025-06-11'), ('start_time', '10:14'), ('end_time', '11:12')])
+[2025-06-14 08:03:50,530] 127.0.0.1 requested http://127.0.0.1:5000/favicon.ico
+ERROR in __init__: Page not found: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
+[2025-06-14 08:16:40,739] None requested None
+ERROR in __init__: Error creating database tables: Error creating backref 'attendance_records' on relationship 'Attendance.employee': property of that name exists on mapper 'Mapper[Employee(employees)]'
+[2025-06-14 08:16:57,440] None requested None
+ERROR in __init__: Error creating database tables: Error creating backref 'attendance_records' on relationship 'Attendance.employee': property of that name exists on mapper 'Mapper[Employee(employees)]'
+[2025-06-14 08:17:09,092] None requested None
+ERROR in __init__: Error creating database tables: Error creating backref 'attendance_records' on relationship 'Attendance.employee': property of that name exists on mapper 'Mapper[Employee(employees)]'
+[2025-06-14 08:17:10,549] None requested None
+ERROR in __init__: Error creating database tables: Error creating backref 'attendance_records' on relationship 'Attendance.employee': property of that name exists on mapper 'Mapper[Employee(employees)]'
+[2025-06-14 08:17:18,059] None requested None
+ERROR in __init__: Error creating database tables: Error creating backref 'attendance_records' on relationship 'Attendance.employee': property of that name exists on mapper 'Mapper[Employee(employees)]'
+[2025-06-14 08:23:13,078] None requested None
+ERROR in __init__: Error creating database tables: Error creating backref 'attendance_records' on relationship 'Attendance.employee': property of that name exists on mapper 'Mapper[Employee(employees)]'
+[2025-06-14 08:23:13,408] None requested None
+ERROR in __init__: Error creating database tables: Error creating backref 'attendance_records' on relationship 'Attendance.employee': property of that name exists on mapper 'Mapper[Employee(employees)]'
+[2025-06-14 08:24:40,217] None requested None
+ERROR in __init__: Error creating database tables: Could not determine join condition between parent/child tables on relationship Employee.user - there are no foreign keys linking these tables.  Ensure that referencing columns are associated with a ForeignKey or ForeignKeyConstraint, or specify a 'primaryjoin' expression.
+[2025-06-14 08:24:40,515] None requested None
+ERROR in __init__: Error creating database tables: Could not determine join condition between parent/child tables on relationship Employee.user - there are no foreign keys linking these tables.  Ensure that referencing columns are associated with a ForeignKey or ForeignKeyConstraint, or specify a 'primaryjoin' expression.
+[2025-06-14 08:26:01,046] None requested None
+ERROR in __init__: Error creating database tables: Could not determine join condition between parent/child tables on relationship Role.users - there are no foreign keys linking these tables.  Ensure that referencing columns are associated with a ForeignKey or ForeignKeyConstraint, or specify a 'primaryjoin' expression.
+[2025-06-14 08:26:01,367] None requested None
+ERROR in __init__: Error creating database tables: Could not determine join condition between parent/child tables on relationship Role.users - there are no foreign keys linking these tables.  Ensure that referencing columns are associated with a ForeignKey or ForeignKeyConstraint, or specify a 'primaryjoin' expression.
+[2025-06-14 08:34:05,634] None requested None
+ERROR in __init__: Error creating database tables: name 'admin' is not defined
+[2025-06-14 09:19:03,782] None requested None
+ERROR in __init__: Error creating database tables: name 'admin' is not defined
+[2025-06-14 09:27:16,021] 127.0.0.1 requested http://127.0.0.1:5000/auth/create-user
+ERROR in __init__: CSRF Error: The CSRF session token is missing.
+[2025-06-14 09:27:16,022] 127.0.0.1 requested http://127.0.0.1:5000/auth/create-user
 ERROR in __init__: Request Method: POST

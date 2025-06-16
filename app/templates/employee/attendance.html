@@ -3,143 +3,131 @@
 {% block title %}Attendance - HRMS{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-    <h1 class="h2">Attendance</h1>
-    <div class="btn-toolbar mb-2 mb-md-0">
-        <button type="button" class="btn btn-success">
-            <i class="fas fa-clock"></i> Clock In
-        </button>
-        <button type="button" class="btn btn-warning ms-2">
-            <i class="fas fa-clock"></i> Clock Out
-        </button>
-    </div>
-</div>
-
-<div class="row">
-    <div class="col-md-4">
-        <div class="card">
-            <div class="card-body text-center">
-                <h5 class="card-title">Today's Status</h5>
-                <div class="mb-3">
-                    <span class="badge bg-success fs-6">Present</span>
+<div class="container-fluid">
+    <div class="row">
+        <!-- Today's Attendance Card -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Today's Attendance</h5>
                 </div>
-                <p><strong>Clock In:</strong> 09:15 AM</p>
-                <p><strong>Clock Out:</strong> --:-- --</p>
-                <p><strong>Hours Worked:</strong> 6h 45m</p>
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-md-8">
-        <div class="card">
-            <div class="card-header">
-                <h6 class="mb-0">Recent Attendance</h6>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-sm">
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Clock In</th>
-                                <th>Clock Out</th>
-                                <th>Hours</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>2024-06-08</td>
-                                <td>09:15 AM</td>
-                                <td>--:-- --</td>
-                                <td>6h 45m</td>
-                                <td><span class="badge bg-success">Present</span></td>
-                            </tr>
-                            <tr>
-                                <td>2024-06-07</td>
-                                <td>09:00 AM</td>
-                                <td>06:00 PM</td>
-                                <td>8h 30m</td>
-                                <td><span class="badge bg-success">Present</span></td>
-                            </tr>
-                            <tr>
-                                <td>2024-06-06</td>
-                                <td>09:30 AM</td>
-                                <td>06:15 PM</td>
-                                <td>8h 15m</td>
-                                <td><span class="badge bg-warning">Late</span></td>
-                            </tr>
-                            <tr>
-                                <td>2024-06-05</td>
-                                <td>--:-- --</td>
-                                <td>--:-- --</td>
-                                <td>0h 0m</td>
-                                <td><span class="badge bg-danger">Absent</span></td>
-                            </tr>
-                        </tbody>
-                    </table>
+                <div class="card-body">
+                    {% if today_record %}
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Status:</strong> {{ today_record.status }}</p>
+                                <p><strong>Clock In:</strong> {{ (today_record.clock_in | to_ist).strftime('%I:%M %p') if today_record.clock_in else 'Not clocked in' }}</p>
+                                <p><strong>Clock Out:</strong> {{ (today_record.clock_out | to_ist).strftime('%I:%M %p') if today_record.clock_out else 'Not clocked out' }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Location:</strong> {{ today_record.clock_in_location }}</p>
+                                <p><strong>Work Mode:</strong> {{ today_record.work_mode }}</p>
+                                {% if today_record.clock_out %}
+                                    <p><strong>Total Hours:</strong> {{ today_record.total_hours }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        {% if not today_record.clock_out %}
+                            <form action="{{ url_for('employee.clock_out') }}" method="POST" class="mt-3">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                                <button type="submit" class="btn btn-danger">
+                                    <i class="fas fa-sign-out-alt"></i> Clock Out
+                                </button>
+                            </form>
+                        {% endif %}
+                    {% else %}
+                        <form action="{{ url_for('employee.clock_in') }}" method="POST">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-sign-in-alt"></i> Clock In
+                            </button>
+                        </form>
+                    {% endif %}
                 </div>
             </div>
         </div>
-    </div>
-</div>
-
-<div class="row mt-4">
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">
-                <h6 class="mb-0">Monthly Summary</h6>
-            </div>
-            <div class="card-body">
-                <div class="row text-center">
-                    <div class="col-3">
-                        <h4 class="text-success">20</h4>
-                        <small>Present</small>
-                    </div>
-                    <div class="col-3">
-                        <h4 class="text-danger">2</h4>
-                        <small>Absent</small>
-                    </div>
-                    <div class="col-3">
-                        <h4 class="text-warning">3</h4>
-                        <small>Late</small>
-                    </div>
-                    <div class="col-3">
-                        <h4 class="text-info">1</h4>
-                        <small>Leave</small>
+        
+        <!-- Monthly Summary Card -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Monthly Summary</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Total Days:</strong> {{ summary.total_days }}</p>
+                            <p><strong>Present Days:</strong> {{ summary.present_days }}</p>
+                            <p><strong>Late Days:</strong> {{ summary.late_days }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Early Leaves:</strong> {{ summary.early_leaves }}</p>
+                            <p><strong>Total Hours:</strong> {{ summary.total_hours }}</p>
+                            <p><strong>Average Hours/Day:</strong> {{ "%.2f"|format(summary.total_hours / summary.total_days if summary.total_days > 0 else 0) }}</p>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
     
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">
-                <h6 class="mb-0">Leave Balance</h6>
-            </div>
-            <div class="card-body">
-                <div class="row text-center">
-                    <div class="col-4">
-                        <h4 class="text-primary">15</h4>
-                        <small>Annual</small>
-                    </div>
-                    <div class="col-4">
-                        <h4 class="text-success">8</h4>
-                        <small>Sick</small>
-                    </div>
-                    <div class="col-4">
-                        <h4 class="text-warning">3</h4>
-                        <small>Casual</small>
-                    </div>
+    <!-- Recent Attendance History -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">Recent Attendance</h5>
+                    <a href="{{ url_for('employee.attendance_history') }}" class="btn btn-primary btn-sm">
+                        View Full History
+                    </a>
                 </div>
-                <div class="mt-3">
-                    <button class="btn btn-outline-primary btn-sm">
-                        <i class="fas fa-calendar-plus"></i> Apply for Leave
-                    </button>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                    <th>Clock In</th>
+                                    <th>Clock Out</th>
+                                    <th>Total Hours</th>
+                                    <th>Location</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for record in summary.records[:5] %}
+                                <tr>
+                                    <td>{{ record.date.strftime('%Y-%m-%d') }}</td>
+                                    <td>
+                                        <span class="badge {% if record.status == 'Present' %}bg-success{% elif record.status == 'Late' %}bg-warning{% else %}bg-danger{% endif %}">
+                                            {{ record.status }}
+                                        </span>
+                                    </td>
+                                    <td>{{ (record.clock_in | to_ist).strftime('%I:%M %p') if record.clock_in else '-' }}</td>
+                                    <td>{{ (record.clock_out | to_ist).strftime('%I:%M %p') if record.clock_out else '-' }}</td>
+                                    <td>{{ record.total_hours }}</td>
+                                    <td>{{ record.clock_in_location }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+{% block scripts %}
+<script>
+// Add JavaScript for real-time updates if needed
+document.addEventListener('DOMContentLoaded', function() {
+    // Example: Update clock in/out times every minute
+    setInterval(function() {
+        // Add AJAX call to update times if needed
+    }, 60000);
+});
+</script>
+{% endblock %}
 {% endblock %} 

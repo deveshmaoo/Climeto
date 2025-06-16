@@ -1,51 +1,68 @@
-2025-06-08 22:20:54,409 ERROR: Request Headers: {'Host': '127.0.0.1:5000', 'Connection': 'keep-alive', 'Content-Length': '40', 'Cache-Control': 'max-age=0', 'Sec-Ch-Ua': '"Google Chrome";v="137", "Chromium";v="137", "Not/A)Brand";v="24"', 'Sec-Ch-Ua-Mobile': '?0', 'Sec-Ch-Ua-Platform': '"macOS"', 'Upgrade-Insecure-Requests': '1', 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36', 'Origin': 'http://127.0.0.1:5000', 'Content-Type': 'application/x-www-form-urlencoded', 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7', 'Sec-Fetch-Site': 'same-origin', 'Sec-Fetch-Mode': 'navigate', 'Sec-Fetch-User': '?1', 'Sec-Fetch-Dest': 'document', 'Referer': 'http://127.0.0.1:5000/auth/login?next=%2Fdashboard', 'Accept-Encoding': 'gzip, deflate, br, zstd', 'Accept-Language': 'en-IN,en;q=0.9,hi-IN;q=0.8,hi;q=0.7,en-GB;q=0.6,en-US;q=0.5', 'Cookie': 'session=eyJfZnJlc2giOmZhbHNlLCJjc3JmX3Rva2VuIjoiNDViNDA3NTBhZjU2MTU5NjJlMWNhZTgwYjcwMTM0NDAxODA3MWE0MCJ9.aEW-8Q.MgMeKR3UugxZI079O87h2Mg_w7g'} [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:47]
-2025-06-08 22:20:54,411 ERROR: Request Form Data: ImmutableMultiDict([('email', 'admin@example.com'), ('password', 'admin')]) [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:48]
-2025-06-08 22:21:19,881 ERROR: CSRF Error: The CSRF token is missing. [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:45]
-2025-06-08 22:21:19,882 ERROR: Request Method: POST [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:46]
-2025-06-08 22:21:19,883 ERROR: Request Headers: {'Host': '127.0.0.1:5000', 'Connection': 'keep-alive', 'Content-Length': '40', 'Cache-Control': 'max-age=0', 'Sec-Ch-Ua': '"Google Chrome";v="137", "Chromium";v="137", "Not/A)Brand";v="24"', 'Sec-Ch-Ua-Mobile': '?0', 'Sec-Ch-Ua-Platform': '"macOS"', 'Origin': 'http://127.0.0.1:5000', 'Content-Type': 'application/x-www-form-urlencoded', 'Upgrade-Insecure-Requests': '1', 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36', 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7', 'Sec-Fetch-Site': 'same-origin', 'Sec-Fetch-Mode': 'navigate', 'Sec-Fetch-User': '?1', 'Sec-Fetch-Dest': 'document', 'Referer': 'http://127.0.0.1:5000/auth/login', 'Accept-Encoding': 'gzip, deflate, br, zstd', 'Accept-Language': 'en-IN,en;q=0.9,hi-IN;q=0.8,hi;q=0.7,en-GB;q=0.6,en-US;q=0.5', 'Cookie': 'session=eyJfZnJlc2giOmZhbHNlLCJjc3JmX3Rva2VuIjoiNDViNDA3NTBhZjU2MTU5NjJlMWNhZTgwYjcwMTM0NDAxODA3MWE0MCJ9.aEW-8Q.MgMeKR3UugxZI079O87h2Mg_w7g'} [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:47]
-2025-06-08 22:21:19,883 ERROR: Request Form Data: ImmutableMultiDict([('email', 'admin@example.com'), ('password', 'admin')]) [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:48]
-2025-06-08 22:22:00,779 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
-2025-06-08 22:22:04,517 ERROR: Page not found: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again. [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:80]
-2025-06-08 22:22:10,707 ERROR: Exception on /auth/login [POST] [in /Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py:1414]
-Traceback (most recent call last):
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 2190, in wsgi_app
-    response = self.full_dispatch_request()
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1486, in full_dispatch_request
-    rv = self.handle_user_exception(e)
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request
-    rv = self.dispatch_request()
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request
-    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
-  File "/Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/auth/routes.py", line 25, in login
-    if user and check_password_hash(user.password, password):
-AttributeError: 'User' object has no attribute 'password'
-2025-06-08 22:22:10,714 ERROR: Server Error: 500 Internal Server Error: The server encountered an internal error and was unable to complete your request. Either the server is overloaded or there is an error in the application. [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:93]
-2025-06-08 22:23:45,385 ERROR: Exception on /auth/login [POST] [in /Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py:1414]
-Traceback (most recent call last):
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 2190, in wsgi_app
-    response = self.full_dispatch_request()
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1486, in full_dispatch_request
-    rv = self.handle_user_exception(e)
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request
-    rv = self.dispatch_request()
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request
-    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
-  File "/Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/auth/routes.py", line 25, in login
-    if user and user.check_password(password):
-AttributeError: 'User' object has no attribute 'password'
-2025-06-08 22:23:45,388 ERROR: Server Error: 500 Internal Server Error: The server encountered an internal error and was unable to complete your request. Either the server is overloaded or there is an error in the application. [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:93]
-2025-06-08 22:24:00,531 ERROR: Exception on /auth/login [POST] [in /Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py:1414]
-Traceback (most recent call last):
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 2190, in wsgi_app
-    response = self.full_dispatch_request()
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1486, in full_dispatch_request
-    rv = self.handle_user_exception(e)
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request
-    rv = self.dispatch_request()
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request
-    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
-  File "/Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/auth/routes.py", line 25, in login
-    if user and user.check_password(password):
-AttributeError: 'User' object has no attribute 'password'
-2025-06-08 22:24:00,532 ERROR: Server Error: 500 Internal Server Error: The server encountered an internal error and was unable to complete your request. Either the server is overloaded or there is an error in the application. [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:93]
-2025-06-08 22:24:57,606 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 09:35:30,585 ERROR: Request Headers: {'Host': '127.0.0.1:5000', 'Connection': 'keep-alive', 'Content-Length': '0', 'Cache-Control': 'max-age=0', 'Sec-Ch-Ua': '"Google Chrome";v="137", "Chromium";v="137", "Not/A)Brand";v="24"', 'Sec-Ch-Ua-Mobile': '?0', 'Sec-Ch-Ua-Platform': '"macOS"', 'Origin': 'http://127.0.0.1:5000', 'Content-Type': 'application/x-www-form-urlencoded', 'Upgrade-Insecure-Requests': '1', 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36', 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7', 'Sec-Fetch-Site': 'same-origin', 'Sec-Fetch-Mode': 'navigate', 'Sec-Fetch-User': '?1', 'Sec-Fetch-Dest': 'document', 'Referer': 'http://127.0.0.1:5000/employee/attendance', 'Accept-Encoding': 'gzip, deflate, br, zstd', 'Accept-Language': 'en-IN,en;q=0.9,hi-IN;q=0.8,hi;q=0.7,en-GB;q=0.6,en-US;q=0.5', 'Cookie': 'session=.eJwljklqBDEMAP_icw7abMnzmcayJBICCXTPnEL-noYcq6CgftpRZ17v7fE8X_nWjo9ojzZTF6--URwVoGvRoq2xTKF7eLrSJp1cBDhTBq_lWtw102S5b7ENaRXRhyjPHhmKMJCNYgwcnMvXFHdAlzvj7ACkXhSh3O6R15Xn_w3duK-zjuf3Z37dgsHdtSMJa8ggKzQa81ZlzESOpaZi7fcPBBA-gg.aEz1Aw.xc7cCy5TF0lXFhEbLEHwewXHzGw'} [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:52]
+2025-06-14 09:35:30,588 ERROR: Request Form Data: ImmutableMultiDict([]) [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:53]
+2025-06-14 09:37:18,132 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 09:37:18,236 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:171]
+2025-06-14 09:37:18,439 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 09:37:18,545 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:171]
+2025-06-14 09:41:15,103 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 09:41:15,217 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:171]
+2025-06-14 09:41:36,005 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 09:41:36,125 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:171]
+2025-06-14 09:42:14,382 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 09:42:14,499 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:171]
+2025-06-14 09:42:15,840 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 09:42:15,952 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:171]
+2025-06-14 09:42:58,602 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 09:42:58,712 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:171]
+2025-06-14 09:44:44,318 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 09:44:44,429 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:171]
+2025-06-14 09:44:53,452 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 09:44:53,555 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:171]
+2025-06-14 09:45:07,166 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 09:45:07,277 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:171]
+2025-06-14 09:45:16,423 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 09:45:16,521 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:171]
+2025-06-14 09:45:24,141 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 09:45:24,268 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:171]
+2025-06-14 09:45:42,490 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 09:45:42,592 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:171]
+2025-06-14 09:45:43,939 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 09:45:44,041 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:171]
+2025-06-14 09:45:50,736 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 09:45:50,841 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:171]
+2025-06-14 09:46:32,919 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 09:46:33,026 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:171]
+2025-06-14 09:46:50,863 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 09:46:51,111 INFO: Admin user created successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:144]
+2025-06-14 09:46:51,115 INFO: Admin employee created and linked successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:169]
+2025-06-14 09:46:51,115 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:171]
+2025-06-14 09:46:51,338 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 09:46:51,433 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:171]
+2025-06-14 09:48:53,292 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 09:48:53,394 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:171]
+2025-06-14 09:49:26,348 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 09:49:26,447 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:171]
+2025-06-14 09:49:26,668 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 09:49:26,766 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:171]
+2025-06-14 09:58:55,792 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 09:58:55,901 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:171]
+2025-06-14 09:59:37,497 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 09:59:37,593 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:171]
+2025-06-14 10:00:00,017 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 10:00:00,110 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:171]
+2025-06-14 10:00:00,321 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 10:00:00,415 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:171]
+2025-06-14 10:02:52,379 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 10:02:52,478 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:171]
+2025-06-14 10:03:03,018 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 10:03:03,121 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:172]
+2025-06-14 10:07:56,628 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 10:07:56,719 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:172]
+2025-06-14 10:07:56,931 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 10:07:57,025 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:172]
+2025-06-14 10:10:32,912 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 10:10:33,007 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:172]
+2025-06-14 10:10:33,225 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 10:10:33,320 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:172]
+2025-06-14 10:41:56,544 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 10:41:56,635 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:172]

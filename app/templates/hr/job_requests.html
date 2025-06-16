@@ -1,0 +1,287 @@
+{% extends "base.html" %}
+
+{% block title %}Job Requests - HR{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-clipboard-list text-primary"></i> Job Requests</h2>
+                <div>
+                    {% if current_user.has_role('HR') or current_user.has_role('Admin') or current_user.has_role('Management') or current_user.has_role('General Manager') or current_user.has_role('Manager') %}
+                    <a href="{{ url_for('hr.create_job_request') }}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> New Job Request
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Status Summary Cards -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card border-left-warning shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Pending</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                        {{ requests | selectattr('status', 'equalto', 'Pending') | list | length }}
+                                    </div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-clock fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card border-left-success shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Approved</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                        {{ requests | selectattr('status', 'equalto', 'Approved') | list | length }}
+                                    </div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-check-circle fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card border-left-info shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-info text-uppercase mb-1">In Review</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                        {{ requests | selectattr('status', 'equalto', 'In Review') | list | length }}
+                                    </div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-eye fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card border-left-danger shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Rejected</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                        {{ requests | selectattr('status', 'equalto', 'Rejected') | list | length }}
+                                    </div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-times-circle fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Job Requests Table -->
+            {% if requests %}
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Job Requests ({{ requests|length }} total)</h6>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Position</th>
+                                    <th>Department</th>
+                                    <th>Requested By</th>
+                                    <th>Request Date</th>
+                                    <th>Urgency</th>
+                                    <th>Budget Range</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for request in requests %}
+                                <tr>
+                                    <td>
+                                        <div>
+                                            <strong>{{ request.title }}</strong>
+                                            <br>
+                                            <small class="text-muted">{{ request.employment_type }} • {{ request.openings }} opening{{ 's' if request.openings != 1 else '' }}</small>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-secondary">{{ request.department }}</span>
+                                    </td>
+                                    <td>
+                                        <div>
+                                            <strong>{{ request.requester.full_name }}</strong>
+                                            <br>
+                                            <small class="text-muted">{{ request.requester.designation or 'N/A' }}</small>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <small>{{ request.request_date.strftime('%Y-%m-%d') }}</small>
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-{{ 'danger' if request.urgency == 'High' else 'warning' if request.urgency == 'Medium' else 'info' }}">
+                                            {{ request.urgency }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if request.budget_min and request.budget_max %}
+                                            <span class="text-success">
+                                                ${{ "{:,.0f}".format(request.budget_min) }} - ${{ "{:,.0f}".format(request.budget_max) }}
+                                            </span>
+                                        {% elif request.budget_min %}
+                                            <span class="text-success">From ${{ "{:,.0f}".format(request.budget_min) }}</span>
+                                        {% elif request.budget_max %}
+                                            <span class="text-success">Up to ${{ "{:,.0f}".format(request.budget_max) }}</span>
+                                        {% else %}
+                                            <span class="text-muted">Not specified</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-{{ 
+                                            'warning' if request.status == 'Pending' else
+                                            'success' if request.status == 'Approved' else
+                                            'info' if request.status == 'In Review' else
+                                            'danger' if request.status == 'Rejected' else 'secondary'
+                                        }}">
+                                            {{ request.status }}
+                                        </span>
+                                        {% if request.status == 'Approved' and request.job_posting_id %}
+                                            <br><small class="text-success"><i class="fas fa-check"></i> Job Posted</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <a href="{{ url_for('hr.job_request_detail', request_id=request.id) }}" 
+                                               class="btn btn-outline-primary" title="View Details">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            
+                                            {% if current_user.has_role('Management') or current_user.has_role('General Manager') or current_user.has_role('Admin') %}
+                                                {% if request.status == 'Pending' %}
+                                                <button class="btn btn-outline-success" title="Approve" 
+                                                        onclick="approveRequest({{ request.id }})">
+                                                    <i class="fas fa-check"></i>
+                                                </button>
+                                                <button class="btn btn-outline-danger" title="Reject"
+                                                        onclick="rejectRequest({{ request.id }})">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                                {% endif %}
+                                            {% endif %}
+                                            
+                                            {% if (current_user.has_role('HR') or current_user.has_role('Admin')) and request.status == 'Approved' and not request.job_posting_id %}
+                                            <a href="{{ url_for('hr.create_posting_from_request', request_id=request.id) }}" 
+                                               class="btn btn-outline-info" title="Create Job Posting">
+                                                <i class="fas fa-plus"></i>
+                                            </a>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-clipboard-list fa-5x text-muted mb-4"></i>
+                <h4 class="text-muted">No Job Requests Found</h4>
+                <p class="text-muted">
+                    {% if current_user.has_role('HR') or current_user.has_role('Admin') or current_user.has_role('Management') or current_user.has_role('General Manager') or current_user.has_role('Manager') %}
+                        Create your first job request to start the hiring process.
+                    {% else %}
+                        No job requests have been submitted yet.
+                    {% endif %}
+                </p>
+                {% if current_user.has_role('HR') or current_user.has_role('Admin') or current_user.has_role('Management') or current_user.has_role('General Manager') or current_user.has_role('Manager') %}
+                <a href="{{ url_for('hr.create_job_request') }}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-plus"></i> Create First Job Request
+                </a>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Approval Modal -->
+<div class="modal fade" id="approvalModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Approve Job Request</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="approvalForm" method="POST">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="approval_notes" class="form-label">Approval Notes (Optional)</label>
+                        <textarea class="form-control" id="approval_notes" name="approval_notes" rows="3"
+                                  placeholder="Add any notes or conditions for this approval..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success">Approve Request</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Rejection Modal -->
+<div class="modal fade" id="rejectionModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Reject Job Request</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="rejectionForm" method="POST">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="rejection_reason" class="form-label">Rejection Reason <span class="text-danger">*</span></label>
+                        <textarea class="form-control" id="rejection_reason" name="rejection_reason" rows="3" required
+                                  placeholder="Please provide a reason for rejecting this request..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">Reject Request</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function approveRequest(requestId) {
+    const form = document.getElementById('approvalForm');
+    form.action = `{{ url_for('hr.approve_job_request', request_id=0) }}`.replace('0', requestId);
+    new bootstrap.Modal(document.getElementById('approvalModal')).show();
+}
+
+function rejectRequest(requestId) {
+    const form = document.getElementById('rejectionForm');
+    form.action = `{{ url_for('hr.reject_job_request', request_id=0) }}`.replace('0', requestId);
+    new bootstrap.Modal(document.getElementById('rejectionModal')).show();
+}
+</script>
+{% endblock %} 

@@ -214,31 +214,35 @@ class ProjectChat(db.Model):
     file_path = db.Column(db.String(255))  # For file attachments
     file_name = db.Column(db.String(100))  # Original filename
     file_size = db.Column(db.Integer)  # File size in bytes
+    has_mentions = db.Column(db.Boolean, default=False)  # Whether message contains @mentions
+    mentioned_users = db.Column(db.Text)  # JSON array of mentioned user IDs
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
     # Relationship
     sender = db.relationship('Employee', backref='sent_messages')
-
-class CalendarEvent(db.Model):
-    __tablename__ = 'calendar_events'
     
-    id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(100), nullable=False)
-    description = db.Column(db.Text)
-    event_type = db.Column(db.String(50), nullable=False)  # Birthday, Deadline, Meeting, Holiday, etc.
-    event_date = db.Column(db.Date, nullable=False)
-    start_time = db.Column(db.Time)
-    end_time = db.Column(db.Time)
-    department = db.Column(db.String(50))
-    created_by_id = db.Column(db.Integer, db.ForeignKey('employees.id'))
-    related_employee_id = db.Column(db.Integer, db.ForeignKey('employees.id'))  # For birthdays, joining dates, etc.
-    is_recurring = db.Column(db.Boolean, default=False)
-    recurrence_pattern = db.Column(db.String(50))  # Daily, Weekly, Monthly, Yearly
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    
-    # Relationships
-    created_by = db.relationship('Employee', foreign_keys=[created_by_id], backref='created_events')
-    related_employee = db.relationship('Employee', foreign_keys=[related_employee_id], backref='related_events')
+    def process_mentions(self):
+        """Process @mentions in the message and create notifications"""
+        from .notifications import NotificationService
+        
+        if '@' in self.message:
+            # Process mentions and create notifications
+            notifications = NotificationService.process_mentions_in_text(
+                text=self.message,
+                author_id=self.sender_id,
+                entity_type='chat',
+                entity_id=self.id
+            )
+            
+            if notifications:
+                self.has_mentions = True
+                # Store mentioned user IDs as JSON
+                import json
+                mentioned_ids = [n.user_id for n in notifications]
+                self.mentioned_users = json.dumps(mentioned_ids)
+                
+            return notifications
+        return []
 
 # Sales Management Models
 class Lead(db.Model):

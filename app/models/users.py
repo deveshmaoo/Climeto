@@ -2,6 +2,7 @@
 from ..database import db, login_manager
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
+from datetime import datetime
 
 # The user_loader callback is used to reload the user object from the user ID stored in the session
 @login_manager.user_loader
@@ -14,13 +15,17 @@ class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), index=True, unique=True, nullable=False)
     email = db.Column(db.String(120), index=True, unique=True, nullable=False)
-    password_hash = db.Column(db.String(256))
+    password_hash = db.Column(db.String(128))
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
-    department = db.Column(db.String(50))  # New field for department assignment
     is_active = db.Column(db.Boolean, default=True)
-    created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    department = db.Column(db.String(50))  # New field for department assignment
     last_login = db.Column(db.DateTime)
-    # role relationship is defined in Role model via backref
+
+    # Relationships
+    role = db.relationship('Role', back_populates='users')
+    employee = db.relationship('Employee', back_populates='user', uselist=False)
 
     # Department constants
     DEPARTMENTS = [
@@ -34,14 +39,13 @@ class User(UserMixin, db.Model):
     ]
 
     def set_password(self, password):
-        # Explicitly use pbkdf2:sha256 to avoid scrypt issues on some systems
-        self.password_hash = generate_password_hash(password, method='pbkdf2:sha256')
+        self.password_hash = generate_password_hash(password)
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
     def __repr__(self):
-        return f'<User {self.username}>'
+        return f'<User {self.email}>'
 
     def set_role(self, role_name):
         """Set user role by role name."""
@@ -160,7 +164,7 @@ class Role(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), unique=True, nullable=False)
     description = db.Column(db.String(255))
-    users = db.relationship('User', backref='role', lazy='dynamic')
+    users = db.relationship('User', back_populates='role', lazy='dynamic')
 
     def __repr__(self):
         return f'<Role {self.name}>'

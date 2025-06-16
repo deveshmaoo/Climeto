@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block title %}Attendance Settings - HRMS{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="h3 mb-4 text-gray-800">Attendance Clock-In Settings</h1>
+
+    <div class="row">
+        <div class="col-lg-6">
+            <!-- Add New Setting -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Add New Restriction</h6>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('hr.attendance_settings') }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <div class="form-group">
+                            <label for="setting_type">Restriction Type</label>
+                            <select class="form-control" id="setting_type" name="setting_type" required>
+                                <option value="allowed_ip">Allowed IP Address</option>
+                                <option value="allowed_location">Allowed Location</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="value">Value</label>
+                            <input type="text" class="form-control" id="value" name="value" placeholder="e.g., 192.168.1.1 or Office Network" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="description">Description</label>
+                            <input type="text" class="form-control" id="description" name="description" placeholder="e.g., Main Office WiFi">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Add Setting</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Allowed IP Addresses -->
+        <div class="col-lg-6">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Allowed IP Addresses</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>IP Address</th>
+                                    <th>Description</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for ip in allowed_ips %}
+                                <tr>
+                                    <td>{{ ip.value }}</td>
+                                    <td>{{ ip.description }}</td>
+                                    <td>
+                                        <form method="POST" action="{{ url_for('hr.delete_attendance_setting', setting_id=ip.id) }}" onsubmit="return confirm('Are you sure you want to delete this IP?');">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="3" class="text-center">No IP address restrictions set. All IPs are allowed.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Allowed Locations -->
+        <div class="col-lg-6">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Allowed Locations</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>Location</th>
+                                    <th>Description</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for loc in allowed_locations %}
+                                <tr>
+                                    <td>{{ loc.value }}</td>
+                                    <td>{{ loc.description }}</td>
+                                    <td>
+                                        <form method="POST" action="{{ url_for('hr.delete_attendance_setting', setting_id=loc.id) }}" onsubmit="return confirm('Are you sure you want to delete this location?');">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="3" class="text-center">No location restrictions set.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

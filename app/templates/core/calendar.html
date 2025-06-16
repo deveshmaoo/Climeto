@@ -1,130 +1,820 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Calendar - HRMS</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/main.min.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-blue: #1a73e8;
+            --primary-blue-hover: #1557b0;
+            --google-grey-50: #f8f9fa;
+            --google-grey-100: #f1f3f4;
+            --google-grey-200: #e8eaed;
+            --google-grey-300: #dadce0;
+            --google-grey-400: #bdc1c6;
+            --google-grey-500: #9aa0a6;
+            --google-grey-600: #80868b;
+            --google-grey-700: #5f6368;
+            --google-grey-800: #3c4043;
+            --google-grey-900: #202124;
+            --google-red: #ea4335;
+            --google-yellow: #fbbc04;
+            --google-green: #34a853;
+            --google-blue: #4285f4;
+            --google-purple: #9c27b0;
+            --google-orange: #ff6d01;
+            --google-pink: #e91e63;
+            --google-teal: #00acc1;
+        }
 
-{% block title %}Calendar - HRMS{% endblock %}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-{% block content %}
-<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-    <h1 class="h2"><i class="fas fa-calendar"></i> Calendar Events</h1>
-    <div class="btn-toolbar mb-2 mb-md-0">
-        <div class="btn-group me-2">
-            <a href="{{ url_for('core.create_event') }}" class="btn btn-sm btn-outline-secondary">
-                <i class="fas fa-plus"></i> Add Event
+        body {
+            background: var(--google-grey-50);
+            font-family: 'Google Sans', 'Roboto', Arial, sans-serif;
+            color: var(--google-grey-800);
+            overflow-x: hidden;
+        }
+
+        /* Top Navigation Bar */
+        .top-nav {
+            background: #fff;
+            border-bottom: 1px solid var(--google-grey-200);
+            padding: 0 16px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 1px 2px rgba(60, 64, 67, 0.1);
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            color: var(--google-grey-800);
+            font-weight: 500;
+            font-size: 18px;
+        }
+
+        .nav-brand:hover {
+            color: var(--primary-blue);
+            text-decoration: none;
+        }
+
+        .nav-brand i {
+            color: var(--primary-blue);
+            font-size: 20px;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .nav-clock {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--google-grey-600);
+            font-size: 14px;
+            font-weight: 400;
+        }
+
+        .nav-user {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--google-grey-700);
+            text-decoration: none;
+            padding: 8px 12px;
+            border-radius: 20px;
+            transition: background-color 0.2s ease;
+        }
+
+        .nav-user:hover {
+            background: var(--google-grey-100);
+            color: var(--google-grey-800);
+            text-decoration: none;
+        }
+
+        /* Calendar Container */
+        .calendar-wrapper {
+            padding: 16px;
+            max-width: 100%;
+            margin: 0 auto;
+        }
+
+        .google-calendar-container {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px 0 rgba(60, 64, 67, 0.3), 0 4px 8px 3px rgba(60, 64, 67, 0.15);
+            overflow: hidden;
+            min-height: calc(100vh - 120px);
+        }
+
+        .google-calendar-header {
+            background: #fff;
+            border-bottom: 1px solid var(--google-grey-200);
+            padding: 20px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .google-calendar-title {
+            font-size: 24px;
+            font-weight: 400;
+            color: var(--google-grey-800);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .google-calendar-title i {
+            color: var(--primary-blue);
+            font-size: 28px;
+        }
+
+        .google-create-btn {
+            background: var(--primary-blue);
+            border: none;
+            border-radius: 24px;
+            color: white;
+            font-weight: 500;
+            padding: 12px 24px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15);
+            text-decoration: none;
+        }
+
+        .google-create-btn:hover {
+            background: var(--primary-blue-hover);
+            box-shadow: 0 1px 3px 0 rgba(60, 64, 67, 0.3), 0 4px 8px 3px rgba(60, 64, 67, 0.15);
+            color: white;
+            text-decoration: none;
+            transform: translateY(-1px);
+        }
+
+        /* FullCalendar Complete Override */
+        #calendar {
+            background: #fff;
+            font-family: 'Google Sans', 'Roboto', Arial, sans-serif;
+            border: none;
+            height: calc(100vh - 220px);
+            padding: 0;
+        }
+
+        .fc {
+            background: #fff;
+            border: none;
+            height: 100%;
+        }
+
+        /* Toolbar styling */
+        .fc .fc-toolbar {
+            padding: 16px 24px;
+            background: #fff;
+            border-bottom: 1px solid var(--google-grey-200);
+            margin-bottom: 0;
+        }
+
+        .fc .fc-toolbar-title {
+            font-size: 22px;
+            font-weight: 400;
+            color: var(--google-grey-800);
+            font-family: 'Google Sans', 'Roboto', Arial, sans-serif;
+            margin: 0;
+        }
+
+        /* Button styling */
+        .fc .fc-button-primary {
+            background: transparent !important;
+            border: 1px solid var(--google-grey-300) !important;
+            color: var(--google-grey-700) !important;
+            border-radius: 4px !important;
+            font-weight: 500 !important;
+            font-size: 14px !important;
+            padding: 8px 16px !important;
+            transition: all 0.2s ease !important;
+            box-shadow: none !important;
+            font-family: 'Google Sans', 'Roboto', Arial, sans-serif !important;
+        }
+
+        .fc .fc-button-primary:hover {
+            background: var(--google-grey-100) !important;
+            border-color: var(--google-grey-400) !important;
+            color: var(--google-grey-800) !important;
+            box-shadow: 0 1px 2px rgba(60, 64, 67, 0.1) !important;
+        }
+
+        .fc .fc-button-primary:focus {
+            box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2) !important;
+        }
+
+        .fc .fc-button-primary.fc-button-active,
+        .fc .fc-button-primary:not(:disabled).fc-button-active {
+            background: var(--primary-blue) !important;
+            border-color: var(--primary-blue) !important;
+            color: white !important;
+            box-shadow: none !important;
+        }
+
+        .fc .fc-today-button {
+            background: transparent !important;
+            border: 1px solid var(--primary-blue) !important;
+            color: var(--primary-blue) !important;
+            font-weight: 500 !important;
+        }
+
+        .fc .fc-today-button:hover {
+            background: rgba(26, 115, 232, 0.04) !important;
+            border-color: var(--primary-blue) !important;
+        }
+
+        /* Calendar grid */
+        .fc-theme-standard .fc-scrollgrid {
+            border: none !important;
+        }
+
+        .fc .fc-scrollgrid-section-header th {
+            background: #fff !important;
+            border: none !important;
+            border-bottom: 1px solid var(--google-grey-200) !important;
+            font-weight: 500 !important;
+            color: var(--google-grey-600) !important;
+            font-size: 11px !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.8px !important;
+            padding: 16px 8px !important;
+            font-family: 'Google Sans', 'Roboto', Arial, sans-serif !important;
+        }
+
+        .fc .fc-col-header-cell {
+            border: none !important;
+        }
+
+        .fc .fc-daygrid-day {
+            border: 1px solid var(--google-grey-100) !important;
+            background: #fff !important;
+            transition: background-color 0.1s ease !important;
+            min-height: 120px !important;
+        }
+
+        .fc .fc-daygrid-day:hover {
+            background: var(--google-grey-50) !important;
+        }
+
+        .fc .fc-daygrid-day-number {
+            color: var(--google-grey-700) !important;
+            font-weight: 400 !important;
+            font-size: 14px !important;
+            padding: 8px !important;
+            text-decoration: none !important;
+            font-family: 'Google Sans', 'Roboto', Arial, sans-serif !important;
+        }
+
+        .fc .fc-day-today {
+            background: rgba(26, 115, 232, 0.04) !important;
+        }
+
+        .fc .fc-day-today .fc-daygrid-day-number {
+            background: var(--primary-blue) !important;
+            color: white !important;
+            border-radius: 50% !important;
+            width: 32px !important;
+            height: 32px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            font-weight: 500 !important;
+            margin: 4px !important;
+        }
+
+        /* Events */
+        .fc-event {
+            border: none !important;
+            border-radius: 4px !important;
+            font-size: 12px !important;
+            font-weight: 500 !important;
+            padding: 4px 8px !important;
+            margin: 2px !important;
+            cursor: pointer !important;
+            transition: all 0.2s ease !important;
+            box-shadow: 0 1px 2px rgba(60, 64, 67, 0.3) !important;
+            font-family: 'Google Sans', 'Roboto', Arial, sans-serif !important;
+        }
+
+        .fc-event:hover {
+            transform: translateY(-1px) !important;
+            box-shadow: 0 2px 4px rgba(60, 64, 67, 0.3) !important;
+        }
+
+        .fc-event.fc-event-draggable {
+            cursor: grab !important;
+        }
+
+        .fc-event.fc-event-dragging {
+            cursor: grabbing !important;
+            opacity: 0.8 !important;
+        }
+
+        /* Event colors based on type */
+        .fc-event[data-event-type="Personal"] {
+            background: var(--google-blue) !important;
+            color: white !important;
+        }
+
+        .fc-event[data-event-type="Work"] {
+            background: var(--google-green) !important;
+            color: white !important;
+        }
+
+        .fc-event[data-event-type="Meeting"] {
+            background: var(--google-yellow) !important;
+            color: var(--google-grey-800) !important;
+        }
+
+        .fc-event[data-event-type="Task"] {
+            background: var(--google-red) !important;
+            color: white !important;
+        }
+
+        .fc-event[data-event-type="Training"] {
+            background: var(--google-teal) !important;
+            color: white !important;
+        }
+
+        .fc-event[data-event-type="Appointment"] {
+            background: var(--google-purple) !important;
+            color: white !important;
+        }
+
+        .fc-event[data-event-type="Deadline"] {
+            background: var(--google-orange) !important;
+            color: white !important;
+        }
+
+        .fc-event[data-event-type="Holiday"] {
+            background: var(--google-pink) !important;
+            color: white !important;
+        }
+
+        /* Modal styling */
+        .modal-content {
+            border: none !important;
+            border-radius: 12px !important;
+            box-shadow: 0 8px 28px rgba(60, 64, 67, 0.3) !important;
+            font-family: 'Google Sans', 'Roboto', Arial, sans-serif !important;
+        }
+
+        .modal-header {
+            border-bottom: 1px solid var(--google-grey-200) !important;
+            padding: 20px 24px 16px !important;
+        }
+
+        .modal-title {
+            font-weight: 500 !important;
+            color: var(--google-grey-800) !important;
+            font-size: 18px !important;
+            font-family: 'Google Sans', 'Roboto', Arial, sans-serif !important;
+        }
+
+        .modal-body {
+            padding: 16px 24px !important;
+            font-family: 'Google Sans', 'Roboto', Arial, sans-serif !important;
+        }
+
+        .modal-body p {
+            margin-bottom: 12px !important;
+            font-size: 14px !important;
+            line-height: 1.5 !important;
+        }
+
+        .modal-footer {
+            border-top: 1px solid var(--google-grey-200) !important;
+            padding: 16px 24px !important;
+        }
+
+        .badge {
+            font-size: 11px !important;
+            font-weight: 500 !important;
+            padding: 4px 8px !important;
+            border-radius: 12px !important;
+            font-family: 'Google Sans', 'Roboto', Arial, sans-serif !important;
+        }
+
+        .btn-close {
+            background: none !important;
+            border: none !important;
+            font-size: 20px !important;
+            color: var(--google-grey-500) !important;
+            opacity: 1 !important;
+        }
+
+        .btn-close:hover {
+            color: var(--google-grey-700) !important;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .top-nav {
+                padding: 0 12px;
+            }
+
+            .nav-clock {
+                display: none;
+            }
+
+            .calendar-wrapper {
+                padding: 8px;
+            }
+
+            .google-calendar-header {
+                padding: 16px;
+                flex-direction: column;
+                gap: 16px;
+                align-items: stretch;
+            }
+
+            .google-calendar-title {
+                font-size: 20px;
+                justify-content: center;
+            }
+
+            .fc .fc-toolbar {
+                padding: 12px 16px;
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .fc .fc-toolbar-chunk {
+                display: flex;
+                justify-content: center;
+            }
+
+            #calendar {
+                height: calc(100vh - 280px);
+            }
+        }
+
+        /* Loading animation */
+        .fc-loading {
+            position: relative !important;
+        }
+
+        .fc-loading::after {
+            content: '' !important;
+            position: absolute !important;
+            top: 50% !important;
+            left: 50% !important;
+            width: 24px !important;
+            height: 24px !important;
+            margin: -12px 0 0 -12px !important;
+            border: 2px solid var(--google-grey-200) !important;
+            border-top-color: var(--primary-blue) !important;
+            border-radius: 50% !important;
+            animation: spin 1s linear infinite !important;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Flash messages */
+        .flash-messages {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            z-index: 1050;
+            width: 300px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Navigation -->
+    <nav class="top-nav">
+        <div class="nav-left">
+            <a href="{{ url_for('core.dashboard') }}" class="nav-brand">
+                <i class="bi bi-house-door"></i>
+                HRMS
             </a>
         </div>
-    </div>
-</div>
+        <div class="nav-right">
+            <div class="nav-clock">
+                <i class="bi bi-clock"></i>
+                <span id="live-clock-ist"></span>
+            </div>
+            <a href="{{ url_for('employee.profile') }}" class="nav-user">
+                <i class="bi bi-person-circle"></i>
+                {{ current_user.email }}
+            </a>
+        </div>
+    </nav>
 
-<div class="row">
-    <div class="col-md-12">
-        {% if events %}
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">Upcoming Events</h5>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Event</th>
-                                <th>Type</th>
-                                <th>Department</th>
-                                <th>Description</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for event in events %}
-                            <tr>
-                                <td>
-                                    <strong>{{ event.event_date.strftime('%b %d, %Y') }}</strong>
-                                    <br>
-                                    <small class="text-muted">{{ event.event_date.strftime('%A') }}</small>
-                                </td>
-                                <td>
-                                    <strong>{{ event.title }}</strong>
-                                </td>
-                                <td>
-                                    <span class="badge 
-                                        {% if event.event_type == 'Meeting' %}bg-primary
-                                        {% elif event.event_type == 'Deadline' %}bg-danger
-                                        {% elif event.event_type == 'Birthday' %}bg-success
-                                        {% elif event.event_type == 'Holiday' %}bg-warning
-                                        {% elif event.event_type == 'Training' %}bg-info
-                                        {% else %}bg-secondary{% endif %}">
-                                        {{ event.event_type }}
-                                    </span>
-                                </td>
-                                <td>
-                                    {% if event.department %}
-                                        {{ event.department }}
-                                    {% else %}
-                                        <span class="text-muted">All Departments</span>
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    {% if event.description %}
-                                        {{ event.description[:100] }}{% if event.description|length > 100 %}...{% endif %}
-                                    {% else %}
-                                        <span class="text-muted">No description</span>
-                                    {% endif %}
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Quick Stats -->
-        <div class="row mt-4">
-            <div class="col-md-3">
-                <div class="card text-center">
-                    <div class="card-body">
-                        <h5 class="text-primary">{{ events|selectattr('event_type', 'equalto', 'Meeting')|list|length }}</h5>
-                        <small class="text-muted">Meetings</small>
+    <!-- Flash Messages -->
+    <div class="flash-messages">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card text-center">
-                    <div class="card-body">
-                        <h5 class="text-danger">{{ events|selectattr('event_type', 'equalto', 'Deadline')|list|length }}</h5>
-                        <small class="text-muted">Deadlines</small>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card text-center">
-                    <div class="card-body">
-                        <h5 class="text-success">{{ events|selectattr('event_type', 'equalto', 'Birthday')|list|length }}</h5>
-                        <small class="text-muted">Birthdays</small>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card text-center">
-                    <div class="card-body">
-                        <h5 class="text-info">{{ events|selectattr('event_type', 'equalto', 'Training')|list|length }}</h5>
-                        <small class="text-muted">Training</small>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        {% else %}
-        <div class="card">
-            <div class="card-body text-center py-5">
-                <i class="fas fa-calendar-alt fa-3x text-muted mb-3"></i>
-                <h5>No Events Scheduled</h5>
-                <p class="text-muted">No events are currently scheduled.</p>
-                <a href="{{ url_for('core.create_event') }}" class="btn btn-primary">
-                    <i class="fas fa-plus"></i> Create First Event
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- Calendar Content -->
+    <div class="calendar-wrapper">
+        <div class="google-calendar-container">
+            <div class="google-calendar-header">
+                <h1 class="google-calendar-title">
+                    <i class="bi bi-calendar3"></i>
+                    My Calendar
+                </h1>
+                <a href="{{ url_for('core.add_calendar_event') }}" class="google-create-btn">
+                    <i class="bi bi-plus-lg"></i>
+                    Create
                 </a>
             </div>
+            <div id="calendar"></div>
         </div>
-        {% endif %}
     </div>
-</div>
-{% endblock %} 
+
+    <!-- Event Details Modal -->
+    <div class="modal fade" id="eventDetailsModal" tabindex="-1" aria-labelledby="eventDetailsModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" id="eventModalContent">
+          <div class="modal-header">
+            <h5 class="modal-title" id="eventDetailsModalLabel">
+                <i class="bi bi-calendar-event me-2"></i>
+                <span id="eventTitle"></span>
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <p><i class="bi bi-tag me-2 text-muted"></i><strong>Type:</strong> <span id="eventType" class="badge"></span></p>
+            <p><i class="bi bi-exclamation-triangle me-2 text-muted"></i><strong>Priority:</strong> <span id="eventPriority" class="badge"></span></p>
+            <p><i class="bi bi-info-circle me-2 text-muted"></i><strong>Status:</strong> <span id="eventStatus" class="badge"></span></p>
+            <p><i class="bi bi-clock me-2 text-muted"></i><strong>Starts:</strong> <span id="eventStart"></span></p>
+            <p id="eventEndWrapper"><i class="bi bi-clock-history me-2 text-muted"></i><strong>Ends:</strong> <span id="eventEnd"></span></p>
+            <hr>
+            <p class="mb-1"><i class="bi bi-file-text me-2 text-muted"></i><strong>Description:</strong></p>
+            <p id="eventDescription" class="text-muted"></p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-danger" id="delete-event-btn">
+                <i class="bi bi-trash me-1"></i>Delete
+            </button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/main.min.js"></script>
+    
+    <script>
+        // Live clock
+        function updateISTClock() {
+            const now = new Date();
+            const istTime = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Kolkata"}));
+            
+            const options = { 
+                weekday: 'short', 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric', 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                second: '2-digit', 
+                hour12: true 
+            };
+            const formattedString = istTime.toLocaleString('en-IN', options);
+
+            const clockElement = document.getElementById('live-clock-ist');
+            if (clockElement) {
+                clockElement.textContent = formattedString;
+            }
+        }
+        setInterval(updateISTClock, 1000);
+        updateISTClock();
+
+        // Calendar initialization
+        document.addEventListener('DOMContentLoaded', function() {
+            var calendarEl = document.getElementById('calendar');
+            var eventModal = new bootstrap.Modal(document.getElementById('eventDetailsModal'));
+            var modalContent = document.getElementById('eventModalContent');
+            var currentEvent = null;
+
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
+                },
+                height: 'auto',
+                contentHeight: 'auto',
+                aspectRatio: 1.8,
+                events: '{{ url_for("core.get_events") }}',
+                editable: true, 
+                selectable: true,
+                dayMaxEvents: 3,
+                moreLinkClick: 'popover',
+                navLinks: true,
+                slotMinTime: '06:00:00',
+                slotMaxTime: '22:00:00',
+                slotDuration: '00:30:00',
+                nowIndicator: true,
+                weekNumbers: false,
+                dayHeaderFormat: { weekday: 'short' },
+                eventDisplay: 'block',
+                displayEventTime: true,
+                eventTimeFormat: {
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    omitZeroMinute: false,
+                    meridiem: 'short'
+                },
+                eventDidMount: function(info) {
+                    // Add event type as data attribute for CSS styling
+                    info.el.setAttribute('data-event-type', info.event.extendedProps.eventType || 'Personal');
+                    
+                    // Add tooltip
+                    info.el.setAttribute('title', info.event.title + (info.event.extendedProps.description ? '\n' + info.event.extendedProps.description : ''));
+                },
+                eventDrop: function(info) {
+                    updateEvent(info.event);
+                },
+                eventResize: function(info) {
+                    updateEvent(info.event);
+                },
+                select: function(info) {
+                    window.location.href = `{{ url_for('core.add_calendar_event') }}?date=${info.startStr}`;
+                },
+                eventClick: function(info) {
+                    currentEvent = info.event;
+                    const props = info.event.extendedProps;
+                    
+                    document.getElementById('eventTitle').textContent = info.event.title;
+                    
+                    const eventTypeEl = document.getElementById('eventType');
+                    eventTypeEl.textContent = props.eventType || 'Personal';
+                    eventTypeEl.className = 'badge';
+                    
+                    // Set event type badge color
+                    const typeColors = {
+                        'Personal': 'bg-primary',
+                        'Work': 'bg-success',
+                        'Meeting': 'bg-warning text-dark',
+                        'Task': 'bg-danger',
+                        'Training': 'bg-info',
+                        'Appointment': 'bg-secondary',
+                        'Deadline': 'bg-dark',
+                        'Holiday': 'bg-success',
+                        'Birthday': 'bg-pink'
+                    };
+                    eventTypeEl.classList.add(typeColors[props.eventType] || 'bg-secondary');
+                    
+                    const priorityEl = document.getElementById('eventPriority');
+                    priorityEl.textContent = props.priority || 'Medium';
+                    priorityEl.className = 'badge';
+                    if (props.priority === 'High') priorityEl.classList.add('bg-danger');
+                    else if (props.priority === 'Medium') priorityEl.classList.add('bg-warning', 'text-dark');
+                    else if (props.priority === 'Low') priorityEl.classList.add('bg-success');
+                    else priorityEl.classList.add('bg-secondary');
+                    
+                    const statusEl = document.getElementById('eventStatus');
+                    statusEl.textContent = props.status || 'Planned';
+                    statusEl.className = 'badge bg-info';
+                    
+                    modalContent.className = 'modal-content';
+                    if (props.priority) {
+                        modalContent.classList.add('priority-' + props.priority);
+                    }
+                    
+                    document.getElementById('eventStart').textContent = info.event.start ? 
+                        info.event.start.toLocaleString('en-US', {
+                            weekday: 'long',
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric',
+                            hour: 'numeric',
+                            minute: '2-digit'
+                        }) : 'N/A';
+                        
+                    const endWrapper = document.getElementById('eventEndWrapper');
+                    if (info.event.end) {
+                        document.getElementById('eventEnd').textContent = info.event.end.toLocaleString('en-US', {
+                            weekday: 'long',
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric',
+                            hour: 'numeric',
+                            minute: '2-digit'
+                        });
+                        endWrapper.style.display = 'block';
+                    } else {
+                        endWrapper.style.display = 'none';
+                    }
+                    
+                    document.getElementById('eventDescription').textContent = 
+                        props.description || info.event.extendedProps.description || 'No description provided.';
+                    eventModal.show();
+                },
+                dateClick: function(info) {
+                    window.location.href = `{{ url_for('core.add_calendar_event') }}?date=${info.dateStr}`;
+                },
+                loading: function(bool) {
+                    if (bool) {
+                        calendarEl.classList.add('fc-loading');
+                    } else {
+                        calendarEl.classList.remove('fc-loading');
+                    }
+                }
+            });
+            
+            calendar.render();
+
+            // Handle event deletion
+            document.getElementById('delete-event-btn').addEventListener('click', function() {
+                if (currentEvent && confirm('Are you sure you want to delete this event?')) {
+                    fetch('/api/calendar/events/' + currentEvent.id, {
+                        method: 'DELETE',
+                        headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.message) {
+                            currentEvent.remove();
+                            eventModal.hide();
+                        } else {
+                            alert('Error deleting event: ' + data.error);
+                        }
+                    });
+                }
+            });
+
+            function updateEvent(event) {
+                var eventData = {
+                    title: event.title,
+                    start: event.start.toISOString(),
+                    end: event.end ? event.end.toISOString() : null,
+                    allDay: event.allDay
+                };
+
+                fetch('/api/calendar/events/' + event.id, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify(eventData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.id) {
+                        alert('Error updating event: ' + data.error);
+                        // Optionally revert the event change here
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html> 

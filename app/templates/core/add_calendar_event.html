@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Event - My Calendar</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-blue: #1a73e8;
+            --primary-blue-hover: #1557b0;
+            --google-grey-50: #f8f9fa;
+            --google-grey-100: #f1f3f4;
+            --google-grey-200: #e8eaed;
+            --google-grey-300: #dadce0;
+            --google-grey-400: #bdc1c6;
+            --google-grey-500: #9aa0a6;
+            --google-grey-600: #80868b;
+            --google-grey-700: #5f6368;
+            --google-grey-800: #3c4043;
+            --google-grey-900: #202124;
+            --google-red: #ea4335;
+            --google-yellow: #fbbc04;
+            --google-green: #34a853;
+            --google-blue: #4285f4;
+            --google-purple: #9c27b0;
+            --google-orange: #ff6d01;
+            --google-pink: #e91e63;
+            --google-teal: #00acc1;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--google-grey-50);
+            font-family: 'Google Sans', 'Roboto', Arial, sans-serif;
+            color: var(--google-grey-800);
+            overflow-x: hidden;
+        }
+
+        /* Top Navigation Bar */
+        .top-nav {
+            background: #fff;
+            border-bottom: 1px solid var(--google-grey-200);
+            padding: 0 16px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 1px 2px rgba(60, 64, 67, 0.1);
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            color: var(--google-grey-800);
+            font-weight: 500;
+            font-size: 18px;
+        }
+
+        .nav-brand:hover {
+            color: var(--primary-blue);
+            text-decoration: none;
+        }
+
+        .nav-brand i {
+            color: var(--primary-blue);
+            font-size: 20px;
+        }
+
+        .nav-back {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--google-grey-700);
+            text-decoration: none;
+            padding: 8px 12px;
+            border-radius: 20px;
+            transition: background-color 0.2s ease;
+            font-weight: 500;
+        }
+
+        .nav-back:hover {
+            background: var(--google-grey-100);
+            color: var(--google-grey-800);
+            text-decoration: none;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .nav-user {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--google-grey-700);
+            text-decoration: none;
+            padding: 8px 12px;
+            border-radius: 20px;
+            transition: background-color 0.2s ease;
+        }
+
+        .nav-user:hover {
+            background: var(--google-grey-100);
+            color: var(--google-grey-800);
+            text-decoration: none;
+        }
+
+        /* Form Container */
+        .form-wrapper {
+            padding: 24px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .form-container {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px 0 rgba(60, 64, 67, 0.3), 0 4px 8px 3px rgba(60, 64, 67, 0.15);
+            overflow: hidden;
+        }
+
+        .form-header {
+            background: #fff;
+            border-bottom: 1px solid var(--google-grey-200);
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .form-title {
+            font-size: 24px;
+            font-weight: 400;
+            color: var(--google-grey-800);
+            margin: 0;
+        }
+
+        .form-title i {
+            color: var(--primary-blue);
+            font-size: 28px;
+        }
+
+        .form-body {
+            padding: 24px;
+        }
+
+        /* Form Styling */
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 500;
+            color: var(--google-grey-700);
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--google-grey-300);
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: 'Google Sans', 'Roboto', Arial, sans-serif;
+            transition: all 0.2s ease;
+            background: #fff;
+            color: var(--google-grey-800);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+        }
+
+        .form-control:hover {
+            border-color: var(--google-grey-400);
+        }
+
+        .form-select {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m1 6 7 7 7-7'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px 12px;
+            padding-right: 40px;
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        /* Button Styling */
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            padding-top: 24px;
+            border-top: 1px solid var(--google-grey-200);
+            margin-top: 24px;
+        }
+
+        .btn {
+            padding: 10px 24px;
+            border-radius: 24px;
+            font-weight: 500;
+            font-size: 14px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'Google Sans', 'Roboto', Arial, sans-serif;
+        }
+
+        .btn-primary {
+            background: var(--primary-blue);
+            color: white;
+            box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-blue-hover);
+            box-shadow: 0 1px 3px 0 rgba(60, 64, 67, 0.3), 0 4px 8px 3px rgba(60, 64, 67, 0.15);
+            transform: translateY(-1px);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--google-grey-700);
+            border: 1px solid var(--google-grey-300);
+        }
+
+        .btn-secondary:hover {
+            background: var(--google-grey-100);
+            border-color: var(--google-grey-400);
+            color: var(--google-grey-800);
+        }
+
+        /* Event Type Guide */
+        .event-type-guide {
+            background: var(--google-grey-50);
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 12px;
+        }
+
+        .event-type-guide h6 {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--google-grey-600);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+
+        .event-types {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 8px;
+        }
+
+        .event-type-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: var(--google-grey-700);
+        }
+
+        .event-type-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+        }
+
+        .event-type-color.personal { background: var(--google-blue); }
+        .event-type-color.work { background: var(--google-green); }
+        .event-type-color.meeting { background: var(--google-yellow); }
+        .event-type-color.task { background: var(--google-red); }
+        .event-type-color.training { background: var(--google-teal); }
+        .event-type-color.appointment { background: var(--google-purple); }
+        .event-type-color.deadline { background: var(--google-orange); }
+        .event-type-color.holiday { background: var(--google-pink); }
+
+        /* Flash messages */
+        .flash-messages {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            z-index: 1050;
+            width: 300px;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .top-nav {
+                padding: 0 12px;
+            }
+
+            .form-wrapper {
+                padding: 12px;
+            }
+
+            .form-header {
+                padding: 20px;
+            }
+
+            .form-body {
+                padding: 20px;
+            }
+
+            .form-title {
+                font-size: 20px;
+            }
+
+            .btn-group {
+                flex-direction: column-reverse;
+            }
+
+            .btn {
+                justify-content: center;
+            }
+
+            .event-types {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Navigation -->
+    <nav class="top-nav">
+        <div class="nav-left">
+            <a href="{{ url_for('core.dashboard') }}" class="nav-brand">
+                <i class="bi bi-house-door"></i>
+                HRMS
+            </a>
+            <a href="{{ url_for('core.calendar') }}" class="nav-back">
+                <i class="bi bi-arrow-left"></i>
+                Back to Calendar
+            </a>
+        </div>
+        <div class="nav-right">
+            <a href="{{ url_for('employee.profile') }}" class="nav-user">
+                <i class="bi bi-person-circle"></i>
+                {{ current_user.email }}
+            </a>
+        </div>
+    </nav>
+
+    <!-- Flash Messages -->
+    <div class="flash-messages">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- Form Content -->
+    <div class="form-wrapper">
+        <div class="form-container">
+            <div class="form-header">
+                <i class="bi bi-calendar-plus"></i>
+                <h1 class="form-title">Create New Event</h1>
+            </div>
+            
+            <div class="form-body">
+                <form method="POST" id="eventForm">
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="form-group">
+                        {{ form.title.label(class="form-label") }}
+                        {{ form.title(class="form-control", placeholder="Enter event title") }}
+                        {% if form.title.errors %}
+                            <div class="text-danger mt-1">
+                                {% for error in form.title.errors %}
+                                    <small>{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{ form.event_type.label(class="form-label") }}
+                                {{ form.event_type(class="form-control form-select") }}
+                                {% if form.event_type.errors %}
+                                    <div class="text-danger mt-1">
+                                        {% for error in form.event_type.errors %}
+                                            <small>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{ form.priority.label(class="form-label") }}
+                                {{ form.priority(class="form-control form-select") }}
+                                {% if form.priority.errors %}
+                                    <div class="text-danger mt-1">
+                                        {% for error in form.priority.errors %}
+                                            <small>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{ form.start_date.label(class="form-label") }}
+                                {{ form.start_date(class="form-control") }}
+                                {% if form.start_date.errors %}
+                                    <div class="text-danger mt-1">
+                                        {% for error in form.start_date.errors %}
+                                            <small>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{ form.start_time.label(class="form-label") }}
+                                {{ form.start_time(class="form-control") }}
+                                {% if form.start_time.errors %}
+                                    <div class="text-danger mt-1">
+                                        {% for error in form.start_time.errors %}
+                                            <small>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{ form.end_date.label(class="form-label") }}
+                                {{ form.end_date(class="form-control") }}
+                                {% if form.end_date.errors %}
+                                    <div class="text-danger mt-1">
+                                        {% for error in form.end_date.errors %}
+                                            <small>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{ form.end_time.label(class="form-label") }}
+                                {{ form.end_time(class="form-control") }}
+                                {% if form.end_time.errors %}
+                                    <div class="text-danger mt-1">
+                                        {% for error in form.end_time.errors %}
+                                            <small>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        {{ form.status.label(class="form-label") }}
+                        {{ form.status(class="form-control form-select") }}
+                        {% if form.status.errors %}
+                            <div class="text-danger mt-1">
+                                {% for error in form.status.errors %}
+                                    <small>{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        {{ form.description.label(class="form-label") }}
+                        {{ form.description(class="form-control", placeholder="Enter event description (optional)", rows="4") }}
+                        {% if form.description.errors %}
+                            <div class="text-danger mt-1">
+                                {% for error in form.description.errors %}
+                                    <small>{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Event Type Guide -->
+                    <div class="event-type-guide">
+                        <h6>Event Type Colors</h6>
+                        <div class="event-types">
+                            <div class="event-type-item">
+                                <div class="event-type-color personal"></div>
+                                <span>Personal</span>
+                            </div>
+                            <div class="event-type-item">
+                                <div class="event-type-color work"></div>
+                                <span>Work</span>
+                            </div>
+                            <div class="event-type-item">
+                                <div class="event-type-color meeting"></div>
+                                <span>Meeting</span>
+                            </div>
+                            <div class="event-type-item">
+                                <div class="event-type-color task"></div>
+                                <span>Task</span>
+                            </div>
+                            <div class="event-type-item">
+                                <div class="event-type-color training"></div>
+                                <span>Training</span>
+                            </div>
+                            <div class="event-type-item">
+                                <div class="event-type-color appointment"></div>
+                                <span>Appointment</span>
+                            </div>
+                            <div class="event-type-item">
+                                <div class="event-type-color deadline"></div>
+                                <span>Deadline</span>
+                            </div>
+                            <div class="event-type-item">
+                                <div class="event-type-color holiday"></div>
+                                <span>Holiday</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="btn-group">
+                        <a href="{{ url_for('core.calendar') }}" class="btn btn-secondary">
+                            <i class="bi bi-x-lg"></i>
+                            Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-lg"></i>
+                            Create Event
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Auto-fill date if provided in URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const dateParam = urlParams.get('date');
+            
+            if (dateParam) {
+                const startDateField = document.getElementById('start_date');
+                const endDateField = document.getElementById('end_date');
+                
+                if (startDateField && !startDateField.value) {
+                    startDateField.value = dateParam;
+                }
+                if (endDateField && !endDateField.value) {
+                    endDateField.value = dateParam;
+                }
+            }
+
+            // Form validation
+            const form = document.getElementById('eventForm');
+            form.addEventListener('submit', function(e) {
+                const title = document.getElementById('title').value.trim();
+                const startDate = document.getElementById('start_date').value;
+                const startTime = document.getElementById('start_time').value;
+                
+                if (!title) {
+                    e.preventDefault();
+                    alert('Please enter an event title.');
+                    return;
+                }
+                
+                if (!startDate) {
+                    e.preventDefault();
+                    alert('Please select a start date.');
+                    return;
+                }
+                
+                if (!startTime) {
+                    e.preventDefault();
+                    alert('Please select a start time.');
+                    return;
+                }
+            });
+
+            // Auto-fill end date when start date changes
+            const startDateField = document.getElementById('start_date');
+            const endDateField = document.getElementById('end_date');
+            
+            if (startDateField && endDateField) {
+                startDateField.addEventListener('change', function() {
+                    if (!endDateField.value) {
+                        endDateField.value = this.value;
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html> 

@@ -33,16 +33,37 @@ class JobApplication(db.Model):
     applicant_name = db.Column(db.String(200), nullable=False)
     applicant_email = db.Column(db.String(120), nullable=False)
     applicant_phone = db.Column(db.String(20))
-    resume_path = db.Column(db.String(500))
+    
+    # Enhanced resume and document handling
+    resume_filename = db.Column(db.String(500))  # Original filename
+    resume_path = db.Column(db.String(500))      # Stored file path
+    resume_size = db.Column(db.Integer)          # File size in bytes
     cover_letter = db.Column(db.Text)
+    portfolio_url = db.Column(db.String(500))    # Portfolio/LinkedIn URL
+    
+    # Experience and compensation
     experience_years = db.Column(db.Integer)
     current_salary = db.Column(db.Float)
     expected_salary = db.Column(db.Float)
     notice_period = db.Column(db.String(50))
-    status = db.Column(db.String(50), default='Applied')  # Applied, Screening, Interview, Rejected, Hired
+    current_company = db.Column(db.String(200))
+    current_position = db.Column(db.String(200))
+    
+    # Application details
+    status = db.Column(db.String(50), default='Applied')  # Applied, Screening, Interview, Rejected, Hired, On Hold
     applied_date = db.Column(db.DateTime, default=datetime.utcnow)
+    source = db.Column(db.String(100))  # How they found the job (Website, LinkedIn, Referral, etc.)
+    
+    # Review and processing
     reviewed_by = db.Column(db.Integer, db.ForeignKey('employees.id'))
+    review_date = db.Column(db.DateTime)
     notes = db.Column(db.Text)
+    hr_rating = db.Column(db.Integer)  # 1-10 scale
+    
+    # Interview scheduling preferences
+    preferred_interview_time = db.Column(db.String(100))  # Morning, Afternoon, Evening
+    available_dates = db.Column(db.Text)  # JSON string of available dates
+    
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
@@ -55,20 +76,68 @@ class Interview(db.Model):
     
     id = db.Column(db.Integer, primary_key=True)
     application_id = db.Column(db.Integer, db.ForeignKey('job_applications.id'), nullable=False)
-    interview_type = db.Column(db.String(50), nullable=False)  # Phone, Video, In-person, Technical, HR
+    interview_type = db.Column(db.String(50), nullable=False)  # Phone, Video, In-person, Technical, HR, Panel
     scheduled_date = db.Column(db.DateTime, nullable=False)
     duration_minutes = db.Column(db.Integer, default=60)
+    
+    # Primary interviewer (required)
     interviewer_id = db.Column(db.Integer, db.ForeignKey('employees.id'), nullable=False)
+    
+    # Location and meeting details
     location = db.Column(db.String(200))  # Meeting room or video link
-    status = db.Column(db.String(50), default='Scheduled')  # Scheduled, Completed, Cancelled, Rescheduled
+    meeting_link = db.Column(db.String(500))  # Video conference link
+    conference_room_id = db.Column(db.Integer, db.ForeignKey('conference_rooms.id'))
+    
+    # Interview status and results
+    status = db.Column(db.String(50), default='Scheduled')  # Scheduled, Completed, Cancelled, Rescheduled, No Show
     feedback = db.Column(db.Text)
     rating = db.Column(db.Integer)  # 1-10 scale
-    recommendation = db.Column(db.String(50))  # Hire, Reject, Next Round
+    recommendation = db.Column(db.String(50))  # Hire, Reject, Next Round, On Hold
+    
+    # Calendar integration
+    calendar_event_id = db.Column(db.Integer, db.ForeignKey('calendar_events.id'))  # Link to calendar event
+    
+    # Scheduling details
+    interview_round = db.Column(db.Integer, default=1)  # 1st round, 2nd round, etc.
+    preparation_notes = db.Column(db.Text)  # Notes for interviewer preparation
+    candidate_instructions = db.Column(db.Text)  # Instructions sent to candidate
+    
+    # Rescheduling tracking
+    original_date = db.Column(db.DateTime)  # Original scheduled date if rescheduled
+    reschedule_reason = db.Column(db.Text)
+    reschedule_count = db.Column(db.Integer, default=0)
+    
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
     # Relationships
     interviewer = db.relationship('Employee', foreign_keys=[interviewer_id])
+    conference_room = db.relationship('ConferenceRoom', foreign_keys=[conference_room_id])
+    calendar_event = db.relationship('CalendarEvent', foreign_keys=[calendar_event_id])
+    participants = db.relationship('InterviewParticipant', backref='interview', lazy='dynamic', cascade='all, delete-orphan')
+
+class InterviewParticipant(db.Model):
+    """Additional participants in an interview (for panel interviews)"""
+    __tablename__ = 'interview_participants'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    interview_id = db.Column(db.Integer, db.ForeignKey('interviews.id'), nullable=False)
+    employee_id = db.Column(db.Integer, db.ForeignKey('employees.id'), nullable=False)
+    role = db.Column(db.String(50), default='Interviewer')  # Interviewer, Observer, Technical Expert, HR Representative
+    is_required = db.Column(db.Boolean, default=True)  # Whether this person's presence is required
+    response = db.Column(db.String(20), default='Pending')  # Pending, Accepted, Declined
+    response_date = db.Column(db.DateTime)
+    notes = db.Column(db.Text)
+    
+    # Individual feedback from this participant
+    individual_rating = db.Column(db.Integer)  # 1-10 scale
+    individual_feedback = db.Column(db.Text)
+    individual_recommendation = db.Column(db.String(50))  # Hire, Reject, Next Round
+    
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # Relationships
+    employee = db.relationship('Employee', backref='interview_participations')
 
 class Salary(db.Model):
     __tablename__ = 'salaries'
@@ -316,24 +385,51 @@ class ConferenceBooking(db.Model):
     room = db.relationship('ConferenceRoom', back_populates='bookings')
     organizer = db.relationship('Employee', backref='conference_bookings')
 
-class PersonalCalendar(db.Model):
-    """Personal calendar events for employees"""
-    __tablename__ = 'personal_calendar'
+# PersonalCalendar model removed - now using unified CalendarEvent in app.models.calendar 
+
+class JobRequest(db.Model):
+    """Job requests from managers/departments to HR for new positions"""
+    __tablename__ = 'job_requests'
     
     id = db.Column(db.Integer, primary_key=True)
-    employee_id = db.Column(db.Integer, db.ForeignKey('employees.id'), nullable=False)
     title = db.Column(db.String(200), nullable=False)
-    description = db.Column(db.Text)
-    event_date = db.Column(db.Date, nullable=False)
-    start_time = db.Column(db.Time)
-    end_time = db.Column(db.Time)
-    event_type = db.Column(db.String(50), default='Personal')  # Personal, Work, Meeting, Task, etc.
-    priority = db.Column(db.String(20), default='Medium')  # High, Medium, Low
-    is_all_day = db.Column(db.Boolean, default=False)
-    reminder_minutes = db.Column(db.Integer, default=15)  # Minutes before event to remind
-    status = db.Column(db.String(20), default='Planned')  # Planned, In Progress, Completed, Cancelled
+    department = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.Text, nullable=False)
+    requirements = db.Column(db.Text, nullable=False)
+    justification = db.Column(db.Text, nullable=False)  # Why this position is needed
+    
+    # Budget and compensation
+    budget_min = db.Column(db.Float)
+    budget_max = db.Column(db.Float)
+    employment_type = db.Column(db.String(50), default='Full-time')
+    location = db.Column(db.String(200))
+    openings = db.Column(db.Integer, default=1)
+    urgency = db.Column(db.String(20), default='Medium')  # High, Medium, Low
+    
+    # Timeline
+    expected_start_date = db.Column(db.Date)
+    application_deadline = db.Column(db.Date)
+    
+    # Request details
+    requested_by = db.Column(db.Integer, db.ForeignKey('employees.id'), nullable=False)
+    request_date = db.Column(db.DateTime, default=datetime.utcnow)
+    status = db.Column(db.String(50), default='Pending')  # Pending, Approved, Rejected, In Review
+    
+    # Approval workflow
+    approved_by = db.Column(db.Integer, db.ForeignKey('employees.id'))
+    approval_date = db.Column(db.DateTime)
+    approval_notes = db.Column(db.Text)
+    
+    # HR processing
+    hr_assigned_to = db.Column(db.Integer, db.ForeignKey('employees.id'))
+    hr_notes = db.Column(db.Text)
+    job_posting_id = db.Column(db.Integer, db.ForeignKey('job_postings.id'))  # Link to created job posting
+    
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
     # Relationships
-    employee = db.relationship('Employee', backref='personal_events') 
+    requester = db.relationship('Employee', foreign_keys=[requested_by], backref='job_requests')
+    approver = db.relationship('Employee', foreign_keys=[approved_by])
+    hr_assignee = db.relationship('Employee', foreign_keys=[hr_assigned_to])
+    job_posting = db.relationship('JobPosting', backref='job_request')

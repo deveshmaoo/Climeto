@@ -1,108 +1,77 @@
-2025-06-08 22:25:09,993 ERROR: Exception on / [GET] [in /Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py:1414]
-Traceback (most recent call last):
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 2190, in wsgi_app
-    response = self.full_dispatch_request()
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1486, in full_dispatch_request
-    rv = self.handle_user_exception(e)
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request
-    rv = self.dispatch_request()
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request
-    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask_login/utils.py", line 290, in decorated_view
-    return current_app.ensure_sync(func)(*args, **kwargs)
-  File "/Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/core/routes.py", line 14, in dashboard
-    return render_template('core/dashboard.html')
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/templating.py", line 151, in render_template
-    return _render(app, template, context)
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/templating.py", line 132, in _render
-    rv = template.render(context)
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/jinja2/environment.py", line 1295, in render
-    self.environment.handle_exception()
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/jinja2/environment.py", line 942, in handle_exception
-    raise rewrite_traceback_stack(source=source)
-  File "/Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/templates/core/dashboard.html", line 1, in top-level template code
-    {% extends "base.html" %}
-  File "/Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/templates/base.html", line 131, in top-level template code
-    <a class="nav-link" href="{{ url_for('project.list') }}">
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1697, in url_for
-    return self.handle_url_build_error(error, endpoint, values)
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1686, in url_for
-    rv = url_adapter.build(  # type: ignore[union-attr]
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/werkzeug/routing/map.py", line 950, in build
-    raise BuildError(endpoint, values, method, self)
-werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'project.list'. Did you mean 'project.list_projects' instead?
-2025-06-08 22:25:10,000 ERROR: Server Error: 500 Internal Server Error: The server encountered an internal error and was unable to complete your request. Either the server is overloaded or there is an error in the application. [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:93]
-2025-06-08 22:30:05,643 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
-2025-06-08 22:30:19,051 ERROR: Exception on / [GET] [in /Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py:1414]
-Traceback (most recent call last):
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 2190, in wsgi_app
-    response = self.full_dispatch_request()
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1486, in full_dispatch_request
-    rv = self.handle_user_exception(e)
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request
-    rv = self.dispatch_request()
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request
-    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask_login/utils.py", line 290, in decorated_view
-    return current_app.ensure_sync(func)(*args, **kwargs)
-  File "/Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/core/routes.py", line 14, in dashboard
-    return render_template('core/dashboard.html')
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/templating.py", line 151, in render_template
-    return _render(app, template, context)
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/templating.py", line 132, in _render
-    rv = template.render(context)
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/jinja2/environment.py", line 1295, in render
-    self.environment.handle_exception()
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/jinja2/environment.py", line 942, in handle_exception
-    raise rewrite_traceback_stack(source=source)
-  File "/Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/templates/core/dashboard.html", line 1, in top-level template code
-    {% extends "base.html" %}
-  File "/Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/templates/base.html", line 144, in top-level template code
-    {% block content %}{% endblock %}
-  File "/Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/templates/core/dashboard.html", line 101, in block 'content'
-    <a href="{{ url_for('project.list') }}" class="btn btn-primary">View All Projects</a>
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1697, in url_for
-    return self.handle_url_build_error(error, endpoint, values)
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1686, in url_for
-    rv = url_adapter.build(  # type: ignore[union-attr]
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/werkzeug/routing/map.py", line 950, in build
-    raise BuildError(endpoint, values, method, self)
-werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'project.list'. Did you mean 'project.list_projects' instead?
-2025-06-08 22:30:19,057 ERROR: Server Error: 500 Internal Server Error: The server encountered an internal error and was unable to complete your request. Either the server is overloaded or there is an error in the application. [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:93]
-2025-06-08 22:30:27,289 ERROR: Exception on /dashboard [GET] [in /Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py:1414]
-Traceback (most recent call last):
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 2190, in wsgi_app
-    response = self.full_dispatch_request()
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1486, in full_dispatch_request
-    rv = self.handle_user_exception(e)
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request
-    rv = self.dispatch_request()
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request
-    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask_login/utils.py", line 290, in decorated_view
-    return current_app.ensure_sync(func)(*args, **kwargs)
-  File "/Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/core/routes.py", line 14, in dashboard
-    return render_template('core/dashboard.html')
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/templating.py", line 151, in render_template
-    return _render(app, template, context)
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/templating.py", line 132, in _render
-    rv = template.render(context)
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/jinja2/environment.py", line 1295, in render
-    self.environment.handle_exception()
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/jinja2/environment.py", line 942, in handle_exception
-    raise rewrite_traceback_stack(source=source)
-  File "/Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/templates/core/dashboard.html", line 1, in top-level template code
-    {% extends "base.html" %}
-  File "/Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/templates/base.html", line 144, in top-level template code
-    {% block content %}{% endblock %}
-  File "/Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/templates/core/dashboard.html", line 101, in block 'content'
-    <a href="{{ url_for('project.list') }}" class="btn btn-primary">View All Projects</a>
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1697, in url_for
-    return self.handle_url_build_error(error, endpoint, values)
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1686, in url_for
-    rv = url_adapter.build(  # type: ignore[union-attr]
-  File "/Users/deveshmalu/Library/Python/3.9/lib/python/site-packages/werkzeug/routing/map.py", line 950, in build
-    raise BuildError(endpoint, values, method, self)
-werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'project.list'. Did you mean 'project.list_projects' instead?
-2025-06-08 22:30:27,294 ERROR: Server Error: 500 Internal Server Error: The server encountered an internal error and was unable to complete your request. Either the server is overloaded or there is an error in the application. [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:93]
-2025-06-08 22:32:46,540 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 10:41:56,844 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 10:41:56,939 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:172]
+2025-06-14 10:51:09,622 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 10:51:09,733 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:172]
+2025-06-14 10:55:26,423 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 11:05:44,956 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 11:06:20,766 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 11:06:20,890 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:172]
+2025-06-14 11:06:26,070 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 11:06:26,332 INFO: Admin user created successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:145]
+2025-06-14 11:06:26,336 INFO: Admin employee created and linked successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:170]
+2025-06-14 11:06:26,336 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:172]
+2025-06-14 11:06:30,993 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 11:06:31,095 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:172]
+2025-06-14 11:06:41,808 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 11:06:41,906 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:172]
+2025-06-14 11:07:01,884 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 11:07:01,992 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:172]
+2025-06-14 11:07:07,959 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 11:07:08,248 INFO: Admin user created successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:145]
+2025-06-14 11:07:08,250 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:172]
+2025-06-14 11:07:26,869 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 11:07:54,567 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 11:07:54,676 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:172]
+2025-06-14 11:07:54,981 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 11:07:55,260 INFO: Admin user created successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:145]
+2025-06-14 11:07:55,262 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:172]
+2025-06-14 11:08:44,933 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 11:08:45,034 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:172]
+2025-06-14 11:08:45,327 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 11:08:45,424 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:172]
+2025-06-14 11:11:02,046 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 11:11:02,151 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:172]
+2025-06-14 11:11:02,365 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 11:11:02,461 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:172]
+2025-06-14 11:12:01,917 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 11:12:02,014 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:172]
+2025-06-14 11:12:14,593 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 11:12:14,698 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:172]
+2025-06-14 11:26:58,014 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 11:26:58,124 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:172]
+2025-06-14 11:27:38,931 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 11:27:39,177 INFO: Admin user created successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:145]
+2025-06-14 11:27:39,182 INFO: Admin employee created and linked successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:170]
+2025-06-14 11:27:39,182 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:172]
+2025-06-14 11:27:39,399 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 11:27:39,497 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:172]
+2025-06-14 11:29:21,630 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 11:29:21,738 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:172]
+2025-06-14 11:29:34,377 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 11:29:34,490 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:172]
+2025-06-14 11:31:16,658 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 11:31:16,765 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:172]
+2025-06-14 11:31:17,051 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 11:31:17,302 INFO: Admin user created successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:145]
+2025-06-14 11:31:17,304 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:172]
+2025-06-14 11:31:29,152 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 11:31:29,252 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:172]
+2025-06-14 11:31:31,704 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 11:31:31,806 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:172]
+2025-06-14 11:31:37,022 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 11:31:37,128 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:172]
+2025-06-14 11:31:37,437 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 11:31:37,543 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:172]
+2025-06-14 11:31:47,449 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 11:31:47,543 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:172]
+2025-06-14 11:32:05,900 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 11:32:06,017 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:172]
+2025-06-14 11:32:06,322 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 11:32:06,427 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:172]
+2025-06-14 11:32:17,596 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 11:32:17,706 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:172]
+2025-06-14 11:32:29,122 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 11:32:29,230 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:172]
+2025-06-14 11:32:29,529 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]
+2025-06-14 11:32:29,632 INFO: Database initialization completed successfully [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/__init__.py:172]
+2025-06-14 11:32:42,606 INFO: Application startup [in /Users/deveshmalu/HRMSV3/HRMSV3_optimized/app/utils/logger.py:55]

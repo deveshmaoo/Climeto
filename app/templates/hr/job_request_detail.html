@@ -1,0 +1,363 @@
+{% extends "base.html" %}
+
+{% block title %}Job Request Details - HR{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-clipboard-list text-primary"></i> Job Request Details</h2>
+                <div>
+                    <a href="{{ url_for('hr.job_requests') }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to Job Requests
+                    </a>
+                    {% if (current_user.has_role('HR') or current_user.has_role('Admin')) and job_request.status == 'Approved' and not job_request.job_posting_id %}
+                    <a href="{{ url_for('hr.create_posting_from_request', request_id=job_request.id) }}" class="btn btn-success">
+                        <i class="fas fa-plus"></i> Create Job Posting
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Main Content -->
+                <div class="col-lg-8">
+                    <!-- Request Overview -->
+                    <div class="card shadow mb-4">
+                        <div class="card-header">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">{{ job_request.title }}</h5>
+                                <span class="badge badge-lg badge-{{ 
+                                    'warning' if job_request.status == 'Pending' else
+                                    'success' if job_request.status == 'Approved' else
+                                    'info' if job_request.status == 'In Review' else
+                                    'danger' if job_request.status == 'Rejected' else 'secondary'
+                                }}">
+                                    {{ job_request.status }}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <strong>Department:</strong>
+                                        <span class="badge badge-secondary">{{ job_request.department }}</span>
+                                    </div>
+                                    <div class="mb-3">
+                                        <strong>Employment Type:</strong>
+                                        <span class="badge badge-info">{{ job_request.employment_type }}</span>
+                                    </div>
+                                    <div class="mb-3">
+                                        <strong>Number of Openings:</strong>
+                                        <span class="badge badge-primary">{{ job_request.openings }}</span>
+                                    </div>
+                                    <div class="mb-3">
+                                        <strong>Urgency Level:</strong>
+                                        <span class="badge badge-{{ 'danger' if job_request.urgency == 'High' else 'warning' if job_request.urgency == 'Medium' else 'info' }}">
+                                            {{ job_request.urgency }}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <strong>Budget Range:</strong>
+                                        {% if job_request.budget_min and job_request.budget_max %}
+                                            <div class="text-success">
+                                                ${{ "{:,.0f}".format(job_request.budget_min) }} - ${{ "{:,.0f}".format(job_request.budget_max) }}
+                                            </div>
+                                        {% elif job_request.budget_min %}
+                                            <div class="text-success">From ${{ "{:,.0f}".format(job_request.budget_min) }}</div>
+                                        {% elif job_request.budget_max %}
+                                            <div class="text-success">Up to ${{ "{:,.0f}".format(job_request.budget_max) }}</div>
+                                        {% else %}
+                                            <span class="text-muted">Not specified</span>
+                                        {% endif %}
+                                    </div>
+                                    <div class="mb-3">
+                                        <strong>Location:</strong>
+                                        <div>{{ job_request.location or 'Not specified' }}</div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <strong>Expected Start Date:</strong>
+                                        <div>{{ job_request.expected_start_date.strftime('%Y-%m-%d') if job_request.expected_start_date else 'Not specified' }}</div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <strong>Application Deadline:</strong>
+                                        <div>{{ job_request.application_deadline.strftime('%Y-%m-%d') if job_request.application_deadline else 'Not specified' }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Job Description -->
+                    <div class="card shadow mb-4">
+                        <div class="card-header">
+                            <h6 class="mb-0">Job Description</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-4">
+                                {{ job_request.description | replace('\n', '<br>') | safe }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Requirements -->
+                    <div class="card shadow mb-4">
+                        <div class="card-header">
+                            <h6 class="mb-0">Requirements & Qualifications</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-4">
+                                {{ job_request.requirements | replace('\n', '<br>') | safe }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Business Justification -->
+                    <div class="card shadow mb-4">
+                        <div class="card-header">
+                            <h6 class="mb-0">Business Justification</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-4">
+                                {{ job_request.justification | replace('\n', '<br>') | safe }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Approval Actions -->
+                    {% if (current_user.has_role('Management') or current_user.has_role('General Manager') or current_user.has_role('Admin')) and job_request.status == 'Pending' %}
+                    <div class="card shadow mb-4">
+                        <div class="card-header">
+                            <h6 class="mb-0">Approval Actions</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <form method="POST" action="{{ url_for('hr.approve_job_request', request_id=job_request.id) }}">
+                                        <div class="mb-3">
+                                            <label for="approval_notes" class="form-label">Approval Notes (Optional)</label>
+                                            <textarea class="form-control" id="approval_notes" name="approval_notes" rows="3"
+                                                      placeholder="Add any notes or conditions for this approval..."></textarea>
+                                        </div>
+                                        <button type="submit" class="btn btn-success">
+                                            <i class="fas fa-check"></i> Approve Request
+                                        </button>
+                                    </form>
+                                </div>
+                                <div class="col-md-6">
+                                    <form method="POST" action="{{ url_for('hr.reject_job_request', request_id=job_request.id) }}">
+                                        <div class="mb-3">
+                                            <label for="rejection_reason" class="form-label">Rejection Reason <span class="text-danger">*</span></label>
+                                            <textarea class="form-control" id="rejection_reason" name="rejection_reason" rows="3" required
+                                                      placeholder="Please provide a reason for rejecting this request..."></textarea>
+                                        </div>
+                                        <button type="submit" class="btn btn-danger">
+                                            <i class="fas fa-times"></i> Reject Request
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Approval History -->
+                    {% if job_request.status != 'Pending' %}
+                    <div class="card shadow mb-4">
+                        <div class="card-header">
+                            <h6 class="mb-0">Approval History</h6>
+                        </div>
+                        <div class="card-body">
+                            {% if job_request.approved_by %}
+                            <div class="d-flex align-items-start mb-3">
+                                <div class="icon-circle bg-{{ 'success' if job_request.status == 'Approved' else 'danger' }} mr-3">
+                                    <i class="fas fa-{{ 'check' if job_request.status == 'Approved' else 'times' }} text-white"></i>
+                                </div>
+                                <div>
+                                    <div class="font-weight-bold">
+                                        {{ job_request.status }} by {{ job_request.approver.full_name }}
+                                    </div>
+                                    <div class="small text-muted">
+                                        {{ job_request.approval_date.strftime('%Y-%m-%d %H:%M') if job_request.approval_date else 'N/A' }}
+                                    </div>
+                                    {% if job_request.approval_notes %}
+                                    <div class="mt-2">
+                                        <strong>Notes:</strong> {{ job_request.approval_notes }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- HR Notes -->
+                    {% if job_request.hr_notes and (current_user.has_role('HR') or current_user.has_role('Admin')) %}
+                    <div class="card shadow mb-4">
+                        <div class="card-header">
+                            <h6 class="mb-0">HR Notes</h6>
+                        </div>
+                        <div class="card-body">
+                            {{ job_request.hr_notes | replace('\n', '<br>') | safe }}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Sidebar -->
+                <div class="col-lg-4">
+                    <!-- Request Information -->
+                    <div class="card shadow mb-4">
+                        <div class="card-header">
+                            <h6 class="mb-0">Request Information</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <strong>Requested By:</strong>
+                                <div>{{ job_request.requester.full_name }}</div>
+                                <small class="text-muted">{{ job_request.requester.designation or 'N/A' }}</small>
+                            </div>
+                            <div class="mb-3">
+                                <strong>Request Date:</strong>
+                                <div>{{ job_request.request_date.strftime('%Y-%m-%d %H:%M') }}</div>
+                            </div>
+                            {% if job_request.hr_assigned_to %}
+                            <div class="mb-3">
+                                <strong>HR Assigned:</strong>
+                                <div>{{ job_request.hr_assignee.full_name }}</div>
+                            </div>
+                            {% endif %}
+                            {% if job_request.job_posting_id %}
+                            <div class="mb-3">
+                                <strong>Job Posting:</strong>
+                                <div>
+                                    <a href="{{ url_for('hr.job_postings') }}" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-external-link-alt"></i> View Job Posting
+                                    </a>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Status Timeline -->
+                    <div class="card shadow mb-4">
+                        <div class="card-header">
+                            <h6 class="mb-0">Status Timeline</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="timeline">
+                                <div class="timeline-item">
+                                    <div class="timeline-marker bg-primary"></div>
+                                    <div class="timeline-content">
+                                        <div class="font-weight-bold">Request Submitted</div>
+                                        <div class="small text-muted">{{ job_request.request_date.strftime('%Y-%m-%d %H:%M') }}</div>
+                                    </div>
+                                </div>
+                                
+                                {% if job_request.status != 'Pending' %}
+                                <div class="timeline-item">
+                                    <div class="timeline-marker bg-{{ 'success' if job_request.status == 'Approved' else 'danger' }}"></div>
+                                    <div class="timeline-content">
+                                        <div class="font-weight-bold">{{ job_request.status }}</div>
+                                        <div class="small text-muted">
+                                            {{ job_request.approval_date.strftime('%Y-%m-%d %H:%M') if job_request.approval_date else 'N/A' }}
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                
+                                {% if job_request.job_posting_id %}
+                                <div class="timeline-item">
+                                    <div class="timeline-marker bg-info"></div>
+                                    <div class="timeline-content">
+                                        <div class="font-weight-bold">Job Posted</div>
+                                        <div class="small text-muted">HR created job posting</div>
+                                    </div>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    {% if current_user.has_role('HR') or current_user.has_role('Admin') %}
+                    <div class="card shadow">
+                        <div class="card-header">
+                            <h6 class="mb-0">Quick Actions</h6>
+                        </div>
+                        <div class="card-body">
+                            {% if job_request.status == 'Approved' and not job_request.job_posting_id %}
+                            <a href="{{ url_for('hr.create_posting_from_request', request_id=job_request.id) }}" 
+                               class="btn btn-success btn-block mb-2">
+                                <i class="fas fa-plus"></i> Create Job Posting
+                            </a>
+                            {% endif %}
+                            
+                            <a href="{{ url_for('hr.job_postings') }}" class="btn btn-outline-primary btn-block mb-2">
+                                <i class="fas fa-briefcase"></i> View All Job Postings
+                            </a>
+                            
+                            <a href="{{ url_for('hr.job_applications') }}" class="btn btn-outline-info btn-block">
+                                <i class="fas fa-file-alt"></i> View Applications
+                            </a>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.timeline {
+    position: relative;
+    padding-left: 30px;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 15px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: #e3e6f0;
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.timeline-marker {
+    position: absolute;
+    left: -22px;
+    top: 5px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    box-shadow: 0 0 0 2px #e3e6f0;
+}
+
+.timeline-content {
+    padding-left: 10px;
+}
+
+.icon-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+</style>
+{% endblock %} 

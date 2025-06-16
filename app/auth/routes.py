@@ -84,12 +84,14 @@ def create_user():
             # Create associated employee record
             employee = Employee(
                 user_id=user.id,
+                email=form.email.data,
                 employee_id=f"EMP{user.id:04d}",
                 first_name=form.first_name.data,
                 last_name=form.last_name.data,
                 work_email=form.email.data,
                 department=form.department.data,
                 designation=form.position.data,
+                role=user.role.name,
                 joining_date=datetime.utcnow().date()
             )
             

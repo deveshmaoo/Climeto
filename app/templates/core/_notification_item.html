@@ -1,0 +1,99 @@
+<!-- Notification Item Template -->
+<div class="notification-item {{ 'notification-unread' if not notification.is_read else 'notification-read' }} p-3 border-bottom" 
+     data-notification-id="{{ notification.id }}"
+     onclick="markNotificationAsRead({{ notification.id }})">
+    <div class="d-flex align-items-start">
+        <!-- Notification Icon -->
+        <div class="notification-icon bg-light {{ notification.color_class }}">
+            <i class="{{ notification.icon_class }}"></i>
+        </div>
+        
+        <!-- Notification Content -->
+        <div class="flex-grow-1">
+            <div class="d-flex justify-content-between align-items-start mb-1">
+                <h6 class="mb-1 {{ 'font-weight-bold' if not notification.is_read else '' }}">
+                    {{ notification.title }}
+                    {% if not notification.is_read %}
+                    <span class="badge badge-warning badge-sm ms-2">New</span>
+                    {% endif %}
+                </h6>
+                <small class="notification-time">{{ notification.time_ago }}</small>
+            </div>
+            
+            <p class="mb-1 text-muted">{{ notification.message }}</p>
+            
+            <!-- Additional Context -->
+            {% if notification.mention_context %}
+            <div class="mt-2 p-2 bg-light rounded">
+                <small class="text-muted">
+                    <i class="fas fa-quote-left"></i>
+                    {{ notification.mention_context[:100] }}{% if notification.mention_context|length > 100 %}...{% endif %}
+                </small>
+            </div>
+            {% endif %}
+            
+            <!-- Notification Type Badge -->
+            <div class="mt-2">
+                <span class="badge badge-{{ 
+                    'primary' if notification.notification_type == 'mention' else
+                    'info' if notification.notification_type == 'meeting' else
+                    'success' if notification.notification_type == 'task' else
+                    'warning' if notification.notification_type == 'reminder' else
+                    'secondary'
+                }} badge-sm">
+                    {{ notification.notification_type.title() }}
+                </span>
+                
+                {% if notification.priority in ['high', 'urgent'] %}
+                <span class="badge badge-{{ 'danger' if notification.priority == 'urgent' else 'warning' }} badge-sm ms-1">
+                    {{ notification.priority.title() }} Priority
+                </span>
+                {% endif %}
+                
+                {% if notification.mentioned_by %}
+                <span class="badge badge-outline-secondary badge-sm ms-1">
+                    by {{ notification.mentioned_by.full_name }}
+                </span>
+                {% endif %}
+            </div>
+            
+            <!-- Action Buttons -->
+            {% if notification.related_entity_type and notification.related_entity_id %}
+            <div class="mt-2">
+                {% if notification.related_entity_type == 'project' %}
+                <a href="{{ url_for('project.view_project', id=notification.related_entity_id) }}" 
+                   class="btn btn-outline-primary btn-sm" onclick="event.stopPropagation();">
+                    <i class="fas fa-external-link-alt"></i> View Project
+                </a>
+                {% elif notification.related_entity_type == 'task' %}
+                <a href="{{ url_for('project.view_task', id=notification.related_entity_id) }}" 
+                   class="btn btn-outline-primary btn-sm" onclick="event.stopPropagation();">
+                    <i class="fas fa-external-link-alt"></i> View Task
+                </a>
+                {% elif notification.related_entity_type == 'meeting' %}
+                <a href="{{ url_for('core.calendar') }}" 
+                   class="btn btn-outline-primary btn-sm" onclick="event.stopPropagation();">
+                    <i class="fas fa-calendar-alt"></i> View Calendar
+                </a>
+                {% elif notification.related_entity_type == 'chat' %}
+                <a href="{{ url_for('project.all_chats') }}" 
+                   class="btn btn-outline-primary btn-sm" onclick="event.stopPropagation();">
+                    <i class="fas fa-comments"></i> View Chat
+                </a>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- Mark as Read Button -->
+        {% if not notification.is_read %}
+        <div class="ms-2">
+            <button class="btn btn-outline-secondary btn-sm" 
+                    onclick="event.stopPropagation(); markNotificationAsRead({{ notification.id }})"
+                    title="Mark as read">
+                <i class="fas fa-check"></i>
+            </button>
+        </div>
+        {% endif %}
+    </div>
+</div> 
